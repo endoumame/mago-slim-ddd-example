@@ -1,0 +1,161 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": {
+    "MAX_THINKING_TOKENS": "32000",
+    "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR": "1"
+  },
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "permissions": {
+    "allow": [
+      "Skill",
+      "Bash(brew info:*)",
+      "Bash(brew list:*)",
+      "Bash(brew search:*)",
+      "Bash(brew services:*)",
+      "Bash(cat:*)",
+      "Bash(chezmoi diff:*)",
+      "Bash(chezmoi git log:*)",
+      "Bash(chezmoi git status:*)",
+      "Bash(chezmoi managed:*)",
+      "Bash(chezmoi source-path:*)",
+      "Bash(chezmoi status:*)",
+      "Bash(chezmoi update:*)",
+      "Bash(claude config --help:*)",
+      "Bash(claude mcp --help:*)",
+      "Bash(defaults read:*)",
+      "Bash(dig:*)",
+      "Bash(du:*)",
+      "Bash(find:*)",
+      "Bash(gh run list:*)",
+      "Bash(git init:*)",
+      "Bash(grep:*)",
+      "Bash(jq:*)",
+      "Bash(ls:*)",
+      "Bash(lsof:*)",
+      "Bash(node:*)",
+      "Bash(npm info:*)",
+      "Bash(npm init:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npm run format:*)",
+      "Bash(npm test)",
+      "Bash(npx biome check:*)",
+      "Bash(npx lefthook install)",
+      "Bash(npx oxfmt:*)",
+      "Bash(npx textlint:*)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(npx tsc:*)",
+      "Bash(npx tsx:*)",
+      "Bash(npx wrangler:*)",
+      "Bash(paste:*)",
+      "Bash(plutil:*)",
+      "Bash(ps:*)",
+      "Bash(sips:*)",
+      "Bash(sort:*)",
+      "Bash(tail:*)",
+      "Bash(tree:*)",
+      "Bash(whois:*)",
+      "Bash(wrangler --version:*)",
+      "Skill(frontend-design)",
+      "WebFetch(domain:api.github.com)",
+      "WebFetch(domain:apify.com)",
+      "WebFetch(domain:arxiv.org)",
+      "WebFetch(domain:cdn.jsdelivr.net)",
+      "WebFetch(domain:cdn.simpleicons.org)",
+      "WebFetch(domain:code.claude.com)",
+      "WebFetch(domain:cookbook.openai.com)",
+      "WebFetch(domain:developers.cloudflare.com)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "WebFetch(domain:docs.claude.com)",
+      "WebFetch(domain:docs.firecrawl.dev)",
+      "WebFetch(domain:empathyfirstmedia.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:icons.getbootstrap.com)",
+      "WebFetch(domain:lefthook.dev)",
+      "WebFetch(domain:medium.com)",
+      "WebFetch(domain:openai.com)",
+      "WebFetch(domain:platform.claude.com)",
+      "WebFetch(domain:platform.openai.com)",
+      "WebFetch(domain:pure.md)",
+      "WebFetch(domain:qiita.com)",
+      "WebFetch(domain:railway.com)",
+      "WebFetch(domain:rapidapi.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:sakana.ai)",
+      "WebFetch(domain:simpleicons.org)",
+      "WebFetch(domain:spider.cloud)",
+      "WebFetch(domain:supadata.ai)",
+      "WebFetch(domain:vercel.com)",
+      "WebFetch(domain:www.anthropic.com)",
+      "WebFetch(domain:www.firecrawl.dev)",
+      "WebFetch(domain:www.humanlayer.dev)",
+      "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:x.ai)",
+      "WebFetch(domain:zenn.dev)",
+      "WebSearch"
+    ],
+    "deny": [
+      "Bash(bash -c:*)",
+      "Bash(git commit --no-verify*)"
+    ],
+    "ask": [
+      "Bash(rm:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git rebase:*)",
+      "Bash(curl:*)",
+      "Bash(xargs:*)"
+    ]
+  },
+  "model": "opus",
+  "enableAllProjectMcpServers": true,
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "WebSearch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '⚠️ Web 検索時は必ず「2026」を含めること' >&2"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path' | grep -qE '(\\.env|\\.git/|package-lock\\.json|credentials|secrets)' && { echo '⚠️ 保護されたファイルへの編集はブロックされました' >&2; exit 2; } || exit 0"
+          }
+        ]
+      },
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.prompt' | grep -qiE '(sk-[a-zA-Z0-9]{20,}|xoxb-|ghp_|AKIA[A-Z0-9]{16})' && { echo '{\"decision\":\"block\",\"reason\":\"⚠️ API キーやトークンが含まれています。1Password などで管理してください。\"}'; exit 0; } || exit 0"
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "context7@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true,
+    "code-review@claude-plugins-official": true,
+    "commit-commands@claude-plugins-official": true,
+    "plugin-dev@claude-plugins-official": true,
+    "pr-review-toolkit@claude-plugins-official": true,
+  },
+  "outputStyle": "Explanatory",
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true
+  },
+  "alwaysThinkingEnabled": true
+}
