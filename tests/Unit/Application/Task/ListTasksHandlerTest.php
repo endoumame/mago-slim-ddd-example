@@ -1,0 +1,63 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Tests\Unit\Application\Task;
+
+use App\Application\Task\Command\ChangeTaskStatusCommand;
+use App\Application\Task\Command\CreateTaskCommand;
+use App\Application\Task\Handler\ChangeTaskStatusHandler;
+use App\Application\Task\Handler\CreateTaskHandler;
+use App\Application\Task\Handler\ListTasksHandler;
+use App\Application\Task\Query\ListTasksQuery;
+use App\Infrastructure\Persistence\InMemoryTaskRepository;
+use PHPUnit\Framework\TestCase;
+
+final class ListTasksHandlerTest extends TestCase
+{
+    private ListTasksHandler $handler;
+    private CreateTaskHandler $createHandler;
+    private ChangeTaskStatusHandler $statusHandler;
+
+    protected function setUp(): void
+    {
+        $repository = new InMemoryTaskRepository();
+        $this->handler = new ListTasksHandler($repository);
+        $this->createHandler = new CreateTaskHandler($repository);
+        $this->statusHandler = new ChangeTaskStatusHandler($repository);
+    }
+
+    public function testListEmptyReturnsEmptyArray(): void
+    {
+        $result = $this->handler->handle(new ListTasksQuery());
+
+        self::assertTrue($result->isSucceeded());
+        self::assertCount(0, $result->getResult());
+    }
+
+    public function testListAllTasks(): void
+    {
+        $this->createHandler->handle(new CreateTaskCommand(title: 'Task 1'));
+        $this->createHandler->handle(new CreateTaskCommand(title: 'Task 2'));
+        $this->createHandler->handle(new CreateTaskCommand(title: 'Task 3'));
+
+        $result = $this->handler->handle(new ListTasksQuery());
+
+        self::assertTrue($result->isSucceeded());
+        self::assertCount(3, $result->getResult());
+    }
+
+    public function testListFilteredByStatus(): void
+    {
+        $task1 = $this->createHandler->handle(new CreateTaskCommand(title: 'Task 1'))->getResult();
+        $this->createHandler->handle(new CreateTaskCommand(title: 'Task 2'));
+
+        $this->statusHandler->handle(new ChangeTaskStatusCommand(id: $task1->id->value(), status: 'in_progress'));
+
+        $result = $this->handler->handle(new ListTasksQuery(status: 'in_progress'));
+
+        self::assertTrue($result->isSucceeded());
+        self::assertCount(1, $result->getResult());
+        self::assertSame('Task 1', $result->getResult()[0]->title->value());
+    }
+}

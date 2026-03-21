@@ -1,0 +1,37 @@
+{
+    "name": "endoumame/task-management-backend",
+    "description": "Task management backend API with DDD, Railway-Oriented Programming, and Always Valid Domain Model",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.4",
+        "php-di/php-di": "^7.0",
+        "php-di/slim-bridge": "^3.4",
+        "php-standard-library/php-standard-library": "^6.1",
+        "ramsey/uuid": "^4.7",
+        "slim/psr7": "^1.7",
+        "slim/slim": "^4.15"
+    },
+    "require-dev": {
+        "carthage-software/mago": "^1.15",
+        "giorgiosironi/eris": "^1.0",
+        "phpunit/phpunit": "^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        },
+        "files": [
+            "src/Shared/Result/ResultFunctions.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "App\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    }
+}

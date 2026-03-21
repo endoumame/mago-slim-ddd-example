@@ -1,0 +1,318 @@
+openapi: 3.1.0
+info:
+  title: Task Management API
+  description: >
+    Task management backend API built with DDD, Railway-Oriented Programming,
+    and Always Valid Domain Model patterns.
+  version: 1.0.0
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+paths:
+  /api/tasks:
+    get:
+      summary: List all tasks
+      operationId: listTasks
+      tags:
+        - Tasks
+      parameters:
+        - name: status
+          in: query
+          required: false
+          description: Filter tasks by status
+          schema:
+            $ref: "#/components/schemas/TaskStatus"
+      responses:
+        "200":
+          description: List of tasks
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Task"
+
+    post:
+      summary: Create a new task
+      operationId: createTask
+      tags:
+        - Tasks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTaskRequest"
+      responses:
+        "201":
+          description: Task created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskResponse"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/tasks/{id}:
+    get:
+      summary: Get a task by ID
+      operationId: getTask
+      tags:
+        - Tasks
+      parameters:
+        - $ref: "#/components/parameters/TaskId"
+      responses:
+        "200":
+          description: Task found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskResponse"
+        "404":
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Invalid task ID format
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    put:
+      summary: Update a task
+      operationId: updateTask
+      tags:
+        - Tasks
+      parameters:
+        - $ref: "#/components/parameters/TaskId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTaskRequest"
+      responses:
+        "200":
+          description: Task updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskResponse"
+        "404":
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    delete:
+      summary: Delete a task
+      operationId: deleteTask
+      tags:
+        - Tasks
+      parameters:
+        - $ref: "#/components/parameters/TaskId"
+      responses:
+        "204":
+          description: Task deleted successfully
+        "404":
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/tasks/{id}/status:
+    patch:
+      summary: Change task status
+      operationId: changeTaskStatus
+      description: >
+        Change the status of a task. Only forward transitions are allowed:
+        Todo → InProgress → Done. No reverse transitions.
+      tags:
+        - Tasks
+      parameters:
+        - $ref: "#/components/parameters/TaskId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangeStatusRequest"
+      responses:
+        "200":
+          description: Status changed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskResponse"
+        "404":
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Invalid status transition
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  parameters:
+    TaskId:
+      name: id
+      in: path
+      required: true
+      description: Task UUID
+      schema:
+        type: string
+        format: uuid
+        example: "550e8400-e29b-41d4-a716-446655440000"
+
+  schemas:
+    TaskStatus:
+      type: string
+      enum:
+        - todo
+        - in_progress
+        - done
+
+    Task:
+      type: object
+      required:
+        - id
+        - title
+        - description
+        - status
+        - due_date
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        title:
+          type: string
+          minLength: 1
+          maxLength: 255
+          example: "Buy groceries"
+        description:
+          type: string
+          maxLength: 1000
+          example: "Milk, eggs, bread"
+        status:
+          $ref: "#/components/schemas/TaskStatus"
+        due_date:
+          type: string
+          format: date
+          nullable: true
+          example: "2026-04-01"
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-03-21T10:00:00+00:00"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2026-03-21T10:00:00+00:00"
+
+    CreateTaskRequest:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 255
+          example: "Buy groceries"
+        description:
+          type: string
+          maxLength: 1000
+          default: ""
+          example: "Milk, eggs, bread"
+        due_date:
+          type: string
+          format: date
+          nullable: true
+          example: "2026-04-01"
+
+    UpdateTaskRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 255
+          example: "Updated title"
+        description:
+          type: string
+          maxLength: 1000
+          example: "Updated description"
+        due_date:
+          type: string
+          format: date
+          example: "2026-04-15"
+
+    ChangeStatusRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          $ref: "#/components/schemas/TaskStatus"
+
+    TaskResponse:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          $ref: "#/components/schemas/Task"
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: object
+          required:
+            - type
+            - message
+          properties:
+            type:
+              type: string
+              enum:
+                - validation_error
+                - not_found
+                - internal_error
+              example: "validation_error"
+            message:
+              type: string
+              example: "Task title must not be empty."
