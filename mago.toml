@@ -1,0 +1,32 @@
+[source]
+paths = ["src", "tests", "config", "public"]
+excludes = ["vendor"]
+
+[linter]
+minimum-fail-level = "note"
+
+[linter.rules]
+too-many-methods = { threshold = 20, exclude = ["tests/"] }
+excessive-parameter-list = { threshold = 7 }
+no-isset = { enabled = false }
+literal-named-argument = { enabled = false }
+
+[analyzer]
+find-unused-expressions = true
+find-unused-definitions = true
+analyze-dead-code = true
+check-throws = true
+check-missing-override = true
+find-unused-parameters = true
+check-missing-type-hints = true
+check-closure-missing-type-hints = true
+check-arrow-function-missing-type-hints = true
+enforce-class-finality = true
+require-api-or-internal = false
+strict-list-index-checks = true
+no-boolean-literal-comparison = true
+allow-possibly-undefined-array-keys = false
+trust-existence-checks = false
+
+[formatter]
+excludes = ["public/index.php", "tests/Integration/Infrastructure/Http/TaskEndpointTest.php"]
