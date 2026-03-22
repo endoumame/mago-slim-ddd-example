@@ -55,6 +55,7 @@ final readonly class TaskController
 
     /**
      * @throws \Throwable
+     *
      */
     public function get(ServerRequestInterface $request, ResponseInterface $response, string $id): ResponseInterface
     {
@@ -80,12 +81,17 @@ final readonly class TaskController
         $tasks = $result->getResult();
 
         return $this->jsonResponse([
-            'data' => Vec\map($tasks, static fn(Task $task): array => $task->toArray()),
+            'data' => Vec\map(
+                $tasks,
+                /** @return array<string, mixed> */
+                static fn(Task $task): array => $task->toArray(),
+            ),
         ]);
     }
 
     /**
      * @throws \Throwable
+     *
      */
     public function update(ServerRequestInterface $request, ResponseInterface $response, string $id): ResponseInterface
     {
@@ -104,6 +110,7 @@ final readonly class TaskController
 
     /**
      * @throws \Throwable
+     *
      */
     public function delete(ServerRequestInterface $request, ResponseInterface $response, string $id): ResponseInterface
     {
@@ -119,6 +126,7 @@ final readonly class TaskController
 
     /**
      * @throws \Throwable
+     *
      */
     public function changeStatus(
         ServerRequestInterface $request,
@@ -189,7 +197,8 @@ final readonly class TaskController
         $response = $response->withHeader('Content-Type', 'application/json');
 
         if ($statusCode !== 204) {
-            $response->getBody()->write(json_encode($data, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE));
+            $json = json_encode($data, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
+            $response->getBody()->write($json);
         }
 
         return $response;

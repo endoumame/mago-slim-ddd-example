@@ -29,6 +29,7 @@ use function App\Shared\Result\succeed;
 function ok_or(Option $option, Throwable $error): ResultInterface
 {
     return $option->proceed(
+        /** @param T $value */
         static fn(mixed $value): ResultInterface => succeed($value),
         static fn(): ResultInterface => fail($error),
     );
@@ -51,6 +52,7 @@ function ok_or(Option $option, Throwable $error): ResultInterface
 function traverse(Option $option, Closure $fn): ResultInterface
 {
     return $option->proceed(
+        /** @param T $value */
         static fn(mixed $value): ResultInterface => $fn($value),
         static fn(): ResultInterface => succeed(null),
     );
@@ -75,10 +77,46 @@ function traverse(Option $option, Closure $fn): ResultInterface
  *
  * @return (Closure(ResultInterface<V>): ResultInterface<V|W>)
  */
+/**
+ * Curried form of ok_or for use with the pipeline operator (|>).
+ *
+ * Usage: $nullable |> from_nullable(...) |> ok_or_err($error)
+ *
+ * @template T
+ *
+ * @return (Closure(Option<T>): ResultInterface<T>)
+ */
+function ok_or_err(Throwable $error): Closure
+{
+    return static fn(Option $option): ResultInterface => ok_or($option, $error);
+}
+
+/**
+ * Curried form of traverse for use with the pipeline operator (|>).
+ *
+ * Usage: $nullable |> from_nullable(...) |> traverse_with(DueDate::create(...))
+ *
+ * @template T
+ * @template U
+ *
+ * @param (Closure(T): ResultInterface<U>) $fn
+ *
+ * @return (Closure(Option<T>): ResultInterface<U|null>)
+ */
+function traverse_with(Closure $fn): Closure
+{
+    return static fn(Option $option): ResultInterface => traverse($option, $fn);
+}
+
 function apply_if_some(Option $option, Closure $fn): Closure
 {
     return $option->proceed(
-        static fn(mixed $value): Closure => bind($fn($value)),
+        static function (mixed $value) use ($fn): Closure {
+            /** @var Closure(mixed): ResultInterface<mixed> $binding */
+            $binding = $fn($value);
+
+            return bind($binding);
+        },
         static fn(): Closure => static fn(ResultInterface $result): ResultInterface => $result,
     );
 }

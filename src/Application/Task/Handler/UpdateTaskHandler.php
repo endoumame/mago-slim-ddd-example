@@ -41,7 +41,8 @@ final readonly class UpdateTaskHandler
      */
     private function applyChanges(Task $task, UpdateTaskCommand $command): ResultInterface
     {
-        return succeed($task)
+        /** @var ResultInterface<Task> $result */
+        $result = succeed($task)
             |> apply_if_some(
                 from_nullable($command->title),
                 static fn(string $title): \Closure => static fn(Task $t): ResultInterface => TaskTitle::create($title)
@@ -58,7 +59,8 @@ final readonly class UpdateTaskHandler
                 from_nullable($command->dueDate),
                 static fn(string $date): \Closure => static fn(Task $t): ResultInterface => DueDate::create($date)
                     |> bind($t->changeDueDate(...)),
-            )
-            |> bind(fn(Task $t): ResultInterface => $this->repository->save($t));
+            );
+
+        return $result |> bind(fn(Task $t): ResultInterface => $this->repository->save($t));
     }
 }

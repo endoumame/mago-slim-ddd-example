@@ -38,14 +38,11 @@ final class ErrorHandlerMiddleware implements MiddlewareInterface
         $response = new Response(500);
         $response = $response->withHeader('Content-Type', 'application/json');
 
-        $body = json_encode([
-            'error' => [
-                'type' => 'internal_error',
-                'message' => 'An unexpected error occurred.',
-            ],
-        ], JSON_THROW_ON_ERROR);
-
-        $response->getBody()->write($body);
+        $json = json_encode(['error' => [
+            'type' => 'internal_error',
+            'message' => 'An unexpected error occurred.',
+        ]], JSON_THROW_ON_ERROR);
+        $response->getBody()->write($json);
 
         return $response;
     }

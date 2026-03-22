@@ -7,7 +7,7 @@ namespace App\Domain\Task;
 use DateTimeImmutable;
 use Psl\Result\ResultInterface;
 
-use function App\Shared\Result\flat_map;
+use function App\Shared\Result\bind;
 use function App\Shared\Result\succeed;
 
 /**
@@ -116,9 +116,8 @@ final readonly class Task
      */
     public function changeStatus(TaskStatus $newStatus): ResultInterface
     {
-        return flat_map(
-            $this->status->transitionTo($newStatus),
-            fn(TaskStatus $validatedStatus): ResultInterface => succeed(
+        return $this->status->transitionTo($newStatus)
+            |> bind(fn(TaskStatus $validatedStatus): ResultInterface => succeed(
                 new self(
                     $this->id,
                     $this->title,
@@ -128,8 +127,7 @@ final readonly class Task
                     $this->createdAt,
                     new DateTimeImmutable(),
                 ),
-            ),
-        );
+            ));
     }
 
     /**
@@ -153,7 +151,7 @@ final readonly class Task
     /**
      * Serialize to an associative array for API responses.
      *
-     * @return array<string, mixed>
+     * @return array{id: string, title: string, description: string, status: string, due_date: string|null, created_at: string, updated_at: string}
      */
     public function toArray(): array
     {
