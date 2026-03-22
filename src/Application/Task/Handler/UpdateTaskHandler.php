@@ -13,7 +13,7 @@ use App\Domain\Task\TaskRepositoryInterface;
 use App\Domain\Task\TaskTitle;
 use Psl\Result\ResultInterface;
 
-use function App\Shared\Result\flat_map;
+use function App\Shared\Result\bind;
 use function App\Shared\Result\succeed;
 
 final readonly class UpdateTaskHandler
@@ -29,10 +29,9 @@ final readonly class UpdateTaskHandler
     {
         $idResult = TaskId::create($command->id);
 
-        return flat_map($idResult, fn(TaskId $id): ResultInterface => flat_map(
-            $this->repository->findById($id),
-            fn(Task $task): ResultInterface => $this->applyChanges($task, $command),
-        ));
+        return $idResult
+            |> bind(fn(TaskId $id): ResultInterface => $this->repository->findById($id))
+            |> bind(fn(Task $task): ResultInterface => $this->applyChanges($task, $command));
     }
 
     /**
@@ -43,26 +42,29 @@ final readonly class UpdateTaskHandler
         $result = succeed($task);
 
         if ($command->title !== null) {
-            $result = flat_map($result, static fn(Task $t): ResultInterface => flat_map(
-                TaskTitle::create($command->title),
-                $t->changeTitle(...),
-            ));
+            $result = $result
+                |> bind(
+                    static fn(Task $t): ResultInterface => TaskTitle::create($command->title)
+                        |> bind($t->changeTitle(...)),
+                );
         }
 
         if ($command->description !== null) {
-            $result = flat_map($result, static fn(Task $t): ResultInterface => flat_map(
-                TaskDescription::create($command->description),
-                $t->changeDescription(...),
-            ));
+            $result = $result
+                |> bind(
+                    static fn(Task $t): ResultInterface => TaskDescription::create($command->description)
+                        |> bind($t->changeDescription(...)),
+                );
         }
 
         if ($command->dueDate !== null) {
-            $result = flat_map($result, static fn(Task $t): ResultInterface => flat_map(
-                DueDate::create($command->dueDate),
-                $t->changeDueDate(...),
-            ));
+            $result = $result
+                |> bind(
+                    static fn(Task $t): ResultInterface => DueDate::create($command->dueDate)
+                        |> bind($t->changeDueDate(...)),
+                );
         }
 
-        return flat_map($result, fn(Task $t): ResultInterface => $this->repository->save($t));
+        return $result |> bind(fn(Task $t): ResultInterface => $this->repository->save($t));
     }
 }
