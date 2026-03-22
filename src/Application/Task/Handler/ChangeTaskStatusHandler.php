@@ -56,6 +56,7 @@ final readonly class ChangeTaskStatusHandler
      */
     private function transitionTo(Task $task, TaskStatus $targetStatus): ResultInterface
     {
+        /** @var ResultInterface<Task> */
         return match (true) {
             $task instanceof TodoTask && $targetStatus === TaskStatus::InProgress => $task->start(),
             $task instanceof InProgressTask && $targetStatus === TaskStatus::Done => $task->complete(),

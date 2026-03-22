@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\Task;
 
 use DateTimeImmutable;
+use Override;
 use Psl\Result\ResultInterface;
 
 use function App\Shared\Result\succeed;
@@ -71,6 +72,7 @@ final readonly class TodoTask extends Task
         ));
     }
 
+    #[Override]
     protected function rebuild(
         TaskTitle $title,
         TaskDescription $description,

@@ -20,6 +20,9 @@ final class TaskStatusTest extends TestCase
         yield 'done' => ['done', TaskStatus::Done];
     }
 
+    /**
+     * @throws \Throwable
+     */
     #[DataProvider('validStatusValuesProvider')]
     public function testValidStatusFromString(string $value, TaskStatus $expected): void
     {
@@ -27,6 +30,9 @@ final class TaskStatusTest extends TestCase
         self::assertSame($expected, $status);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testInvalidStatusFromString(): void
     {
         $status = TaskStatus::tryFrom('invalid');

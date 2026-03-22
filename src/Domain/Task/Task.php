@@ -21,6 +21,8 @@ use function App\Shared\Result\succeed;
  * Immutable: all mutation methods return a new Task instance.
  *
  * @psalm-immutable
+ *
+ * @api
  */
 abstract readonly class Task
 {

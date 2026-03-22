@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\Task;
 
 use DateTimeImmutable;
+use Override;
 
 /**
  * A Task in Done status. Terminal state — no further transitions are possible.
@@ -28,6 +29,7 @@ final readonly class DoneTask extends Task
         parent::__construct($id, $title, $description, TaskStatus::Done, $dueDate, $createdAt, $updatedAt);
     }
 
+    #[Override]
     protected function rebuild(
         TaskTitle $title,
         TaskDescription $description,
