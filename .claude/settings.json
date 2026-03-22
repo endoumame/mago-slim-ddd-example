@@ -118,6 +118,10 @@
           {
             "type": "command",
             "command": "cd \"$CLAUDE_PROJECT_DIR\" && vendor/bin/mago lint 2>&1 | tail -30"
+          },
+          {
+            "type": "command",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && vendor/bin/mago analyze 2>&1 | tail -30"
           }
         ]
       }
