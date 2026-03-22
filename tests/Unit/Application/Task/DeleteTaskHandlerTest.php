@@ -19,6 +19,10 @@ final class DeleteTaskHandlerTest extends TestCase
     private CreateTaskHandler $createHandler;
     private InMemoryTaskRepository $repository;
 
+    /**
+     * @throws \Throwable
+     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->repository = new InMemoryTaskRepository();
@@ -26,6 +30,9 @@ final class DeleteTaskHandlerTest extends TestCase
         $this->createHandler = new CreateTaskHandler($this->repository);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testDeleteExistingTaskSucceeds(): void
     {
         $task = $this->createHandler->handle(new CreateTaskCommand(title: 'To delete'))->getResult();
@@ -35,6 +42,9 @@ final class DeleteTaskHandlerTest extends TestCase
         self::assertTrue($result->isSucceeded());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testDeletedTaskIsNoLongerFound(): void
     {
         $task = $this->createHandler->handle(new CreateTaskCommand(title: 'To delete'))->getResult();
@@ -46,6 +56,9 @@ final class DeleteTaskHandlerTest extends TestCase
         self::assertInstanceOf(TaskNotFoundException::class, $findResult->getThrowable());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testDeleteNonExistentTaskFails(): void
     {
         $result = $this->handler->handle(new DeleteTaskCommand(id: Uuid::uuid4()->toString()));

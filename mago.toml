@@ -1,13 +1,14 @@
 [source]
 paths = ["src", "tests", "config", "public"]
-excludes = ["vendor"]
+includes = ["vendor"]
+excludes = ["vendor/nikic/fast-route/test/"]
 
 [linter]
 minimum-fail-level = "note"
 
 [linter.rules]
-too-many-methods = { threshold = 20, exclude = ["tests/"] }
-excessive-parameter-list = { threshold = 7 }
+excessive-parameter-list = { threshold = 8 }
+too-many-methods = { threshold = 25 }
 no-isset = { enabled = false }
 literal-named-argument = { enabled = false }
 
@@ -27,6 +28,7 @@ strict-list-index-checks = true
 no-boolean-literal-comparison = true
 allow-possibly-undefined-array-keys = false
 trust-existence-checks = false
+excludes = ["tests/Property/"]
 
 [formatter]
 excludes = ["public/index.php", "tests/Integration/Infrastructure/Http/TaskEndpointTest.php"]

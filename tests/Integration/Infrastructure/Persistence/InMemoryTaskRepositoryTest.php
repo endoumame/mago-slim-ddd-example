@@ -16,11 +16,15 @@ final class InMemoryTaskRepositoryTest extends TestCase
 {
     private InMemoryTaskRepository $repository;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->repository = new InMemoryTaskRepository();
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testSaveAndFindById(): void
     {
         $task = $this->createTask('Test task');
@@ -34,6 +38,9 @@ final class InMemoryTaskRepositoryTest extends TestCase
         self::assertSame('Test task', $findResult->getResult()->title->value());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testFindByIdNotFound(): void
     {
         $id = TaskId::generate();
@@ -44,6 +51,9 @@ final class InMemoryTaskRepositoryTest extends TestCase
         self::assertInstanceOf(TaskNotFoundException::class, $result->getThrowable());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testFindAllEmpty(): void
     {
         $result = $this->repository->findAll();
@@ -52,6 +62,9 @@ final class InMemoryTaskRepositoryTest extends TestCase
         self::assertCount(0, $result->getResult());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testFindAllWithTasks(): void
     {
         $this->repository->save($this->createTask('Task 1'));
@@ -64,6 +77,9 @@ final class InMemoryTaskRepositoryTest extends TestCase
         self::assertCount(3, $result->getResult());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testSaveUpdatesExistingTask(): void
     {
         $task = $this->createTask('Original');
@@ -79,6 +95,9 @@ final class InMemoryTaskRepositoryTest extends TestCase
         self::assertCount(1, $allResult->getResult());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testDelete(): void
     {
         $task = $this->createTask('To delete');
@@ -91,6 +110,9 @@ final class InMemoryTaskRepositoryTest extends TestCase
         self::assertTrue($findResult->isFailed());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testDeleteNonExistent(): void
     {
         $result = $this->repository->delete(TaskId::generate());
@@ -99,6 +121,9 @@ final class InMemoryTaskRepositoryTest extends TestCase
         self::assertInstanceOf(TaskNotFoundException::class, $result->getThrowable());
     }
 
+    /**
+     * @throws \Throwable
+     */
     private function createTask(string $titleStr): Task
     {
         $title = TaskTitle::create($titleStr)->getResult();

@@ -4,25 +4,36 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Http\Middleware;
 
+use Override;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Slim\Psr7\Response;
-use Throwable;
 
 final class ErrorHandlerMiddleware implements MiddlewareInterface
 {
+    /**
+     * @throws \JsonException
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
+     */
+    #[Override]
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         try {
             return $handler->handle($request);
-        } catch (Throwable $e) {
-            return $this->createErrorResponse($e);
+        } catch (\Throwable) {
+            return $this->createErrorResponse();
         }
     }
 
-    private function createErrorResponse(Throwable $e): ResponseInterface
+    /**
+     * @throws \JsonException
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
+     */
+    private function createErrorResponse(): ResponseInterface
     {
         $response = new Response(500);
         $response = $response->withHeader('Content-Type', 'application/json');

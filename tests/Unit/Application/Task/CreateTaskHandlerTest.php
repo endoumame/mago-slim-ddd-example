@@ -18,12 +18,19 @@ final class CreateTaskHandlerTest extends TestCase
     private CreateTaskHandler $handler;
     private InMemoryTaskRepository $repository;
 
+    /**
+     * @throws \Throwable
+     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->repository = new InMemoryTaskRepository();
         $this->handler = new CreateTaskHandler($this->repository);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testCreateTaskSucceeds(): void
     {
         $command = new CreateTaskCommand(title: 'Buy groceries');
@@ -40,6 +47,9 @@ final class CreateTaskHandlerTest extends TestCase
         self::assertNull($task->dueDate);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testCreateTaskWithDescriptionAndDueDate(): void
     {
         $futureDate = new \DateTimeImmutable('+7 days')->format('Y-m-d');
@@ -60,6 +70,9 @@ final class CreateTaskHandlerTest extends TestCase
         self::assertSame($futureDate, $task->dueDate->format());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testCreateTaskIsSavedToRepository(): void
     {
         $command = new CreateTaskCommand(title: 'Saved task');
@@ -71,6 +84,9 @@ final class CreateTaskHandlerTest extends TestCase
         self::assertSame($task->id->value(), $found->getResult()->id->value());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testCreateTaskWithEmptyTitleFails(): void
     {
         $command = new CreateTaskCommand(title: '');
@@ -81,6 +97,9 @@ final class CreateTaskHandlerTest extends TestCase
         self::assertInstanceOf(InvalidTaskTitleException::class, $result->getThrowable());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testCreateTaskWithInvalidDueDateFails(): void
     {
         $command = new CreateTaskCommand(title: 'Valid title', dueDate: 'not-a-date');

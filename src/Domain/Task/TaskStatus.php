@@ -22,7 +22,7 @@ enum TaskStatus: string
     /**
      * Validate a status transition. Only forward transitions are allowed.
      *
-     * @return ResultInterface<TaskStatus>
+     * @return ResultInterface<self>
      */
     public function transitionTo(self $next): ResultInterface
     {
@@ -33,6 +33,7 @@ enum TaskStatus: string
         };
 
         if (!$allowed) {
+            /** @var ResultInterface<self> */
             return fail(InvalidTaskStatusTransitionException::notAllowed($this, $next));
         }
 

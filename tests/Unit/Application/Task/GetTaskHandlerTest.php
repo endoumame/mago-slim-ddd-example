@@ -19,6 +19,10 @@ final class GetTaskHandlerTest extends TestCase
     private GetTaskHandler $handler;
     private CreateTaskHandler $createHandler;
 
+    /**
+     * @throws \Throwable
+     */
+    #[\Override]
     protected function setUp(): void
     {
         $repository = new InMemoryTaskRepository();
@@ -26,6 +30,9 @@ final class GetTaskHandlerTest extends TestCase
         $this->createHandler = new CreateTaskHandler($repository);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testGetExistingTask(): void
     {
         $task = $this->createHandler->handle(new CreateTaskCommand(title: 'Find me'))->getResult();
@@ -36,6 +43,9 @@ final class GetTaskHandlerTest extends TestCase
         self::assertSame('Find me', $result->getResult()->title->value());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testGetNonExistentTask(): void
     {
         $result = $this->handler->handle(new GetTaskQuery(id: Uuid::uuid4()->toString()));
@@ -44,6 +54,9 @@ final class GetTaskHandlerTest extends TestCase
         self::assertInstanceOf(TaskNotFoundException::class, $result->getThrowable());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testGetWithInvalidId(): void
     {
         $result = $this->handler->handle(new GetTaskQuery(id: 'not-a-uuid'));

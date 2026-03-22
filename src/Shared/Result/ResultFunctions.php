@@ -25,17 +25,16 @@ use Throwable;
  *
  * @template T
  * @template U
- * @template Te of Throwable
  *
- * @param ResultInterface<T> $result
  * @param (Closure(T): ResultInterface<U>) $fn
  *
  * @return ResultInterface<U>
+ *
+ * @throws Throwable
  */
 function flat_map(ResultInterface $result, Closure $fn): ResultInterface
 {
     if ($result->isFailed()) {
-        /** @var ResultInterface<U> */
         return $result;
     }
 
@@ -73,6 +72,8 @@ function bind(Closure $fn): Closure
  * @param (Closure(mixed): ResultInterface<mixed>) ...$fns
  *
  * @return ResultInterface<mixed>
+ *
+ * @throws Throwable
  */
 function pipeline(ResultInterface $initial, Closure ...$fns): ResultInterface
 {
@@ -92,9 +93,9 @@ function pipeline(ResultInterface $initial, Closure ...$fns): ResultInterface
  *
  * @param T $value
  *
- * @return ResultInterface<T>
+ * @return Success<T>
  */
-function succeed(mixed $value): ResultInterface
+function succeed(mixed $value): Success
 {
     return new Success($value);
 }
@@ -104,12 +105,9 @@ function succeed(mixed $value): ResultInterface
  *
  * @template T
  *
- * @param Throwable $error
- *
  * @return ResultInterface<T>
  */
 function fail(Throwable $error): ResultInterface
 {
-    /** @var ResultInterface<T> */
     return new Failure($error);
 }

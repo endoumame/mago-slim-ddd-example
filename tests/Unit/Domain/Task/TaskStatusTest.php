@@ -34,6 +34,9 @@ final class TaskStatusTest extends TestCase
         yield 'done to done' => [TaskStatus::Done, TaskStatus::Done];
     }
 
+    /**
+     * @throws \Throwable
+     */
     #[DataProvider('validTransitionsProvider')]
     public function testValidTransition(TaskStatus $from, TaskStatus $to): void
     {
@@ -43,6 +46,9 @@ final class TaskStatusTest extends TestCase
         self::assertSame($to, $result->getResult());
     }
 
+    /**
+     * @throws \Throwable
+     */
     #[DataProvider('invalidTransitionsProvider')]
     public function testInvalidTransition(TaskStatus $from, TaskStatus $to): void
     {

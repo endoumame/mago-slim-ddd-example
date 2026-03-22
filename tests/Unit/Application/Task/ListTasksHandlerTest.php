@@ -19,6 +19,10 @@ final class ListTasksHandlerTest extends TestCase
     private CreateTaskHandler $createHandler;
     private ChangeTaskStatusHandler $statusHandler;
 
+    /**
+     * @throws \Throwable
+     */
+    #[\Override]
     protected function setUp(): void
     {
         $repository = new InMemoryTaskRepository();
@@ -27,6 +31,9 @@ final class ListTasksHandlerTest extends TestCase
         $this->statusHandler = new ChangeTaskStatusHandler($repository);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testListEmptyReturnsEmptyArray(): void
     {
         $result = $this->handler->handle(new ListTasksQuery());
@@ -35,6 +42,9 @@ final class ListTasksHandlerTest extends TestCase
         self::assertCount(0, $result->getResult());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testListAllTasks(): void
     {
         $this->createHandler->handle(new CreateTaskCommand(title: 'Task 1'));
@@ -47,6 +57,9 @@ final class ListTasksHandlerTest extends TestCase
         self::assertCount(3, $result->getResult());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testListFilteredByStatus(): void
     {
         $task1 = $this->createHandler->handle(new CreateTaskCommand(title: 'Task 1'))->getResult();

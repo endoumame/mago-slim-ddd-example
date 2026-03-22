@@ -8,6 +8,7 @@ use App\Domain\Task\Exception\TaskNotFoundException;
 use App\Domain\Task\Task;
 use App\Domain\Task\TaskId;
 use App\Domain\Task\TaskRepositoryInterface;
+use Override;
 use Psl\Result\ResultInterface;
 use Psl\Vec;
 
@@ -22,11 +23,13 @@ final class InMemoryTaskRepository implements TaskRepositoryInterface
     /**
      * @return ResultInterface<Task>
      */
+    #[Override]
     public function findById(TaskId $id): ResultInterface
     {
         $key = $id->value();
 
         if (!isset($this->tasks[$key])) {
+            /** @var ResultInterface<Task> */
             return fail(TaskNotFoundException::withId($key));
         }
 
@@ -36,6 +39,7 @@ final class InMemoryTaskRepository implements TaskRepositoryInterface
     /**
      * @return ResultInterface<list<Task>>
      */
+    #[Override]
     public function findAll(): ResultInterface
     {
         return $this->tasks |> Vec\values(...) |> succeed(...);
@@ -44,6 +48,7 @@ final class InMemoryTaskRepository implements TaskRepositoryInterface
     /**
      * @return ResultInterface<Task>
      */
+    #[Override]
     public function save(Task $task): ResultInterface
     {
         $this->tasks[$task->id->value()] = $task;
@@ -54,11 +59,13 @@ final class InMemoryTaskRepository implements TaskRepositoryInterface
     /**
      * @return ResultInterface<true>
      */
+    #[Override]
     public function delete(TaskId $id): ResultInterface
     {
         $key = $id->value();
 
         if (!isset($this->tasks[$key])) {
+            /** @var ResultInterface<true> */
             return fail(TaskNotFoundException::withId($key));
         }
 

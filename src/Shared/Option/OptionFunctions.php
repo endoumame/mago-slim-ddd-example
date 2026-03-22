@@ -77,9 +77,8 @@ function traverse(Option $option, Closure $fn): ResultInterface
  */
 function apply_if_some(Option $option, Closure $fn): Closure
 {
-    if ($option->isNone()) {
-        return static fn(ResultInterface $result): ResultInterface => $result;
-    }
-
-    return bind($fn($option->unwrap()));
+    return $option->proceed(
+        static fn(mixed $value): Closure => bind($fn($value)),
+        static fn(): Closure => static fn(ResultInterface $result): ResultInterface => $result,
+    );
 }

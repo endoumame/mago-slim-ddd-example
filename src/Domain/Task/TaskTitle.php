@@ -26,17 +26,21 @@ final readonly class TaskTitle
      * Parse a string into a TaskTitle. Returns Failure for invalid values.
      *
      * @return ResultInterface<TaskTitle>
+     *
+     * @throws Str\Exception\InvalidArgumentException
      */
     public static function create(string $value): ResultInterface
     {
         $trimmed = Str\trim($value);
 
         if ($trimmed === '') {
+            /** @var ResultInterface<TaskTitle> */
             return fail(InvalidTaskTitleException::empty());
         }
 
         $length = Str\length($trimmed);
         if ($length > self::MAX_LENGTH) {
+            /** @var ResultInterface<TaskTitle> */
             return fail(InvalidTaskTitleException::tooLong($length));
         }
 

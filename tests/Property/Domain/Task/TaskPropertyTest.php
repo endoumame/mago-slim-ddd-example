@@ -21,6 +21,9 @@ final class TaskPropertyTest extends TestCase
 {
     use TestTrait;
 
+    /**
+     * @throws \Throwable
+     */
     public function testTaskAlwaysCreatedWithTodoStatus(): void
     {
         $this->forAll(suchThat(
@@ -37,6 +40,9 @@ final class TaskPropertyTest extends TestCase
         });
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testTaskSerializationRoundTrip(): void
     {
         $this->forAll(
@@ -47,6 +53,7 @@ final class TaskPropertyTest extends TestCase
             $description = TaskDescription::create($descStr)->getResult();
 
             $task = Task::create($title, $description)->getResult();
+            /** @var array{title: string, description: string, status: string, due_date: string|null} $array */
             $array = $task->toArray();
 
             self::assertSame(trim($titleStr), $array['title']);
@@ -56,6 +63,9 @@ final class TaskPropertyTest extends TestCase
         });
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testStatusTransitionChainTodoToInProgressToDone(): void
     {
         $this->forAll(map(
@@ -77,6 +87,9 @@ final class TaskPropertyTest extends TestCase
         });
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testImmutabilityPreservedAcrossMutations(): void
     {
         $this->forAll(
@@ -95,6 +108,9 @@ final class TaskPropertyTest extends TestCase
         });
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testNoReverseTransitionsAllowed(): void
     {
         $this->forAll(elements(
@@ -103,7 +119,10 @@ final class TaskPropertyTest extends TestCase
             [TaskStatus::Done, TaskStatus::Todo],
             [TaskStatus::Done, TaskStatus::InProgress],
         ))->then(static function (array $pair): void {
-            [$from, $to] = $pair;
+            /** @var TaskStatus $from */
+            $from = $pair[0];
+            /** @var TaskStatus $to */
+            $to = $pair[1];
             $result = $from->transitionTo($to);
             self::assertTrue($result->isFailed(), "Expected failure for {$from->value} -> {$to->value}");
         });

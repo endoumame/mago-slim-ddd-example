@@ -31,11 +31,13 @@ final readonly class DueDate
         $parsed = DateTimeImmutable::createFromFormat('Y-m-d', $value);
 
         if ($parsed === false || $parsed->format('Y-m-d') !== $value) {
+            /** @var ResultInterface<DueDate> */
             return fail(InvalidDueDateException::invalidFormat($value));
         }
 
         $today = new DateTimeImmutable('today');
         if ($parsed < $today) {
+            /** @var ResultInterface<DueDate> */
             return fail(InvalidDueDateException::inThePast($value));
         }
 

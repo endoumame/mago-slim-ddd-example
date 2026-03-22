@@ -28,6 +28,7 @@ final readonly class TaskId
     public static function create(string $value): ResultInterface
     {
         if (!Uuid::isValid($value)) {
+            /** @var ResultInterface<TaskId> */
             return fail(InvalidTaskIdException::invalidFormat($value));
         }
 

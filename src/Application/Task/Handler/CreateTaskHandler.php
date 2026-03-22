@@ -24,6 +24,8 @@ final readonly class CreateTaskHandler
 
     /**
      * @return ResultInterface<Task>
+     *
+     * @throws \Throwable
      */
     public function handle(CreateTaskCommand $command): ResultInterface
     {
@@ -40,9 +42,7 @@ final readonly class CreateTaskHandler
 
         return $dueDateResult
             |> bind(function (?DueDate $dueDate) use ($titleResult, $descriptionResult): ResultInterface {
-                /** @var TaskTitle $title */
                 $title = $titleResult->getResult();
-                /** @var TaskDescription $description */
                 $description = $descriptionResult->getResult();
 
                 return Task::create($title, $description, $dueDate)

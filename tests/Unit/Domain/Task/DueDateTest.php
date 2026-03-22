@@ -10,6 +10,9 @@ use PHPUnit\Framework\TestCase;
 
 final class DueDateTest extends TestCase
 {
+    /**
+     * @throws \Throwable
+     */
     public function testCreateWithTodaySucceeds(): void
     {
         $today = new \DateTimeImmutable('today')->format('Y-m-d');
@@ -19,6 +22,9 @@ final class DueDateTest extends TestCase
         self::assertSame($today, $result->getResult()->format());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testCreateWithFutureDateSucceeds(): void
     {
         $future = new \DateTimeImmutable('+30 days')->format('Y-m-d');
@@ -28,6 +34,9 @@ final class DueDateTest extends TestCase
         self::assertSame($future, $result->getResult()->format());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testCreateWithPastDateFails(): void
     {
         $past = new \DateTimeImmutable('-1 day')->format('Y-m-d');
@@ -38,6 +47,9 @@ final class DueDateTest extends TestCase
         self::assertStringContainsString('past', $result->getThrowable()->getMessage());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testCreateWithInvalidFormatFails(): void
     {
         $result = DueDate::create('not-a-date');
@@ -47,6 +59,9 @@ final class DueDateTest extends TestCase
         self::assertStringContainsString('format', $result->getThrowable()->getMessage());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testCreateWithInvalidDateValueFails(): void
     {
         $result = DueDate::create('2025-13-45');
@@ -55,6 +70,9 @@ final class DueDateTest extends TestCase
         self::assertInstanceOf(InvalidDueDateException::class, $result->getThrowable());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testEquals(): void
     {
         $date = new \DateTimeImmutable('+5 days')->format('Y-m-d');
@@ -64,6 +82,9 @@ final class DueDateTest extends TestCase
         self::assertTrue($d1->equals($d2));
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testToString(): void
     {
         $date = new \DateTimeImmutable('+5 days')->format('Y-m-d');

@@ -10,6 +10,9 @@ use PHPUnit\Framework\TestCase;
 
 final class TaskDescriptionTest extends TestCase
 {
+    /**
+     * @throws \Throwable
+     */
     public function testCreateWithValidDescription(): void
     {
         $result = TaskDescription::create('A detailed task description');
@@ -18,6 +21,9 @@ final class TaskDescriptionTest extends TestCase
         self::assertSame('A detailed task description', $result->getResult()->value());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testCreateWithEmptyStringSucceeds(): void
     {
         $result = TaskDescription::create('');
@@ -26,6 +32,9 @@ final class TaskDescriptionTest extends TestCase
         self::assertSame('', $result->getResult()->value());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testCreateTrimsWhitespace(): void
     {
         $result = TaskDescription::create('  description  ');
@@ -34,6 +43,9 @@ final class TaskDescriptionTest extends TestCase
         self::assertSame('description', $result->getResult()->value());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testCreateWithMaxLengthSucceeds(): void
     {
         $desc = str_repeat(string: 'a', times: 1000);
@@ -42,6 +54,9 @@ final class TaskDescriptionTest extends TestCase
         self::assertTrue($result->isSucceeded());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testCreateWithTooLongDescriptionFails(): void
     {
         $desc = str_repeat(string: 'a', times: 1001);
@@ -52,6 +67,9 @@ final class TaskDescriptionTest extends TestCase
         self::assertStringContainsString('1000', $result->getThrowable()->getMessage());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testEmptyFactory(): void
     {
         $desc = TaskDescription::empty();
@@ -59,6 +77,9 @@ final class TaskDescriptionTest extends TestCase
         self::assertSame('', $desc->value());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testEquals(): void
     {
         $desc1 = TaskDescription::create('Same')->getResult();
