@@ -23,11 +23,14 @@ check-missing-type-hints = true
 check-closure-missing-type-hints = true
 check-arrow-function-missing-type-hints = true
 enforce-class-finality = true
-require-api-or-internal = false
+require-api-or-internal = true
 strict-list-index-checks = true
 no-boolean-literal-comparison = true
 allow-possibly-undefined-array-keys = false
 trust-existence-checks = false
+check-property-initialization = true
+class-initializers = ["setUp"]
+check-use-statements = true
 excludes = ["tests/Property/"]
 
 [formatter]
