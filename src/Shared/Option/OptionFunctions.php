@@ -112,7 +112,6 @@ function apply_if_some(Option $option, Closure $fn): Closure
 {
     return $option->proceed(
         static function (mixed $value) use ($fn): Closure {
-            /** @var Closure(mixed): ResultInterface<mixed> $binding */
             $binding = $fn($value);
 
             return bind($binding);

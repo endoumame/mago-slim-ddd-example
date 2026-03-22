@@ -73,7 +73,10 @@ final readonly class TaskController
 
         return $this->handleResult(
             $this->listHandler->handle($query),
-            /** @param list<Task> $tasks */
+            /**
+             * @param list<Task> $tasks
+             * @return array<string, mixed>
+             */
             static fn(array $tasks): array => [
                 'data' => Vec\map(
                     $tasks,
@@ -112,6 +115,7 @@ final readonly class TaskController
 
         return $this->handleResult(
             $this->deleteHandler->handle($command),
+            /** @return array<string, mixed> */
             static fn(mixed $_): array => ['data' => null],
             204,
         );
@@ -140,7 +144,12 @@ final readonly class TaskController
      */
     private function toResponse(ResultInterface $result, int $successCode = 200): ResponseInterface
     {
-        return $this->handleResult($result, static fn(Task $task): array => ['data' => $task->toArray()], $successCode);
+        return $this->handleResult(
+            $result,
+            /** @return array<string, mixed> */
+            static fn(Task $task): array => ['data' => $task->toArray()],
+            $successCode,
+        );
     }
 
     /**
