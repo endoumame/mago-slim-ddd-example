@@ -32,7 +32,7 @@ final readonly class CreateTaskHandler
     {
         return TaskTitle::create($command->title)
             |> bind(
-                fn(TaskTitle $title): ResultInterface => TaskDescription::create($command->description)
+                static fn(TaskTitle $title): ResultInterface => TaskDescription::create($command->description)
                     |> bind(
                         static fn(TaskDescription $description): ResultInterface => $command->dueDate
                             |> from_nullable(...)
