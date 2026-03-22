@@ -59,25 +59,6 @@ function traverse(Option $option, Closure $fn): ResultInterface
 }
 
 /**
- * Conditionally apply a bind operation based on an Option value.
- *
- * If Some, applies $fn(unwrapped value) which must return a Closure suitable for bind().
- * If None, returns an identity function that passes ResultInterface through unchanged.
- *
- * Usage with pipeline operator:
- *   succeed($task)
- *       |> apply_if_some(from_nullable($title), fn(string $t) => fn(Task $task) => ...)
- *
- * @template T
- * @template V
- * @template W
- *
- * @param Option<T> $option
- * @param (Closure(T): (Closure(V): ResultInterface<W>)) $fn
- *
- * @return (Closure(ResultInterface<V>): ResultInterface<V|W>)
- */
-/**
  * Curried form of ok_or for use with the pipeline operator (|>).
  *
  * Usage: $nullable |> from_nullable(...) |> ok_or_err($error)
@@ -108,6 +89,25 @@ function traverse_with(Closure $fn): Closure
     return static fn(Option $option): ResultInterface => traverse($option, $fn);
 }
 
+/**
+ * Conditionally apply a bind operation based on an Option value.
+ *
+ * If Some, applies $fn(unwrapped value) which must return a Closure suitable for bind().
+ * If None, returns an identity function that passes ResultInterface through unchanged.
+ *
+ * Usage with pipeline operator:
+ *   succeed($task)
+ *       |> apply_if_some(from_nullable($title), fn(string $t) => fn(Task $task) => ...)
+ *
+ * @template T
+ * @template V
+ * @template W
+ *
+ * @param Option<T> $option
+ * @param (Closure(T): (Closure(V): ResultInterface<W>)) $fn
+ *
+ * @return (Closure(ResultInterface<V>): ResultInterface<V|W>)
+ */
 function apply_if_some(Option $option, Closure $fn): Closure
 {
     return $option->proceed(
