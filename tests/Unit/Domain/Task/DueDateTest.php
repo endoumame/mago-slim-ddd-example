@@ -18,8 +18,8 @@ final class DueDateTest extends TestCase
         $today = new \DateTimeImmutable('today')->format('Y-m-d');
         $result = DueDate::create($today);
 
-        self::assertTrue($result->isSucceeded());
-        self::assertSame($today, $result->getResult()->format());
+        self::assertTrue($result->isOk());
+        self::assertSame($today, $result->unwrap()->format());
     }
 
     /**
@@ -30,8 +30,8 @@ final class DueDateTest extends TestCase
         $future = new \DateTimeImmutable('+30 days')->format('Y-m-d');
         $result = DueDate::create($future);
 
-        self::assertTrue($result->isSucceeded());
-        self::assertSame($future, $result->getResult()->format());
+        self::assertTrue($result->isOk());
+        self::assertSame($future, $result->unwrap()->format());
     }
 
     /**
@@ -42,9 +42,9 @@ final class DueDateTest extends TestCase
         $past = new \DateTimeImmutable('-1 day')->format('Y-m-d');
         $result = DueDate::create($past);
 
-        self::assertTrue($result->isFailed());
-        self::assertInstanceOf(InvalidDueDateException::class, $result->getThrowable());
-        self::assertStringContainsString('past', $result->getThrowable()->getMessage());
+        self::assertTrue($result->isErr());
+        self::assertInstanceOf(InvalidDueDateException::class, $result->unwrapErr());
+        self::assertStringContainsString('past', $result->unwrapErr()->getMessage());
     }
 
     /**
@@ -54,9 +54,9 @@ final class DueDateTest extends TestCase
     {
         $result = DueDate::create('not-a-date');
 
-        self::assertTrue($result->isFailed());
-        self::assertInstanceOf(InvalidDueDateException::class, $result->getThrowable());
-        self::assertStringContainsString('format', $result->getThrowable()->getMessage());
+        self::assertTrue($result->isErr());
+        self::assertInstanceOf(InvalidDueDateException::class, $result->unwrapErr());
+        self::assertStringContainsString('format', $result->unwrapErr()->getMessage());
     }
 
     /**
@@ -66,8 +66,8 @@ final class DueDateTest extends TestCase
     {
         $result = DueDate::create('2025-13-45');
 
-        self::assertTrue($result->isFailed());
-        self::assertInstanceOf(InvalidDueDateException::class, $result->getThrowable());
+        self::assertTrue($result->isErr());
+        self::assertInstanceOf(InvalidDueDateException::class, $result->unwrapErr());
     }
 
     /**
@@ -76,8 +76,8 @@ final class DueDateTest extends TestCase
     public function testEquals(): void
     {
         $date = new \DateTimeImmutable('+5 days')->format('Y-m-d');
-        $d1 = DueDate::create($date)->getResult();
-        $d2 = DueDate::create($date)->getResult();
+        $d1 = DueDate::create($date)->unwrap();
+        $d2 = DueDate::create($date)->unwrap();
 
         self::assertTrue($d1->equals($d2));
     }
@@ -88,7 +88,7 @@ final class DueDateTest extends TestCase
     public function testToString(): void
     {
         $date = new \DateTimeImmutable('+5 days')->format('Y-m-d');
-        $dueDate = DueDate::create($date)->getResult();
+        $dueDate = DueDate::create($date)->unwrap();
 
         self::assertSame($date, (string) $dueDate);
     }

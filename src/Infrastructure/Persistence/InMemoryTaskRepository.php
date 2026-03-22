@@ -8,12 +8,11 @@ use App\Domain\Task\Exception\TaskNotFoundException;
 use App\Domain\Task\Task;
 use App\Domain\Task\TaskId;
 use App\Domain\Task\TaskRepositoryInterface;
+use EndouMame\PhpMonad\Result;
 use Override;
-use Psl\Result\ResultInterface;
-use Psl\Vec;
 
-use function App\Shared\Result\fail;
-use function App\Shared\Result\succeed;
+use function EndouMame\PhpMonad\Result\err;
+use function EndouMame\PhpMonad\Result\ok;
 
 final class InMemoryTaskRepository implements TaskRepositoryInterface
 {
@@ -21,56 +20,56 @@ final class InMemoryTaskRepository implements TaskRepositoryInterface
     private array $tasks = [];
 
     /**
-     * @return ResultInterface<Task>
+     * @return Result<Task, \Throwable>
      */
     #[Override]
-    public function findById(TaskId $id): ResultInterface
+    public function findById(TaskId $id): Result
     {
         $key = $id->value();
 
         if (!isset($this->tasks[$key])) {
-            /** @var ResultInterface<Task> */
-            return fail(TaskNotFoundException::withId($key));
+            /** @var Result<Task, \Throwable> */
+            return err(TaskNotFoundException::withId($key));
         }
 
-        return succeed($this->tasks[$key]);
+        return ok($this->tasks[$key]);
     }
 
     /**
-     * @return ResultInterface<list<Task>>
+     * @return Result<list<Task>, \Throwable>
      */
     #[Override]
-    public function findAll(): ResultInterface
+    public function findAll(): Result
     {
-        return $this->tasks |> Vec\values(...) |> succeed(...);
+        return $this->tasks |> array_values(...) |> ok(...);
     }
 
     /**
-     * @return ResultInterface<Task>
+     * @return Result<Task, \Throwable>
      */
     #[Override]
-    public function save(Task $task): ResultInterface
+    public function save(Task $task): Result
     {
         $this->tasks[$task->id->value()] = $task;
 
-        return succeed($task);
+        return ok($task);
     }
 
     /**
-     * @return ResultInterface<true>
+     * @return Result<true, \Throwable>
      */
     #[Override]
-    public function delete(TaskId $id): ResultInterface
+    public function delete(TaskId $id): Result
     {
         $key = $id->value();
 
         if (!isset($this->tasks[$key])) {
-            /** @var ResultInterface<true> */
-            return fail(TaskNotFoundException::withId($key));
+            /** @var Result<true, \Throwable> */
+            return err(TaskNotFoundException::withId($key));
         }
 
         unset($this->tasks[$key]);
 
-        return succeed(true);
+        return ok(true);
     }
 }

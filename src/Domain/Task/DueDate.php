@@ -6,10 +6,10 @@ namespace App\Domain\Task;
 
 use App\Domain\Task\Exception\InvalidDueDateException;
 use DateTimeImmutable;
-use Psl\Result\ResultInterface;
+use EndouMame\PhpMonad\Result;
 
-use function App\Shared\Result\fail;
-use function App\Shared\Result\succeed;
+use function EndouMame\PhpMonad\Result\err;
+use function EndouMame\PhpMonad\Result\ok;
 
 /**
  * @psalm-immutable
@@ -24,24 +24,24 @@ final readonly class DueDate
      * Parse a date string (Y-m-d) into a DueDate.
      * The date must be today or in the future.
      *
-     * @return ResultInterface<DueDate>
+     * @return Result<DueDate, InvalidDueDateException>
      */
-    public static function create(string $value): ResultInterface
+    public static function create(string $value): Result
     {
         $parsed = DateTimeImmutable::createFromFormat('Y-m-d', $value);
 
         if ($parsed === false || $parsed->format('Y-m-d') !== $value) {
-            /** @var ResultInterface<DueDate> */
-            return fail(InvalidDueDateException::invalidFormat($value));
+            /** @var Result<DueDate, InvalidDueDateException> */
+            return err(InvalidDueDateException::invalidFormat($value));
         }
 
         $today = new DateTimeImmutable('today');
         if ($parsed < $today) {
-            /** @var ResultInterface<DueDate> */
-            return fail(InvalidDueDateException::inThePast($value));
+            /** @var Result<DueDate, InvalidDueDateException> */
+            return err(InvalidDueDateException::inThePast($value));
         }
 
-        return succeed(new self($parsed));
+        return ok(new self($parsed));
     }
 
     public function value(): DateTimeImmutable

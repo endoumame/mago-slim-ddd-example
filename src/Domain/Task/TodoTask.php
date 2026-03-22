@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Domain\Task;
 
 use DateTimeImmutable;
+use EndouMame\PhpMonad\Result;
 use Override;
-use Psl\Result\ResultInterface;
 
-use function App\Shared\Result\succeed;
+use function EndouMame\PhpMonad\Result\ok;
 
 /**
  * A Task in Todo status. The only valid transition is start() → InProgressTask.
@@ -32,16 +32,13 @@ final readonly class TodoTask extends Task
     /**
      * Create a new Task. Always starts in Todo status.
      *
-     * @return ResultInterface<self>
+     * @return Result<self, never>
      */
-    public static function create(
-        TaskTitle $title,
-        TaskDescription $description,
-        ?DueDate $dueDate = null,
-    ): ResultInterface {
+    public static function create(TaskTitle $title, TaskDescription $description, ?DueDate $dueDate = null): Result
+    {
         $now = new DateTimeImmutable();
 
-        return succeed(
+        return ok(
             new self(
                 id: TaskId::generate(),
                 title: $title,
@@ -56,12 +53,12 @@ final readonly class TodoTask extends Task
     /**
      * Start working on this task. Transitions to InProgress.
      *
-     * @return ResultInterface<InProgressTask>
+     * @return Result<InProgressTask, never>
      */
-    public function start(): ResultInterface
+    public function start(): Result
     {
-        /** @var ResultInterface<InProgressTask> */
-        return succeed(Task::reconstitute(
+        /** @var Result<InProgressTask, never> */
+        return ok(Task::reconstitute(
             $this->id,
             $this->title,
             $this->description,

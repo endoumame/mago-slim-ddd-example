@@ -38,8 +38,8 @@ final class ListTasksHandlerTest extends TestCase
     {
         $result = $this->handler->handle(new ListTasksQuery());
 
-        self::assertTrue($result->isSucceeded());
-        self::assertCount(0, $result->getResult());
+        self::assertTrue($result->isOk());
+        self::assertCount(0, $result->unwrap());
     }
 
     /**
@@ -53,8 +53,8 @@ final class ListTasksHandlerTest extends TestCase
 
         $result = $this->handler->handle(new ListTasksQuery());
 
-        self::assertTrue($result->isSucceeded());
-        self::assertCount(3, $result->getResult());
+        self::assertTrue($result->isOk());
+        self::assertCount(3, $result->unwrap());
     }
 
     /**
@@ -62,15 +62,15 @@ final class ListTasksHandlerTest extends TestCase
      */
     public function testListFilteredByStatus(): void
     {
-        $task1 = $this->createHandler->handle(new CreateTaskCommand(title: 'Task 1'))->getResult();
+        $task1 = $this->createHandler->handle(new CreateTaskCommand(title: 'Task 1'))->unwrap();
         $this->createHandler->handle(new CreateTaskCommand(title: 'Task 2'));
 
         $this->statusHandler->handle(new ChangeTaskStatusCommand(id: $task1->id->value(), status: 'in_progress'));
 
         $result = $this->handler->handle(new ListTasksQuery(status: 'in_progress'));
 
-        self::assertTrue($result->isSucceeded());
-        self::assertCount(1, $result->getResult());
-        self::assertSame('Task 1', $result->getResult()[0]->title->value());
+        self::assertTrue($result->isOk());
+        self::assertCount(1, $result->unwrap());
+        self::assertSame('Task 1', $result->unwrap()[0]->title->value());
     }
 }

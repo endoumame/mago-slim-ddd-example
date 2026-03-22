@@ -12,12 +12,12 @@ use App\Domain\Task\TaskId;
 use App\Domain\Task\TaskRepositoryInterface;
 use App\Domain\Task\TaskStatus;
 use App\Domain\Task\TodoTask;
-use Psl\Result\ResultInterface;
+use EndouMame\PhpMonad\Result;
 
 use function App\Shared\Option\ok_or_err;
 use function App\Shared\Result\bind;
-use function App\Shared\Result\fail;
-use function Psl\Option\from_nullable;
+use function EndouMame\PhpMonad\Option\fromValue;
+use function EndouMame\PhpMonad\Result\err;
 
 final readonly class ChangeTaskStatusHandler
 {
@@ -26,25 +26,25 @@ final readonly class ChangeTaskStatusHandler
     ) {}
 
     /**
-     * @return ResultInterface<Task>
+     * @return Result<Task, \Throwable>
      */
-    public function handle(ChangeTaskStatusCommand $command): ResultInterface
+    public function handle(ChangeTaskStatusCommand $command): Result
     {
-        /** @var ResultInterface<TaskStatus> $statusResult */
+        /** @var Result<TaskStatus, \Throwable> $statusResult */
         $statusResult = TaskStatus::tryFrom($command->status)
-            |> from_nullable(...)
+            |> fromValue(...)
             |> ok_or_err(
                 new \InvalidArgumentException(
                     "Invalid status: '{$command->status}'. Must be one of: todo, in_progress, done.",
                 ),
             );
 
-        $idResult = $statusResult |> bind(static fn(TaskStatus $_): ResultInterface => TaskId::create($command->id));
+        $idResult = $statusResult |> bind(static fn(TaskStatus $_): Result => TaskId::create($command->id));
 
         return $idResult
-            |> bind(fn(TaskId $id): ResultInterface => $this->repository->findById($id))
-            |> bind(fn(Task $task): ResultInterface => $this->transitionTo($task, $statusResult->getResult()))
-            |> bind(fn(Task $updated): ResultInterface => $this->repository->save($updated));
+            |> bind(fn(TaskId $id): Result => $this->repository->findById($id))
+            |> bind(fn(Task $task): Result => $this->transitionTo($task, $statusResult->unwrap()))
+            |> bind(fn(Task $updated): Result => $this->repository->save($updated));
     }
 
     /**
@@ -52,15 +52,15 @@ final readonly class ChangeTaskStatusHandler
      * Invalid transitions are prevented by the type system — only valid
      * transition methods exist on each concrete type.
      *
-     * @return ResultInterface<Task>
+     * @return Result<Task, \Throwable>
      */
-    private function transitionTo(Task $task, TaskStatus $targetStatus): ResultInterface
+    private function transitionTo(Task $task, TaskStatus $targetStatus): Result
     {
-        /** @var ResultInterface<Task> */
+        /** @var Result<Task, \Throwable> */
         return match (true) {
             $task instanceof TodoTask && $targetStatus === TaskStatus::InProgress => $task->start(),
             $task instanceof InProgressTask && $targetStatus === TaskStatus::Done => $task->complete(),
-            default => fail(InvalidTaskStatusTransitionException::notAllowed($task->status, $targetStatus)),
+            default => err(InvalidTaskStatusTransitionException::notAllowed($task->status, $targetStatus)),
         };
     }
 }

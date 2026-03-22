@@ -36,12 +36,12 @@ final class UpdateTaskHandlerTest extends TestCase
      */
     public function testUpdateTitleSucceeds(): void
     {
-        $task = $this->createHandler->handle(new CreateTaskCommand(title: 'Original'))->getResult();
+        $task = $this->createHandler->handle(new CreateTaskCommand(title: 'Original'))->unwrap();
 
         $result = $this->handler->handle(new UpdateTaskCommand(id: $task->id->value(), title: 'Updated'));
 
-        self::assertTrue($result->isSucceeded());
-        self::assertSame('Updated', $result->getResult()->title->value());
+        self::assertTrue($result->isOk());
+        self::assertSame('Updated', $result->unwrap()->title->value());
     }
 
     /**
@@ -49,12 +49,12 @@ final class UpdateTaskHandlerTest extends TestCase
      */
     public function testUpdateDescriptionSucceeds(): void
     {
-        $task = $this->createHandler->handle(new CreateTaskCommand(title: 'Task'))->getResult();
+        $task = $this->createHandler->handle(new CreateTaskCommand(title: 'Task'))->unwrap();
 
         $result = $this->handler->handle(new UpdateTaskCommand(id: $task->id->value(), description: 'New description'));
 
-        self::assertTrue($result->isSucceeded());
-        self::assertSame('New description', $result->getResult()->description->value());
+        self::assertTrue($result->isOk());
+        self::assertSame('New description', $result->unwrap()->description->value());
     }
 
     /**
@@ -64,8 +64,8 @@ final class UpdateTaskHandlerTest extends TestCase
     {
         $result = $this->handler->handle(new UpdateTaskCommand(id: Uuid::uuid4()->toString(), title: 'Will fail'));
 
-        self::assertTrue($result->isFailed());
-        self::assertInstanceOf(TaskNotFoundException::class, $result->getThrowable());
+        self::assertTrue($result->isErr());
+        self::assertInstanceOf(TaskNotFoundException::class, $result->unwrapErr());
     }
 
     /**
@@ -73,11 +73,11 @@ final class UpdateTaskHandlerTest extends TestCase
      */
     public function testUpdateWithInvalidTitleFails(): void
     {
-        $task = $this->createHandler->handle(new CreateTaskCommand(title: 'Task'))->getResult();
+        $task = $this->createHandler->handle(new CreateTaskCommand(title: 'Task'))->unwrap();
 
         $result = $this->handler->handle(new UpdateTaskCommand(id: $task->id->value(), title: ''));
 
-        self::assertTrue($result->isFailed());
-        self::assertInstanceOf(InvalidTaskTitleException::class, $result->getThrowable());
+        self::assertTrue($result->isErr());
+        self::assertInstanceOf(InvalidTaskTitleException::class, $result->unwrapErr());
     }
 }

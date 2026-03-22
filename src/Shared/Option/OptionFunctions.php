@@ -5,117 +5,119 @@ declare(strict_types=1);
 namespace App\Shared\Option;
 
 use Closure;
-use Psl\Option\Option;
-use Psl\Result\ResultInterface;
-use Throwable;
+use EndouMame\PhpMonad\Option;
+use EndouMame\PhpMonad\Result;
 
 use function App\Shared\Result\bind;
-use function App\Shared\Result\fail;
-use function App\Shared\Result\succeed;
+use function EndouMame\PhpMonad\Result\ok;
 
 /**
  * Convert an Option to a Result.
  *
- * Some($value) becomes succeed($value).
- * None becomes fail($error).
+ * Some($value) becomes ok($value).
+ * None becomes err($error).
  *
  * @template T
+ * @template E
  *
  * @param Option<T> $option
- * @param Throwable $error
+ * @param E $error
  *
- * @return ResultInterface<T>
+ * @return Result<T, E>
  */
-function ok_or(Option $option, Throwable $error): ResultInterface
+function ok_or(Option $option, mixed $error): Result
 {
-    return $option->proceed(
-        /** @param T $value */
-        static fn(mixed $value): ResultInterface => succeed($value),
-        static fn(): ResultInterface => fail($error),
-    );
+    return $option->okOr($error);
 }
 
 /**
- * Apply a function that returns ResultInterface if Some, or succeed(null) if None.
+ * Apply a function that returns Result if Some, or ok(null) if None.
  *
  * Useful for optional value object creation:
- *   traverse(from_nullable($command->dueDate), fn(string $d) => DueDate::create($d))
+ *   traverse(fromValue($command->dueDate), fn(string $d) => DueDate::create($d))
  *
  * @template T
  * @template U
+ * @template E
  *
  * @param Option<T> $option
- * @param (Closure(T): ResultInterface<U>) $fn
+ * @param (Closure(T): Result<U, E>) $fn
  *
- * @return ResultInterface<U|null>
+ * @return Result<U|null, E>
  */
-function traverse(Option $option, Closure $fn): ResultInterface
+function traverse(Option $option, Closure $fn): Result
 {
-    return $option->proceed(
+    /** @var Result<U|null, E> */
+    return $option->mapOrElse(
         /** @param T $value */
-        static fn(mixed $value): ResultInterface => $fn($value),
-        static fn(): ResultInterface => succeed(null),
+        static fn(mixed $value): Result => $fn($value),
+        static fn(): Result => ok(null),
     );
 }
 
 /**
  * Curried form of ok_or for use with the pipeline operator (|>).
  *
- * Usage: $nullable |> from_nullable(...) |> ok_or_err($error)
+ * Usage: $nullable |> fromValue(...) |> ok_or_err($error)
  *
  * @template T
+ * @template E
  *
- * @return (Closure(Option<T>): ResultInterface<T>)
+ * @param E $error
+ *
+ * @return (Closure(Option<T>): Result<T, E>)
  */
-function ok_or_err(Throwable $error): Closure
+function ok_or_err(mixed $error): Closure
 {
-    return static fn(Option $option): ResultInterface => ok_or($option, $error);
+    return static fn(Option $option): Result => ok_or($option, $error);
 }
 
 /**
  * Curried form of traverse for use with the pipeline operator (|>).
  *
- * Usage: $nullable |> from_nullable(...) |> traverse_with(DueDate::create(...))
+ * Usage: $nullable |> fromValue(...) |> traverse_with(DueDate::create(...))
  *
  * @template T
  * @template U
+ * @template E
  *
- * @param (Closure(T): ResultInterface<U>) $fn
+ * @param (Closure(T): Result<U, E>) $fn
  *
- * @return (Closure(Option<T>): ResultInterface<U|null>)
+ * @return (Closure(Option<T>): Result<U|null, E>)
  */
 function traverse_with(Closure $fn): Closure
 {
-    return static fn(Option $option): ResultInterface => traverse($option, $fn);
+    return static fn(Option $option): Result => traverse($option, $fn);
 }
 
 /**
  * Conditionally apply a bind operation based on an Option value.
  *
  * If Some, applies $fn(unwrapped value) which must return a Closure suitable for bind().
- * If None, returns an identity function that passes ResultInterface through unchanged.
+ * If None, returns an identity function that passes Result through unchanged.
  *
  * Usage with pipeline operator:
- *   succeed($task)
- *       |> apply_if_some(from_nullable($title), fn(string $t) => fn(Task $task) => ...)
+ *   ok($task)
+ *       |> apply_if_some(fromValue($title), fn(string $t) => fn(Task $task) => ...)
  *
  * @template T
  * @template V
  * @template W
+ * @template E
  *
  * @param Option<T> $option
- * @param (Closure(T): (Closure(V): ResultInterface<W>)) $fn
+ * @param (Closure(T): (Closure(V): Result<W, E>)) $fn
  *
- * @return (Closure(ResultInterface<V>): ResultInterface<V|W>)
+ * @return (Closure(Result<V, E>): Result<V|W, E>)
  */
 function apply_if_some(Option $option, Closure $fn): Closure
 {
-    return $option->proceed(
+    return $option->mapOrElse(
         static function (mixed $value) use ($fn): Closure {
             $binding = $fn($value);
 
             return bind($binding);
         },
-        static fn(): Closure => static fn(ResultInterface $result): ResultInterface => $result,
+        static fn(): Closure => static fn(Result $result): Result => $result,
     );
 }

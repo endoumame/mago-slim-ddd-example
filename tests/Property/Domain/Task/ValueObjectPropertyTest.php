@@ -31,8 +31,8 @@ final class ValueObjectPropertyTest extends TestCase
             string(),
         ))->then(static function (string $value): void {
             $result = TaskTitle::create($value);
-            self::assertTrue($result->isSucceeded(), "Expected success for: '{$value}'");
-            self::assertSame(trim($value), $result->getResult()->value());
+            self::assertTrue($result->isOk(), "Expected success for: '{$value}'");
+            self::assertSame(trim($value), $result->unwrap()->value());
         });
     }
 
@@ -46,7 +46,7 @@ final class ValueObjectPropertyTest extends TestCase
             choose(0, 100),
         ))->then(static function (string $value): void {
             $result = TaskTitle::create($value);
-            self::assertTrue($result->isFailed());
+            self::assertTrue($result->isErr());
         });
     }
 
@@ -57,7 +57,7 @@ final class ValueObjectPropertyTest extends TestCase
     {
         $this->forAll(constant(''))->then(static function (string $value): void {
             $result = TaskTitle::create($value);
-            self::assertTrue($result->isFailed());
+            self::assertTrue($result->isErr());
         });
     }
 
@@ -71,7 +71,7 @@ final class ValueObjectPropertyTest extends TestCase
             string(),
         ))->then(static function (string $value): void {
             $result = TaskDescription::create($value);
-            self::assertTrue($result->isSucceeded());
+            self::assertTrue($result->isOk());
         });
     }
 
@@ -85,7 +85,7 @@ final class ValueObjectPropertyTest extends TestCase
             choose(0, 100),
         ))->then(static function (string $value): void {
             $result = TaskDescription::create($value);
-            self::assertTrue($result->isFailed());
+            self::assertTrue($result->isErr());
         });
     }
 
@@ -99,9 +99,9 @@ final class ValueObjectPropertyTest extends TestCase
             choose(0, 100),
         ))->then(static function (string $uuid): void {
             $result = TaskId::create($uuid);
-            self::assertTrue($result->isSucceeded());
-            self::assertSame($uuid, $result->getResult()->value());
-            self::assertSame($uuid, (string) $result->getResult());
+            self::assertTrue($result->isOk());
+            self::assertSame($uuid, $result->unwrap()->value());
+            self::assertSame($uuid, (string) $result->unwrap());
         });
     }
 
@@ -113,7 +113,7 @@ final class ValueObjectPropertyTest extends TestCase
         $this->forAll(choose(0, 365))->then(static function (int $daysFromNow): void {
             $date = new \DateTimeImmutable("+{$daysFromNow} days")->format('Y-m-d');
             $result = DueDate::create($date);
-            self::assertTrue($result->isSucceeded(), "Expected success for: {$date}");
+            self::assertTrue($result->isOk(), "Expected success for: {$date}");
         });
     }
 
@@ -125,7 +125,7 @@ final class ValueObjectPropertyTest extends TestCase
         $this->forAll(choose(1, 365))->then(static function (int $daysAgo): void {
             $date = new \DateTimeImmutable("-{$daysAgo} days")->format('Y-m-d');
             $result = DueDate::create($date);
-            self::assertTrue($result->isFailed(), "Expected failure for past date: {$date}");
+            self::assertTrue($result->isErr(), "Expected failure for past date: {$date}");
         });
     }
 }

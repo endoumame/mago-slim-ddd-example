@@ -37,9 +37,9 @@ final class CreateTaskHandlerTest extends TestCase
 
         $result = $this->handler->handle($command);
 
-        self::assertTrue($result->isSucceeded());
+        self::assertTrue($result->isOk());
 
-        $task = $result->getResult();
+        $task = $result->unwrap();
         self::assertInstanceOf(TodoTask::class, $task);
         self::assertSame('Buy groceries', $task->title->value());
         self::assertSame('', $task->description->value());
@@ -61,9 +61,9 @@ final class CreateTaskHandlerTest extends TestCase
 
         $result = $this->handler->handle($command);
 
-        self::assertTrue($result->isSucceeded());
+        self::assertTrue($result->isOk());
 
-        $task = $result->getResult();
+        $task = $result->unwrap();
         self::assertSame('Important task', $task->title->value());
         self::assertSame('This is important', $task->description->value());
         self::assertNotNull($task->dueDate);
@@ -77,11 +77,11 @@ final class CreateTaskHandlerTest extends TestCase
     {
         $command = new CreateTaskCommand(title: 'Saved task');
         $result = $this->handler->handle($command);
-        $task = $result->getResult();
+        $task = $result->unwrap();
 
         $found = $this->repository->findById($task->id);
-        self::assertTrue($found->isSucceeded());
-        self::assertSame($task->id->value(), $found->getResult()->id->value());
+        self::assertTrue($found->isOk());
+        self::assertSame($task->id->value(), $found->unwrap()->id->value());
     }
 
     /**
@@ -93,8 +93,8 @@ final class CreateTaskHandlerTest extends TestCase
 
         $result = $this->handler->handle($command);
 
-        self::assertTrue($result->isFailed());
-        self::assertInstanceOf(InvalidTaskTitleException::class, $result->getThrowable());
+        self::assertTrue($result->isErr());
+        self::assertInstanceOf(InvalidTaskTitleException::class, $result->unwrapErr());
     }
 
     /**
@@ -106,7 +106,7 @@ final class CreateTaskHandlerTest extends TestCase
 
         $result = $this->handler->handle($command);
 
-        self::assertTrue($result->isFailed());
-        self::assertInstanceOf(InvalidDueDateException::class, $result->getThrowable());
+        self::assertTrue($result->isErr());
+        self::assertInstanceOf(InvalidDueDateException::class, $result->unwrapErr());
     }
 }

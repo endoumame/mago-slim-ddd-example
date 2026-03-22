@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace App\Domain\Task;
 
 use App\Domain\Task\Exception\InvalidTaskTitleException;
-use Psl\Result\ResultInterface;
-use Psl\Str;
+use EndouMame\PhpMonad\Result;
 
-use function App\Shared\Result\fail;
-use function App\Shared\Result\succeed;
+use function EndouMame\PhpMonad\Result\err;
+use function EndouMame\PhpMonad\Result\ok;
 
 /**
  * @psalm-immutable
@@ -23,28 +22,26 @@ final readonly class TaskTitle
     ) {}
 
     /**
-     * Parse a string into a TaskTitle. Returns Failure for invalid values.
+     * Parse a string into a TaskTitle. Returns Err for invalid values.
      *
-     * @return ResultInterface<TaskTitle>
-     *
-     * @throws Str\Exception\InvalidArgumentException
+     * @return Result<TaskTitle, InvalidTaskTitleException>
      */
-    public static function create(string $value): ResultInterface
+    public static function create(string $value): Result
     {
-        $trimmed = Str\trim($value);
+        $trimmed = trim($value);
 
         if ($trimmed === '') {
-            /** @var ResultInterface<TaskTitle> */
-            return fail(InvalidTaskTitleException::empty());
+            /** @var Result<TaskTitle, InvalidTaskTitleException> */
+            return err(InvalidTaskTitleException::empty());
         }
 
-        $length = Str\length($trimmed);
+        $length = mb_strlen($trimmed);
         if ($length > self::MAX_LENGTH) {
-            /** @var ResultInterface<TaskTitle> */
-            return fail(InvalidTaskTitleException::tooLong($length));
+            /** @var Result<TaskTitle, InvalidTaskTitleException> */
+            return err(InvalidTaskTitleException::tooLong($length));
         }
 
-        return succeed(new self($trimmed));
+        return ok(new self($trimmed));
     }
 
     public function value(): string

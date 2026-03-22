@@ -11,11 +11,11 @@ use App\Domain\Task\TaskDescription;
 use App\Domain\Task\TaskRepositoryInterface;
 use App\Domain\Task\TaskTitle;
 use App\Domain\Task\TodoTask;
-use Psl\Result\ResultInterface;
+use EndouMame\PhpMonad\Result;
 
 use function App\Shared\Option\traverse_with;
 use function App\Shared\Result\bind;
-use function Psl\Option\from_nullable;
+use function EndouMame\PhpMonad\Option\fromValue;
 
 final readonly class CreateTaskHandler
 {
@@ -24,21 +24,19 @@ final readonly class CreateTaskHandler
     ) {}
 
     /**
-     * @return ResultInterface<Task>
-     *
-     * @throws \Throwable
+     * @return Result<Task, \Throwable>
      */
-    public function handle(CreateTaskCommand $command): ResultInterface
+    public function handle(CreateTaskCommand $command): Result
     {
         return TaskTitle::create($command->title)
             |> bind(
-                static fn(TaskTitle $title): ResultInterface => TaskDescription::create($command->description)
+                static fn(TaskTitle $title): Result => TaskDescription::create($command->description)
                     |> bind(
-                        static fn(TaskDescription $description): ResultInterface => $command->dueDate
-                            |> from_nullable(...)
+                        static fn(TaskDescription $description): Result => $command->dueDate
+                            |> fromValue(...)
                             |> traverse_with(DueDate::create(...))
                             |> bind(
-                                static fn(?DueDate $dueDate): ResultInterface => TodoTask::create(
+                                static fn(?DueDate $dueDate): Result => TodoTask::create(
                                     $title,
                                     $description,
                                     $dueDate,
@@ -46,6 +44,6 @@ final readonly class CreateTaskHandler
                             ),
                     ),
             )
-            |> bind(fn(Task $task): ResultInterface => $this->repository->save($task));
+            |> bind(fn(Task $task): Result => $this->repository->save($task));
     }
 }

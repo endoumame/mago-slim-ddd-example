@@ -4,28 +4,28 @@ declare(strict_types=1);
 
 namespace App\Domain\Task;
 
-use Psl\Result\ResultInterface;
+use EndouMame\PhpMonad\Result;
 
 /** @api */
 interface TaskRepositoryInterface
 {
     /**
-     * @return ResultInterface<Task>
+     * @return Result<Task, \Throwable>
      */
-    public function findById(TaskId $id): ResultInterface;
+    public function findById(TaskId $id): Result;
 
     /**
-     * @return ResultInterface<list<Task>>
+     * @return Result<list<Task>, \Throwable>
      */
-    public function findAll(): ResultInterface;
+    public function findAll(): Result;
 
     /**
-     * @return ResultInterface<Task>
+     * @return Result<Task, \Throwable>
      */
-    public function save(Task $task): ResultInterface;
+    public function save(Task $task): Result;
 
     /**
-     * @return ResultInterface<true>
+     * @return Result<true, \Throwable>
      */
-    public function delete(TaskId $id): ResultInterface;
+    public function delete(TaskId $id): Result;
 }

@@ -17,8 +17,8 @@ final class TaskTitleTest extends TestCase
     {
         $result = TaskTitle::create('Buy groceries');
 
-        self::assertTrue($result->isSucceeded());
-        self::assertSame('Buy groceries', $result->getResult()->value());
+        self::assertTrue($result->isOk());
+        self::assertSame('Buy groceries', $result->unwrap()->value());
     }
 
     /**
@@ -28,8 +28,8 @@ final class TaskTitleTest extends TestCase
     {
         $result = TaskTitle::create('  Buy groceries  ');
 
-        self::assertTrue($result->isSucceeded());
-        self::assertSame('Buy groceries', $result->getResult()->value());
+        self::assertTrue($result->isOk());
+        self::assertSame('Buy groceries', $result->unwrap()->value());
     }
 
     /**
@@ -39,9 +39,9 @@ final class TaskTitleTest extends TestCase
     {
         $result = TaskTitle::create('');
 
-        self::assertTrue($result->isFailed());
-        self::assertInstanceOf(InvalidTaskTitleException::class, $result->getThrowable());
-        self::assertStringContainsString('empty', $result->getThrowable()->getMessage());
+        self::assertTrue($result->isErr());
+        self::assertInstanceOf(InvalidTaskTitleException::class, $result->unwrapErr());
+        self::assertStringContainsString('empty', $result->unwrapErr()->getMessage());
     }
 
     /**
@@ -51,8 +51,8 @@ final class TaskTitleTest extends TestCase
     {
         $result = TaskTitle::create('   ');
 
-        self::assertTrue($result->isFailed());
-        self::assertInstanceOf(InvalidTaskTitleException::class, $result->getThrowable());
+        self::assertTrue($result->isErr());
+        self::assertInstanceOf(InvalidTaskTitleException::class, $result->unwrapErr());
     }
 
     /**
@@ -63,7 +63,7 @@ final class TaskTitleTest extends TestCase
         $title = str_repeat(string: 'a', times: 255);
         $result = TaskTitle::create($title);
 
-        self::assertTrue($result->isSucceeded());
+        self::assertTrue($result->isOk());
     }
 
     /**
@@ -74,9 +74,9 @@ final class TaskTitleTest extends TestCase
         $title = str_repeat(string: 'a', times: 256);
         $result = TaskTitle::create($title);
 
-        self::assertTrue($result->isFailed());
-        self::assertInstanceOf(InvalidTaskTitleException::class, $result->getThrowable());
-        self::assertStringContainsString('255', $result->getThrowable()->getMessage());
+        self::assertTrue($result->isErr());
+        self::assertInstanceOf(InvalidTaskTitleException::class, $result->unwrapErr());
+        self::assertStringContainsString('255', $result->unwrapErr()->getMessage());
     }
 
     /**
@@ -84,8 +84,8 @@ final class TaskTitleTest extends TestCase
      */
     public function testEquals(): void
     {
-        $title1 = TaskTitle::create('Same title')->getResult();
-        $title2 = TaskTitle::create('Same title')->getResult();
+        $title1 = TaskTitle::create('Same title')->unwrap();
+        $title2 = TaskTitle::create('Same title')->unwrap();
 
         self::assertTrue($title1->equals($title2));
     }
@@ -95,8 +95,8 @@ final class TaskTitleTest extends TestCase
      */
     public function testNotEquals(): void
     {
-        $title1 = TaskTitle::create('Title A')->getResult();
-        $title2 = TaskTitle::create('Title B')->getResult();
+        $title1 = TaskTitle::create('Title A')->unwrap();
+        $title2 = TaskTitle::create('Title B')->unwrap();
 
         self::assertFalse($title1->equals($title2));
     }
