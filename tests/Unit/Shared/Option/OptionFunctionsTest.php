@@ -17,6 +17,9 @@ use function Psl\Option\some;
 
 final class OptionFunctionsTest extends TestCase
 {
+    /**
+     * @throws \Throwable
+     */
     public function testOkOrConvertsNoneToFailure(): void
     {
         $result = ok_or(none(), new \InvalidArgumentException('missing'));
@@ -25,6 +28,9 @@ final class OptionFunctionsTest extends TestCase
         self::assertInstanceOf(\InvalidArgumentException::class, $result->getThrowable());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testOkOrConvertsSomeToSuccess(): void
     {
         $result = ok_or(some(42), new \InvalidArgumentException('missing'));
@@ -33,6 +39,9 @@ final class OptionFunctionsTest extends TestCase
         self::assertSame(42, $result->getResult());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testTraverseWithSomeAppliesFn(): void
     {
         $result = traverse(some('hello'), static fn(string $s): ResultInterface => succeed(mb_strtoupper($s)));
@@ -41,6 +50,9 @@ final class OptionFunctionsTest extends TestCase
         self::assertSame('HELLO', $result->getResult());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testTraverseWithNoneReturnsSucceedNull(): void
     {
         /** @var Option<string> */
@@ -51,6 +63,9 @@ final class OptionFunctionsTest extends TestCase
         self::assertNull($result->getResult());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testApplyIfSomeWithSomeAppliesBindFunction(): void
     {
         $initial = succeed(10);
@@ -66,6 +81,9 @@ final class OptionFunctionsTest extends TestCase
         self::assertSame(15, $result->getResult());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testApplyIfSomeWithNonePassesThrough(): void
     {
         $initial = succeed(10);
@@ -83,6 +101,9 @@ final class OptionFunctionsTest extends TestCase
         self::assertSame(10, $result->getResult());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testApplyIfSomeChaining(): void
     {
         $initial = succeed(0);

@@ -20,7 +20,6 @@ use function App\Shared\Result\succeed;
  */
 final readonly class Task
 {
-    /** @mago-ignore excessive-parameter-list */
     private function __construct(
         public TaskId $id,
         public TaskTitle $title,
@@ -59,7 +58,6 @@ final readonly class Task
     /**
      * Reconstitute a Task from persistence. No validation — data is already trusted.
      *
-     * @mago-ignore excessive-parameter-list
      */
     public static function reconstitute(
         TaskId $id,
@@ -113,6 +111,8 @@ final readonly class Task
      * Transition status. Only forward transitions allowed: Todo -> InProgress -> Done.
      *
      * @return ResultInterface<Task>
+     *
+     * @throws \Throwable
      */
     public function changeStatus(TaskStatus $newStatus): ResultInterface
     {

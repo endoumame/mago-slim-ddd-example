@@ -14,6 +14,9 @@ use PHPUnit\Framework\TestCase;
 
 final class TaskTest extends TestCase
 {
+    /**
+     * @throws \Throwable
+     */
     public function testCreateTask(): void
     {
         $title = TaskTitle::create('Test task')->getResult();
@@ -30,6 +33,9 @@ final class TaskTest extends TestCase
         self::assertNull($task->dueDate);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testCreateTaskWithDueDate(): void
     {
         $title = TaskTitle::create('Test task')->getResult();
@@ -40,10 +46,15 @@ final class TaskTest extends TestCase
         $result = Task::create($title, $description, $dueDate);
 
         self::assertTrue($result->isSucceeded());
-        self::assertNotNull($result->getResult()->dueDate);
-        self::assertSame($futureDate, $result->getResult()->dueDate->format());
+        $task = $result->getResult();
+        $dueDate = $task->dueDate;
+        self::assertNotNull($dueDate);
+        self::assertSame($futureDate, $dueDate->format());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testChangeTitle(): void
     {
         $task = $this->createTestTask();
@@ -56,6 +67,9 @@ final class TaskTest extends TestCase
         self::assertSame($task->id->value(), $result->getResult()->id->value());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testChangeDescription(): void
     {
         $task = $this->createTestTask();
@@ -67,6 +81,9 @@ final class TaskTest extends TestCase
         self::assertSame('Updated description', $result->getResult()->description->value());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testChangeStatusTodoToInProgress(): void
     {
         $task = $this->createTestTask();
@@ -77,6 +94,9 @@ final class TaskTest extends TestCase
         self::assertSame(TaskStatus::InProgress, $result->getResult()->status);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testChangeStatusInProgressToDone(): void
     {
         $task = $this->createTestTask();
@@ -88,6 +108,9 @@ final class TaskTest extends TestCase
         self::assertSame(TaskStatus::Done, $result->getResult()->status);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testChangeStatusInvalidTransitionFails(): void
     {
         $task = $this->createTestTask();
@@ -98,6 +121,9 @@ final class TaskTest extends TestCase
         self::assertInstanceOf(InvalidTaskStatusTransitionException::class, $result->getThrowable());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testImmutability(): void
     {
         $task = $this->createTestTask();
@@ -110,6 +136,9 @@ final class TaskTest extends TestCase
         self::assertSame($task->id->value(), $updatedTask->id->value());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testToArray(): void
     {
         $task = $this->createTestTask();
@@ -126,6 +155,9 @@ final class TaskTest extends TestCase
         self::assertSame('todo', $array['status']);
     }
 
+    /**
+     * @throws \Throwable
+     */
     private function createTestTask(): Task
     {
         $title = TaskTitle::create('Test task')->getResult();

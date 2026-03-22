@@ -20,6 +20,10 @@ final class UpdateTaskHandlerTest extends TestCase
     private CreateTaskHandler $createHandler;
     private InMemoryTaskRepository $repository;
 
+    /**
+     * @throws \Throwable
+     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->repository = new InMemoryTaskRepository();
@@ -27,6 +31,9 @@ final class UpdateTaskHandlerTest extends TestCase
         $this->createHandler = new CreateTaskHandler($this->repository);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testUpdateTitleSucceeds(): void
     {
         $task = $this->createHandler->handle(new CreateTaskCommand(title: 'Original'))->getResult();
@@ -37,6 +44,9 @@ final class UpdateTaskHandlerTest extends TestCase
         self::assertSame('Updated', $result->getResult()->title->value());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testUpdateDescriptionSucceeds(): void
     {
         $task = $this->createHandler->handle(new CreateTaskCommand(title: 'Task'))->getResult();
@@ -47,6 +57,9 @@ final class UpdateTaskHandlerTest extends TestCase
         self::assertSame('New description', $result->getResult()->description->value());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testUpdateNonExistentTaskFails(): void
     {
         $result = $this->handler->handle(new UpdateTaskCommand(id: Uuid::uuid4()->toString(), title: 'Will fail'));
@@ -55,6 +68,9 @@ final class UpdateTaskHandlerTest extends TestCase
         self::assertInstanceOf(TaskNotFoundException::class, $result->getThrowable());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testUpdateWithInvalidTitleFails(): void
     {
         $task = $this->createHandler->handle(new CreateTaskCommand(title: 'Task'))->getResult();

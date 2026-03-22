@@ -36,6 +36,9 @@ final readonly class TaskController
         private ChangeTaskStatusHandler $changeStatusHandler,
     ) {}
 
+    /**
+     * @throws \Throwable
+     */
     public function create(ServerRequestInterface $request): ResponseInterface
     {
         /** @var array<string, mixed> $body */
@@ -50,13 +53,19 @@ final readonly class TaskController
         return $this->toResponse($this->createHandler->handle($command), 201);
     }
 
-    public function get(ServerRequestInterface $request, ResponseInterface $response, string $id): ResponseInterface
+    /**
+     * @throws \Throwable
+     */
+    public function get(ServerRequestInterface $_request, ResponseInterface $_response, string $id): ResponseInterface
     {
         $query = new GetTaskQuery(id: $id);
 
         return $this->toResponse($this->getHandler->handle($query));
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function list(ServerRequestInterface $request): ResponseInterface
     {
         $params = $request->getQueryParams();
@@ -68,7 +77,6 @@ final readonly class TaskController
             return $this->errorResponse($result->getThrowable());
         }
 
-        /** @var list<Task> $tasks */
         $tasks = $result->getResult();
 
         return $this->jsonResponse([
@@ -76,7 +84,10 @@ final readonly class TaskController
         ]);
     }
 
-    public function update(ServerRequestInterface $request, ResponseInterface $response, string $id): ResponseInterface
+    /**
+     * @throws \Throwable
+     */
+    public function update(ServerRequestInterface $request, ResponseInterface $_response, string $id): ResponseInterface
     {
         /** @var array<string, mixed> $body */
         $body = $request->getParsedBody() ?? [];
@@ -91,8 +102,14 @@ final readonly class TaskController
         return $this->toResponse($this->updateHandler->handle($command));
     }
 
-    public function delete(ServerRequestInterface $request, ResponseInterface $response, string $id): ResponseInterface
-    {
+    /**
+     * @throws \Throwable
+     */
+    public function delete(
+        ServerRequestInterface $_request,
+        ResponseInterface $_response,
+        string $id,
+    ): ResponseInterface {
         $command = new DeleteTaskCommand(id: $id);
         $result = $this->deleteHandler->handle($command);
 
@@ -103,9 +120,12 @@ final readonly class TaskController
         return $this->jsonResponse(['data' => null], 204);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function changeStatus(
         ServerRequestInterface $request,
-        ResponseInterface $response,
+        ResponseInterface $_response,
         string $id,
     ): ResponseInterface {
         /** @var array<string, mixed> $body */
@@ -118,6 +138,8 @@ final readonly class TaskController
 
     /**
      * @param ResultInterface<Task> $result
+     *
+     * @throws \Throwable
      */
     private function toResponse(ResultInterface $result, int $successCode = 200): ResponseInterface
     {
@@ -125,12 +147,16 @@ final readonly class TaskController
             return $this->errorResponse($result->getThrowable());
         }
 
-        /** @var Task $task */
         $task = $result->getResult();
 
         return $this->jsonResponse(['data' => $task->toArray()], $successCode);
     }
 
+    /**
+     * @throws \JsonException
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
+     */
     private function errorResponse(\Throwable $error): ResponseInterface
     {
         $statusCode = match (true) {
@@ -155,6 +181,10 @@ final readonly class TaskController
 
     /**
      * @param array<string, mixed> $data
+     *
+     * @throws \JsonException
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
      */
     private function jsonResponse(array $data, int $statusCode = 200): ResponseInterface
     {

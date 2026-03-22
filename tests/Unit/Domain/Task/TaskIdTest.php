@@ -11,6 +11,9 @@ use Ramsey\Uuid\Uuid;
 
 final class TaskIdTest extends TestCase
 {
+    /**
+     * @throws \Throwable
+     */
     public function testCreateWithValidUuid(): void
     {
         $uuid = Uuid::uuid4()->toString();
@@ -20,6 +23,9 @@ final class TaskIdTest extends TestCase
         self::assertSame($uuid, $result->getResult()->value());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testCreateWithInvalidUuid(): void
     {
         $result = TaskId::create('not-a-uuid');
@@ -28,6 +34,9 @@ final class TaskIdTest extends TestCase
         self::assertInstanceOf(InvalidTaskIdException::class, $result->getThrowable());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testCreateWithEmptyString(): void
     {
         $result = TaskId::create('');
@@ -36,6 +45,9 @@ final class TaskIdTest extends TestCase
         self::assertInstanceOf(InvalidTaskIdException::class, $result->getThrowable());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testGenerate(): void
     {
         $id = TaskId::generate();
@@ -43,6 +55,9 @@ final class TaskIdTest extends TestCase
         self::assertTrue(Uuid::isValid($id->value()));
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testGenerateProducesUniqueIds(): void
     {
         $id1 = TaskId::generate();
@@ -51,6 +66,9 @@ final class TaskIdTest extends TestCase
         self::assertFalse($id1->equals($id2));
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testEquals(): void
     {
         $uuid = Uuid::uuid4()->toString();
@@ -60,6 +78,9 @@ final class TaskIdTest extends TestCase
         self::assertTrue($id1->equals($id2));
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testToString(): void
     {
         $uuid = Uuid::uuid4()->toString();

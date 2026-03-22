@@ -10,6 +10,9 @@ use PHPUnit\Framework\TestCase;
 
 final class TaskTitleTest extends TestCase
 {
+    /**
+     * @throws \Throwable
+     */
     public function testCreateWithValidTitle(): void
     {
         $result = TaskTitle::create('Buy groceries');
@@ -18,6 +21,9 @@ final class TaskTitleTest extends TestCase
         self::assertSame('Buy groceries', $result->getResult()->value());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testCreateTrimsWhitespace(): void
     {
         $result = TaskTitle::create('  Buy groceries  ');
@@ -26,6 +32,9 @@ final class TaskTitleTest extends TestCase
         self::assertSame('Buy groceries', $result->getResult()->value());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testCreateWithEmptyStringFails(): void
     {
         $result = TaskTitle::create('');
@@ -35,6 +44,9 @@ final class TaskTitleTest extends TestCase
         self::assertStringContainsString('empty', $result->getThrowable()->getMessage());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testCreateWithWhitespaceOnlyFails(): void
     {
         $result = TaskTitle::create('   ');
@@ -43,6 +55,9 @@ final class TaskTitleTest extends TestCase
         self::assertInstanceOf(InvalidTaskTitleException::class, $result->getThrowable());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testCreateWithMaxLengthSucceeds(): void
     {
         $title = str_repeat(string: 'a', times: 255);
@@ -51,6 +66,9 @@ final class TaskTitleTest extends TestCase
         self::assertTrue($result->isSucceeded());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testCreateWithTooLongTitleFails(): void
     {
         $title = str_repeat(string: 'a', times: 256);
@@ -61,6 +79,9 @@ final class TaskTitleTest extends TestCase
         self::assertStringContainsString('255', $result->getThrowable()->getMessage());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testEquals(): void
     {
         $title1 = TaskTitle::create('Same title')->getResult();
@@ -69,6 +90,9 @@ final class TaskTitleTest extends TestCase
         self::assertTrue($title1->equals($title2));
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testNotEquals(): void
     {
         $title1 = TaskTitle::create('Title A')->getResult();

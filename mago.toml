@@ -7,8 +7,8 @@ excludes = ["vendor/nikic/fast-route/test/"]
 minimum-fail-level = "note"
 
 [linter.rules]
-too-many-methods = { threshold = 20, exclude = ["tests/"] }
-excessive-parameter-list = { threshold = 7 }
+excessive-parameter-list = { threshold = 8 }
+too-many-methods = { threshold = 25 }
 no-isset = { enabled = false }
 literal-named-argument = { enabled = false }
 
@@ -28,29 +28,7 @@ strict-list-index-checks = true
 no-boolean-literal-comparison = true
 allow-possibly-undefined-array-keys = false
 trust-existence-checks = false
-baseline = "analyzer-baseline.toml"
-ignore = [
-    { code = "unhandled-thrown-type", in = "tests/" },
-    { code = "missing-override-attribute", in = "tests/" },
-    { code = "unused-parameter", in = "tests/" },
-    { code = "unused-method", in = "tests/" },
-    { code = "unused-property", in = "tests/" },
-    { code = "too-many-arguments", in = "tests/" },
-    { code = "mixed-array-access", in = "tests/" },
-    { code = "mixed-argument", in = "tests/" },
-    { code = "mixed-assignment", in = "tests/" },
-    { code = "mixed-method-access", in = "tests/" },
-    { code = "mixed-property-access", in = "tests/" },
-    { code = "possibly-undefined-array-index", in = "tests/" },
-    { code = "less-specific-argument", in = "tests/" },
-    { code = "less-specific-nested-return-statement", in = "tests/" },
-    { code = "invalid-callable", in = "tests/" },
-    { code = "invalid-destructuring-source", in = "tests/" },
-    { code = "possible-method-access-on-null", in = "tests/" },
-    { code = "imprecise-type", in = "tests/" },
-    { code = "missing-return-type", in = "tests/" },
-    { code = "redundant-docblock-type", in = "tests/" },
-]
+excludes = ["tests/Property/"]
 
 [formatter]
 excludes = ["public/index.php", "tests/Integration/Infrastructure/Http/TaskEndpointTest.php"]

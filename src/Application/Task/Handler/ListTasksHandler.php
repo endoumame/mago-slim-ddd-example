@@ -8,6 +8,7 @@ use App\Application\Task\Query\ListTasksQuery;
 use App\Domain\Task\Task;
 use App\Domain\Task\TaskRepositoryInterface;
 use App\Domain\Task\TaskStatus;
+use Psl\Option\Option;
 use Psl\Result\ResultInterface;
 use Psl\Vec;
 
@@ -27,18 +28,24 @@ final readonly class ListTasksHandler
     public function handle(ListTasksQuery $query): ResultInterface
     {
         return $this->repository->findAll()
-            |> bind(static function (array $tasks) use ($query): ResultInterface {
-                $filtered = from_nullable($query->status)
-                    ->andThen(static fn(string $s) => from_nullable(TaskStatus::tryFrom($s)))
-                    ->proceed(
-                        static fn(TaskStatus $status) => Vec\filter(
-                            $tasks,
-                            static fn(Task $task): bool => $task->status === $status,
-                        ),
-                        static fn() => $tasks,
-                    );
+            |> bind(
+                /**
+                 * @param list<Task> $tasks
+                 * @return ResultInterface<list<Task>>
+                 */
+                static function (array $tasks) use ($query): ResultInterface {
+                    $filtered = from_nullable($query->status)
+                        ->andThen(static fn(string $s): Option => from_nullable(TaskStatus::tryFrom($s)))
+                        ->proceed(
+                            static fn(TaskStatus $status): array => Vec\filter(
+                                $tasks,
+                                static fn(Task $task): bool => $task->status === $status,
+                            ),
+                            static fn(): array => $tasks,
+                        );
 
-                return succeed($filtered);
-            });
+                    return succeed($filtered);
+                },
+            );
     }
 }

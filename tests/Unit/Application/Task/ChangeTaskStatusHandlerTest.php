@@ -19,6 +19,10 @@ final class ChangeTaskStatusHandlerTest extends TestCase
     private CreateTaskHandler $createHandler;
     private InMemoryTaskRepository $repository;
 
+    /**
+     * @throws \Throwable
+     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->repository = new InMemoryTaskRepository();
@@ -26,6 +30,9 @@ final class ChangeTaskStatusHandlerTest extends TestCase
         $this->createHandler = new CreateTaskHandler($this->repository);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testChangeStatusTodoToInProgress(): void
     {
         $task = $this->createHandler->handle(new CreateTaskCommand(title: 'Task'))->getResult();
@@ -36,6 +43,9 @@ final class ChangeTaskStatusHandlerTest extends TestCase
         self::assertSame(TaskStatus::InProgress, $result->getResult()->status);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testChangeStatusInProgressToDone(): void
     {
         $task = $this->createHandler->handle(new CreateTaskCommand(title: 'Task'))->getResult();
@@ -47,6 +57,9 @@ final class ChangeTaskStatusHandlerTest extends TestCase
         self::assertSame(TaskStatus::Done, $result->getResult()->status);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testInvalidTransitionFails(): void
     {
         $task = $this->createHandler->handle(new CreateTaskCommand(title: 'Task'))->getResult();
@@ -57,6 +70,9 @@ final class ChangeTaskStatusHandlerTest extends TestCase
         self::assertInstanceOf(InvalidTaskStatusTransitionException::class, $result->getThrowable());
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testInvalidStatusValueFails(): void
     {
         $task = $this->createHandler->handle(new CreateTaskCommand(title: 'Task'))->getResult();

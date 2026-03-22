@@ -17,11 +17,13 @@ use function Eris\Generator\map;
 use function Eris\Generator\string;
 use function Eris\Generator\suchThat;
 
-/** @mago-ignore too-many-methods */
 final class ValueObjectPropertyTest extends TestCase
 {
     use TestTrait;
 
+    /**
+     * @throws \Throwable
+     */
     public function testAnyNonEmptyStringUpTo255CharsCreatesValidTaskTitle(): void
     {
         $this->forAll(suchThat(
@@ -34,6 +36,9 @@ final class ValueObjectPropertyTest extends TestCase
         });
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testAnyStringOver255CharsFailsTaskTitle(): void
     {
         $this->forAll(map(
@@ -45,6 +50,9 @@ final class ValueObjectPropertyTest extends TestCase
         });
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testEmptyStringAlwaysFailsTaskTitle(): void
     {
         $this->forAll(constant(''))->then(static function (string $value): void {
@@ -53,6 +61,9 @@ final class ValueObjectPropertyTest extends TestCase
         });
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testAnyStringUpTo1000CharsCreatesValidTaskDescription(): void
     {
         $this->forAll(suchThat(
@@ -64,6 +75,9 @@ final class ValueObjectPropertyTest extends TestCase
         });
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testAnyStringOver1000CharsFailsTaskDescription(): void
     {
         $this->forAll(map(
@@ -75,6 +89,9 @@ final class ValueObjectPropertyTest extends TestCase
         });
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testTaskIdRoundTrips(): void
     {
         $this->forAll(map(
@@ -88,6 +105,9 @@ final class ValueObjectPropertyTest extends TestCase
         });
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testFutureDatesAlwaysCreateValidDueDate(): void
     {
         $this->forAll(choose(0, 365))->then(static function (int $daysFromNow): void {
@@ -97,6 +117,9 @@ final class ValueObjectPropertyTest extends TestCase
         });
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testPastDatesAlwaysFailDueDate(): void
     {
         $this->forAll(choose(1, 365))->then(static function (int $daysAgo): void {

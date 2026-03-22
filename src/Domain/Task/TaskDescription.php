@@ -26,6 +26,8 @@ final readonly class TaskDescription
      * Parse a string into a TaskDescription. Returns Failure for invalid values.
      *
      * @return ResultInterface<TaskDescription>
+     *
+     * @throws Str\Exception\InvalidArgumentException
      */
     public static function create(string $value): ResultInterface
     {
@@ -33,6 +35,7 @@ final readonly class TaskDescription
         $length = Str\length($trimmed);
 
         if ($length > self::MAX_LENGTH) {
+            /** @var ResultInterface<TaskDescription> */
             return fail(InvalidTaskDescriptionException::tooLong($length));
         }
 
