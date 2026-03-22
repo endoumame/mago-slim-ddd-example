@@ -55,8 +55,10 @@ final class OptionFunctionsTest extends TestCase
     {
         $initial = succeed(10);
 
-        $fn = apply_if_some(some(5), static fn(int $extra): \Closure =>
-            static fn(int $current): ResultInterface => succeed($current + $extra));
+        $fn = apply_if_some(
+            some(5),
+            static fn(int $extra): \Closure => static fn(int $current): ResultInterface => succeed($current + $extra),
+        );
 
         $result = $fn($initial);
 
@@ -70,8 +72,10 @@ final class OptionFunctionsTest extends TestCase
 
         /** @var Option<int> */
         $none = none();
-        $fn = apply_if_some($none, static fn(int $extra): \Closure =>
-            static fn(int $current): ResultInterface => succeed($current + $extra));
+        $fn = apply_if_some(
+            $none,
+            static fn(int $extra): \Closure => static fn(int $current): ResultInterface => succeed($current + $extra),
+        );
 
         $result = $fn($initial);
 
@@ -83,14 +87,20 @@ final class OptionFunctionsTest extends TestCase
     {
         $initial = succeed(0);
 
-        $step1 = apply_if_some(some(1), static fn(int $v): \Closure =>
-            static fn(int $acc): ResultInterface => succeed($acc + $v));
+        $step1 = apply_if_some(
+            some(1),
+            static fn(int $v): \Closure => static fn(int $acc): ResultInterface => succeed($acc + $v),
+        );
 
-        $step2 = apply_if_some(none(), static fn(int $v): \Closure =>
-            static fn(int $acc): ResultInterface => succeed($acc + $v));
+        $step2 = apply_if_some(
+            none(),
+            static fn(int $v): \Closure => static fn(int $acc): ResultInterface => succeed($acc + $v),
+        );
 
-        $step3 = apply_if_some(some(3), static fn(int $v): \Closure =>
-            static fn(int $acc): ResultInterface => succeed($acc + $v));
+        $step3 = apply_if_some(
+            some(3),
+            static fn(int $v): \Closure => static fn(int $acc): ResultInterface => succeed($acc + $v),
+        );
 
         $result = $step3($step2($step1($initial)));
 

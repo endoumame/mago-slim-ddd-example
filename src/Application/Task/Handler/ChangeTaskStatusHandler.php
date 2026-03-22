@@ -12,8 +12,8 @@ use App\Domain\Task\TaskStatus;
 use Psl\Result\ResultInterface;
 
 use function App\Shared\Option\ok_or;
-use function Psl\Option\from_nullable;
 use function App\Shared\Result\bind;
+use function Psl\Option\from_nullable;
 
 final readonly class ChangeTaskStatusHandler
 {
@@ -33,13 +33,11 @@ final readonly class ChangeTaskStatusHandler
             ),
         );
 
-        $idResult = $statusResult
-            |> bind(static fn(TaskStatus $_): ResultInterface => TaskId::create($command->id));
+        $idResult = $statusResult |> bind(static fn(TaskStatus $_): ResultInterface => TaskId::create($command->id));
 
         return $idResult
             |> bind(fn(TaskId $id): ResultInterface => $this->repository->findById($id))
-            |> bind(static fn(Task $task): ResultInterface =>
-                $task->changeStatus($statusResult->getResult()))
+            |> bind(static fn(Task $task): ResultInterface => $task->changeStatus($statusResult->getResult()))
             |> bind(fn(Task $updated): ResultInterface => $this->repository->save($updated));
     }
 }

@@ -133,10 +133,7 @@ final class OptionTest extends TestCase
 
     public function testProceedCallsSomeOnSome(): void
     {
-        $result = some(42)->proceed(
-            static fn(int $v): string => "value: {$v}",
-            static fn(): string => 'empty',
-        );
+        $result = some(42)->proceed(static fn(int $v): string => "value: {$v}", static fn(): string => 'empty');
 
         self::assertSame('value: 42', $result);
     }
@@ -145,10 +142,7 @@ final class OptionTest extends TestCase
     {
         /** @var Option<int> */
         $none = none();
-        $result = $none->proceed(
-            static fn(int $v): string => "value: {$v}",
-            static fn(): string => 'empty',
-        );
+        $result = $none->proceed(static fn(int $v): string => "value: {$v}", static fn(): string => 'empty');
 
         self::assertSame('empty', $result);
     }

@@ -11,9 +11,9 @@ use App\Domain\Task\TaskStatus;
 use Psl\Result\ResultInterface;
 use Psl\Vec;
 
-use function Psl\Option\from_nullable;
 use function App\Shared\Result\bind;
 use function App\Shared\Result\succeed;
+use function Psl\Option\from_nullable;
 
 final readonly class ListTasksHandler
 {
