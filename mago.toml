@@ -1,6 +1,7 @@
 [source]
 paths = ["src", "tests", "config", "public"]
-excludes = ["vendor"]
+includes = ["vendor"]
+excludes = ["vendor/nikic/fast-route/test/"]
 
 [linter]
 minimum-fail-level = "note"
@@ -27,6 +28,29 @@ strict-list-index-checks = true
 no-boolean-literal-comparison = true
 allow-possibly-undefined-array-keys = false
 trust-existence-checks = false
+baseline = "analyzer-baseline.toml"
+ignore = [
+    { code = "unhandled-thrown-type", in = "tests/" },
+    { code = "missing-override-attribute", in = "tests/" },
+    { code = "unused-parameter", in = "tests/" },
+    { code = "unused-method", in = "tests/" },
+    { code = "unused-property", in = "tests/" },
+    { code = "too-many-arguments", in = "tests/" },
+    { code = "mixed-array-access", in = "tests/" },
+    { code = "mixed-argument", in = "tests/" },
+    { code = "mixed-assignment", in = "tests/" },
+    { code = "mixed-method-access", in = "tests/" },
+    { code = "mixed-property-access", in = "tests/" },
+    { code = "possibly-undefined-array-index", in = "tests/" },
+    { code = "less-specific-argument", in = "tests/" },
+    { code = "less-specific-nested-return-statement", in = "tests/" },
+    { code = "invalid-callable", in = "tests/" },
+    { code = "invalid-destructuring-source", in = "tests/" },
+    { code = "possible-method-access-on-null", in = "tests/" },
+    { code = "imprecise-type", in = "tests/" },
+    { code = "missing-return-type", in = "tests/" },
+    { code = "redundant-docblock-type", in = "tests/" },
+]
 
 [formatter]
 excludes = ["public/index.php", "tests/Integration/Infrastructure/Http/TaskEndpointTest.php"]

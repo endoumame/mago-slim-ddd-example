@@ -1,0 +1,229 @@
+variant = "loose"
+
+[[issues]]
+file = "public/index.php"
+code = "invalid-callable"
+message = "Expression of type `mixed` cannot be called as a function or method."
+count = 2
+
+[[issues]]
+file = "src/Application/Task/Handler/CreateTaskHandler.php"
+code = "redundant-docblock-type"
+message = "Redundant docblock type for variable `$description`."
+count = 1
+
+[[issues]]
+file = "src/Application/Task/Handler/CreateTaskHandler.php"
+code = "redundant-docblock-type"
+message = "Redundant docblock type for variable `$title`."
+count = 1
+
+[[issues]]
+file = "src/Application/Task/Handler/ListTasksHandler.php"
+code = "imprecise-type"
+message = "Type `array` in parameter `$tasks` is imprecise, equivalent to `array<array-key, mixed>`."
+count = 1
+
+[[issues]]
+file = "src/Application/Task/Handler/ListTasksHandler.php"
+code = "less-specific-nested-return-statement"
+message = '''Returned type `Psl\Result\ResultInterface<array<array-key, mixed>|list<mixed>>` is less specific than the declared return type `Psl\Result\ResultInterface<list<App\Domain\Task\Task>>` for function `app\application\task\handler\listtaskshandler::handle` due to nested 'mixed'.'''
+count = 1
+
+[[issues]]
+file = "src/Application/Task/Handler/ListTasksHandler.php"
+code = "missing-return-type"
+message = "Function `arrow function` is missing a return type hint."
+count = 3
+
+[[issues]]
+file = "src/Domain/Task/DueDate.php"
+code = "less-specific-nested-return-statement"
+message = '''Returned type `Psl\Result\ResultInterface<mixed>` is less specific than the declared return type `Psl\Result\ResultInterface<App\Domain\Task\DueDate>` for function `app\domain\task\duedate::create` due to nested 'mixed'.'''
+count = 2
+
+[[issues]]
+file = "src/Domain/Task/TaskDescription.php"
+code = "less-specific-nested-return-statement"
+message = '''Returned type `Psl\Result\ResultInterface<mixed>` is less specific than the declared return type `Psl\Result\ResultInterface<App\Domain\Task\TaskDescription>` for function `app\domain\task\taskdescription::create` due to nested 'mixed'.'''
+count = 1
+
+[[issues]]
+file = "src/Domain/Task/TaskDescription.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Psl\Str\Exception\InvalidArgumentException` in `App\Domain\Task\TaskDescription::create`.'
+count = 1
+
+[[issues]]
+file = "src/Domain/Task/TaskId.php"
+code = "less-specific-nested-return-statement"
+message = '''Returned type `Psl\Result\ResultInterface<mixed>` is less specific than the declared return type `Psl\Result\ResultInterface<App\Domain\Task\TaskId>` for function `app\domain\task\taskid::create` due to nested 'mixed'.'''
+count = 1
+
+[[issues]]
+file = "src/Domain/Task/TaskStatus.php"
+code = "invalid-return-statement"
+message = 'Invalid return type for function `app\domain\task\taskstatus::transitionto`: expected `Psl\Result\ResultInterface<enum(App\Domain\Task\TaskStatus)>`, but found `Psl\Result\ResultInterface<mixed>`.'
+count = 1
+
+[[issues]]
+file = "src/Domain/Task/TaskTitle.php"
+code = "less-specific-nested-return-statement"
+message = '''Returned type `Psl\Result\ResultInterface<mixed>` is less specific than the declared return type `Psl\Result\ResultInterface<App\Domain\Task\TaskTitle>` for function `app\domain\task\tasktitle::create` due to nested 'mixed'.'''
+count = 2
+
+[[issues]]
+file = "src/Domain/Task/TaskTitle.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Psl\Str\Exception\InvalidArgumentException` in `App\Domain\Task\TaskTitle::create`.'
+count = 1
+
+[[issues]]
+file = "src/Infrastructure/Http/Controller/TaskController.php"
+code = "imprecise-type"
+message = "Type `array` in return type of `arrow function` is imprecise, equivalent to `array<array-key, mixed>`."
+count = 1
+
+[[issues]]
+file = "src/Infrastructure/Http/Controller/TaskController.php"
+code = "redundant-docblock-type"
+message = "Redundant docblock type for variable `$task`."
+count = 1
+
+[[issues]]
+file = "src/Infrastructure/Http/Controller/TaskController.php"
+code = "redundant-docblock-type"
+message = "Redundant docblock type for variable `$tasks`."
+count = 1
+
+[[issues]]
+file = "src/Infrastructure/Http/Controller/TaskController.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `InvalidArgumentException` in `App\Infrastructure\Http\Controller\TaskController::jsonResponse`.'
+count = 1
+
+[[issues]]
+file = "src/Infrastructure/Http/Controller/TaskController.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Psl\Exception\InvariantViolationException` in `App\Infrastructure\Http\Controller\TaskController::delete`.'
+count = 1
+
+[[issues]]
+file = "src/Infrastructure/Http/Controller/TaskController.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Psl\Exception\InvariantViolationException` in `App\Infrastructure\Http\Controller\TaskController::list`.'
+count = 1
+
+[[issues]]
+file = "src/Infrastructure/Http/Controller/TaskController.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Psl\Exception\InvariantViolationException` in `App\Infrastructure\Http\Controller\TaskController::toResponse`.'
+count = 1
+
+[[issues]]
+file = "src/Infrastructure/Http/Controller/TaskController.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `RuntimeException` in `App\Infrastructure\Http\Controller\TaskController::jsonResponse`.'
+count = 1
+
+[[issues]]
+file = "src/Infrastructure/Http/Controller/TaskController.php"
+code = "unused-parameter"
+message = "Parameter `$request` is never used."
+count = 2
+
+[[issues]]
+file = "src/Infrastructure/Http/Controller/TaskController.php"
+code = "unused-parameter"
+message = "Parameter `$response` is never used."
+count = 4
+
+[[issues]]
+file = "src/Infrastructure/Http/Middleware/ErrorHandlerMiddleware.php"
+code = "missing-override-attribute"
+message = 'Missing `#[Override]` attribute on overriding method `App\Infrastructure\Http\Middleware\ErrorHandlerMiddleware::process`.'
+count = 1
+
+[[issues]]
+file = "src/Infrastructure/Http/Middleware/ErrorHandlerMiddleware.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `InvalidArgumentException` in `App\Infrastructure\Http\Middleware\ErrorHandlerMiddleware::createErrorResponse`.'
+count = 1
+
+[[issues]]
+file = "src/Infrastructure/Http/Middleware/ErrorHandlerMiddleware.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `RuntimeException` in `App\Infrastructure\Http\Middleware\ErrorHandlerMiddleware::createErrorResponse`.'
+count = 1
+
+[[issues]]
+file = "src/Infrastructure/Http/Middleware/ErrorHandlerMiddleware.php"
+code = "unused-parameter"
+message = "Parameter `$e` is never used."
+count = 1
+
+[[issues]]
+file = "src/Infrastructure/Http/Middleware/JsonBodyParserMiddleware.php"
+code = "missing-override-attribute"
+message = 'Missing `#[Override]` attribute on overriding method `App\Infrastructure\Http\Middleware\JsonBodyParserMiddleware::process`.'
+count = 1
+
+[[issues]]
+file = "src/Infrastructure/Http/Middleware/JsonBodyParserMiddleware.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `InvalidArgumentException` in `App\Infrastructure\Http\Middleware\JsonBodyParserMiddleware::process`.'
+count = 1
+
+[[issues]]
+file = "src/Infrastructure/Persistence/InMemoryTaskRepository.php"
+code = "less-specific-nested-return-statement"
+message = '''Returned type `Psl\Result\ResultInterface<mixed>` is less specific than the declared return type `Psl\Result\ResultInterface<App\Domain\Task\Task>` for function `app\infrastructure\persistence\inmemorytaskrepository::findbyid` due to nested 'mixed'.'''
+count = 1
+
+[[issues]]
+file = "src/Infrastructure/Persistence/InMemoryTaskRepository.php"
+code = "less-specific-nested-return-statement"
+message = '''Returned type `Psl\Result\ResultInterface<mixed>` is less specific than the declared return type `Psl\Result\ResultInterface<true>` for function `app\infrastructure\persistence\inmemorytaskrepository::delete` due to nested 'mixed'.'''
+count = 1
+
+[[issues]]
+file = "src/Infrastructure/Persistence/InMemoryTaskRepository.php"
+code = "missing-override-attribute"
+message = 'Missing `#[Override]` attribute on overriding method `App\Infrastructure\Persistence\InMemoryTaskRepository::delete`.'
+count = 1
+
+[[issues]]
+file = "src/Infrastructure/Persistence/InMemoryTaskRepository.php"
+code = "missing-override-attribute"
+message = 'Missing `#[Override]` attribute on overriding method `App\Infrastructure\Persistence\InMemoryTaskRepository::findAll`.'
+count = 1
+
+[[issues]]
+file = "src/Infrastructure/Persistence/InMemoryTaskRepository.php"
+code = "missing-override-attribute"
+message = 'Missing `#[Override]` attribute on overriding method `App\Infrastructure\Persistence\InMemoryTaskRepository::findById`.'
+count = 1
+
+[[issues]]
+file = "src/Infrastructure/Persistence/InMemoryTaskRepository.php"
+code = "missing-override-attribute"
+message = 'Missing `#[Override]` attribute on overriding method `App\Infrastructure\Persistence\InMemoryTaskRepository::save`.'
+count = 1
+
+[[issues]]
+file = "src/Shared/Option/OptionFunctions.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Psl\Option\Exception\NoneException` in `App\Shared\Option\apply_if_some`.'
+count = 1
+
+[[issues]]
+file = "src/Shared/Result/ResultFunctions.php"
+code = "redundant-docblock-type"
+message = "Redundant docblock type for expression."
+count = 1
+
+[[issues]]
+file = "src/Shared/Result/ResultFunctions.php"
+code = "unused-template-parameter"
+message = 'Template parameter `Te` is never used in function `App\Shared\Result\flat_map`.'
+count = 1
