@@ -57,9 +57,6 @@ else
   make -j"$(nproc)"
   make install
 
-  # sodium 拡張を有効化
-  echo "extension=sodium" > "$PHP_PREFIX/lib/php.ini"
-
   # クリーンアップ
   rm -rf "$BUILD_DIR"
 
