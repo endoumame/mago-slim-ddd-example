@@ -49,13 +49,11 @@ final class TaskEndpointTest extends TestCase
 
         self::assertSame(201, $response->getStatusCode());
 
+        /** @var array{data: array{title: string, description: string, status: string}} $body */
         $body = $this->parseJson($response);
-        self::assertArrayHasKey('data', $body);
-        /** @var array<string, mixed> $data */
-        $data = $body['data'];
-        self::assertSame('Integration test task', $data['title']);
-        self::assertSame('Created via test', $data['description']);
-        self::assertSame('todo', $data['status']);
+        self::assertSame('Integration test task', $body['data']['title']);
+        self::assertSame('Created via test', $body['data']['description']);
+        self::assertSame('todo', $body['data']['status']);
     }
 
     /**
@@ -67,11 +65,9 @@ final class TaskEndpointTest extends TestCase
 
         self::assertSame(422, $response->getStatusCode());
 
+        /** @var array{error: array{type: string}} $body */
         $body = $this->parseJson($response);
-        self::assertArrayHasKey('error', $body);
-        /** @var array<string, mixed> $error */
-        $error = $body['error'];
-        self::assertSame('validation_error', $error['type']);
+        self::assertSame('validation_error', $body['error']['type']);
     }
 
     /**
@@ -80,22 +76,17 @@ final class TaskEndpointTest extends TestCase
     public function testGetTask(): void
     {
         $createResponse = $this->postJson('/api/tasks', ['title' => 'Find me']);
+        /** @var array{data: array{id: string}} $created */
         $created = $this->parseJson($createResponse);
-        self::assertArrayHasKey('data', $created);
-        /** @var array<string, mixed> $createdData */
-        $createdData = $created['data'];
-        /** @var string $id */
-        $id = $createdData['id'];
+        $id = $created['data']['id'];
 
         $response = $this->request('GET', "/api/tasks/{$id}");
 
         self::assertSame(200, $response->getStatusCode());
 
+        /** @var array{data: array{title: string}} $body */
         $body = $this->parseJson($response);
-        self::assertArrayHasKey('data', $body);
-        /** @var array<string, mixed> $data */
-        $data = $body['data'];
-        self::assertSame('Find me', $data['title']);
+        self::assertSame('Find me', $body['data']['title']);
     }
 
     /**
@@ -120,11 +111,9 @@ final class TaskEndpointTest extends TestCase
 
         self::assertSame(200, $response->getStatusCode());
 
+        /** @var array{data: list<mixed>} $body */
         $body = $this->parseJson($response);
-        self::assertArrayHasKey('data', $body);
-        /** @var array<int, mixed> $data */
-        $data = $body['data'];
-        self::assertCount(2, $data);
+        self::assertCount(2, $body['data']);
     }
 
     /**
@@ -133,21 +122,16 @@ final class TaskEndpointTest extends TestCase
     public function testUpdateTask(): void
     {
         $createResponse = $this->postJson('/api/tasks', ['title' => 'Original']);
+        /** @var array{data: array{id: string}} $created */
         $created = $this->parseJson($createResponse);
-        self::assertArrayHasKey('data', $created);
-        /** @var array<string, mixed> $createdData */
-        $createdData = $created['data'];
-        /** @var string $id */
-        $id = $createdData['id'];
+        $id = $created['data']['id'];
 
         $response = $this->putJson("/api/tasks/{$id}", ['title' => 'Updated']);
 
         self::assertSame(200, $response->getStatusCode());
+        /** @var array{data: array{title: string}} $body */
         $body = $this->parseJson($response);
-        self::assertArrayHasKey('data', $body);
-        /** @var array<string, mixed> $data */
-        $data = $body['data'];
-        self::assertSame('Updated', $data['title']);
+        self::assertSame('Updated', $body['data']['title']);
     }
 
     /**
@@ -156,12 +140,9 @@ final class TaskEndpointTest extends TestCase
     public function testDeleteTask(): void
     {
         $createResponse = $this->postJson('/api/tasks', ['title' => 'Delete me']);
+        /** @var array{data: array{id: string}} $created */
         $created = $this->parseJson($createResponse);
-        self::assertArrayHasKey('data', $created);
-        /** @var array<string, mixed> $createdData */
-        $createdData = $created['data'];
-        /** @var string $id */
-        $id = $createdData['id'];
+        $id = $created['data']['id'];
 
         $response = $this->request('DELETE', "/api/tasks/{$id}");
 
@@ -177,21 +158,16 @@ final class TaskEndpointTest extends TestCase
     public function testChangeStatus(): void
     {
         $createResponse = $this->postJson('/api/tasks', ['title' => 'Status test']);
+        /** @var array{data: array{id: string}} $created */
         $created = $this->parseJson($createResponse);
-        self::assertArrayHasKey('data', $created);
-        /** @var array<string, mixed> $createdData */
-        $createdData = $created['data'];
-        /** @var string $id */
-        $id = $createdData['id'];
+        $id = $created['data']['id'];
 
         $response = $this->patchJson("/api/tasks/{$id}/status", ['status' => 'in_progress']);
 
         self::assertSame(200, $response->getStatusCode());
+        /** @var array{data: array{status: string}} $body */
         $body = $this->parseJson($response);
-        self::assertArrayHasKey('data', $body);
-        /** @var array<string, mixed> $data */
-        $data = $body['data'];
-        self::assertSame('in_progress', $data['status']);
+        self::assertSame('in_progress', $body['data']['status']);
     }
 
     /**
@@ -200,12 +176,9 @@ final class TaskEndpointTest extends TestCase
     public function testChangeStatusInvalidTransition(): void
     {
         $createResponse = $this->postJson('/api/tasks', ['title' => 'Status test']);
+        /** @var array{data: array{id: string}} $created */
         $created = $this->parseJson($createResponse);
-        self::assertArrayHasKey('data', $created);
-        /** @var array<string, mixed> $createdData */
-        $createdData = $created['data'];
-        /** @var string $id */
-        $id = $createdData['id'];
+        $id = $created['data']['id'];
 
         $response = $this->patchJson("/api/tasks/{$id}/status", ['status' => 'done']);
 
