@@ -19,19 +19,19 @@ run = "./vendor/bin/phpunit --testsuite Integration"
 
 [tasks.lint]
 description = "Run mago linter"
-run = "mago lint"
+run = "./vendor/bin/mago lint"
 
 [tasks.format]
 description = "Run mago formatter"
-run = "mago format"
+run = "./vendor/bin/mago format"
 
 [tasks."format:check"]
 description = "Check formatting without modifying files"
-run = "mago format --check"
+run = "./vendor/bin/mago format --check"
 
 [tasks.analyze]
 description = "Run mago static analyzer"
-run = "mago analyze"
+run = "./vendor/bin/mago analyze"
 
 [tasks.check]
 description = "Run all checks (lint, format check, analyze, test)"
