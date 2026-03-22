@@ -29,6 +29,7 @@ use function App\Shared\Result\succeed;
 function ok_or(Option $option, Throwable $error): ResultInterface
 {
     return $option->proceed(
+        /** @param T $value */
         static fn(mixed $value): ResultInterface => succeed($value),
         static fn(): ResultInterface => fail($error),
     );
@@ -51,6 +52,7 @@ function ok_or(Option $option, Throwable $error): ResultInterface
 function traverse(Option $option, Closure $fn): ResultInterface
 {
     return $option->proceed(
+        /** @param T $value */
         static fn(mixed $value): ResultInterface => $fn($value),
         static fn(): ResultInterface => succeed(null),
     );
@@ -109,7 +111,12 @@ function traverse_with(Closure $fn): Closure
 function apply_if_some(Option $option, Closure $fn): Closure
 {
     return $option->proceed(
-        static fn(mixed $value): Closure => bind($fn($value)),
+        static function (mixed $value) use ($fn): Closure {
+            /** @var Closure(mixed): ResultInterface<mixed> $binding */
+            $binding = $fn($value);
+
+            return bind($binding);
+        },
         static fn(): Closure => static fn(ResultInterface $result): ResultInterface => $result,
     );
 }

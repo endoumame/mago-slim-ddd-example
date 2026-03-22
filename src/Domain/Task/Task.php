@@ -151,7 +151,7 @@ final readonly class Task
     /**
      * Serialize to an associative array for API responses.
      *
-     * @return array<string, mixed>
+     * @return array{id: string, title: string, description: string, status: string, due_date: string|null, created_at: string, updated_at: string}
      */
     public function toArray(): array
     {

@@ -37,10 +37,12 @@ final readonly class ListTasksHandler
                     $filtered = from_nullable($query->status)
                         ->andThen(static fn(string $s): Option => TaskStatus::tryFrom($s) |> from_nullable(...))
                         ->proceed(
+                            /** @return list<Task> */
                             static fn(TaskStatus $status): array => Vec\filter(
                                 $tasks,
                                 static fn(Task $task): bool => $task->status === $status,
                             ),
+                            /** @return list<Task> */
                             static fn(): array => $tasks,
                         );
 

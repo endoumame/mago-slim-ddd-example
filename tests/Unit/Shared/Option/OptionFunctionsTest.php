@@ -75,6 +75,7 @@ final class OptionFunctionsTest extends TestCase
             static fn(int $extra): \Closure => static fn(int $current): ResultInterface => succeed($current + $extra),
         );
 
+        /** @var ResultInterface<int> $result */
         $result = $fn($initial);
 
         self::assertTrue($result->isSucceeded());
@@ -95,6 +96,7 @@ final class OptionFunctionsTest extends TestCase
             static fn(int $extra): \Closure => static fn(int $current): ResultInterface => succeed($current + $extra),
         );
 
+        /** @var ResultInterface<int> $result */
         $result = $fn($initial);
 
         self::assertTrue($result->isSucceeded());
@@ -123,6 +125,7 @@ final class OptionFunctionsTest extends TestCase
             static fn(int $v): \Closure => static fn(int $acc): ResultInterface => succeed($acc + $v),
         );
 
+        /** @var ResultInterface<int> $result */
         $result = $step3($step2($step1($initial)));
 
         self::assertTrue($result->isSucceeded());

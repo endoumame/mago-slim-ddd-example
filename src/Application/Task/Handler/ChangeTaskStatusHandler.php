@@ -26,6 +26,7 @@ final readonly class ChangeTaskStatusHandler
      */
     public function handle(ChangeTaskStatusCommand $command): ResultInterface
     {
+        /** @var ResultInterface<TaskStatus> $statusResult */
         $statusResult = TaskStatus::tryFrom($command->status)
             |> from_nullable(...)
             |> ok_or_err(
