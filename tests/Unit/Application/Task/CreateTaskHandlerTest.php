@@ -8,8 +8,8 @@ use App\Application\Task\Command\CreateTaskCommand;
 use App\Application\Task\Handler\CreateTaskHandler;
 use App\Domain\Task\Exception\InvalidDueDateException;
 use App\Domain\Task\Exception\InvalidTaskTitleException;
-use App\Domain\Task\Task;
 use App\Domain\Task\TaskStatus;
+use App\Domain\Task\TodoTask;
 use App\Infrastructure\Persistence\InMemoryTaskRepository;
 use PHPUnit\Framework\TestCase;
 
@@ -40,7 +40,7 @@ final class CreateTaskHandlerTest extends TestCase
         self::assertTrue($result->isSucceeded());
 
         $task = $result->getResult();
-        self::assertInstanceOf(Task::class, $task);
+        self::assertInstanceOf(TodoTask::class, $task);
         self::assertSame('Buy groceries', $task->title->value());
         self::assertSame('', $task->description->value());
         self::assertSame(TaskStatus::Todo, $task->status);

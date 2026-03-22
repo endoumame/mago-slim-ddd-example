@@ -10,6 +10,7 @@ use App\Domain\Task\Task;
 use App\Domain\Task\TaskDescription;
 use App\Domain\Task\TaskRepositoryInterface;
 use App\Domain\Task\TaskTitle;
+use App\Domain\Task\TodoTask;
 use Psl\Result\ResultInterface;
 
 use function App\Shared\Option\traverse_with;
@@ -46,7 +47,7 @@ final readonly class CreateTaskHandler
                 $title = $titleResult->getResult();
                 $description = $descriptionResult->getResult();
 
-                return Task::create($title, $description, $dueDate)
+                return TodoTask::create($title, $description, $dueDate)
                     |> bind(fn(Task $task): ResultInterface => $this->repository->save($task));
             });
     }

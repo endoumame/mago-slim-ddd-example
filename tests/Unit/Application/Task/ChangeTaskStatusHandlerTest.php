@@ -8,7 +8,9 @@ use App\Application\Task\Command\ChangeTaskStatusCommand;
 use App\Application\Task\Command\CreateTaskCommand;
 use App\Application\Task\Handler\ChangeTaskStatusHandler;
 use App\Application\Task\Handler\CreateTaskHandler;
+use App\Domain\Task\DoneTask;
 use App\Domain\Task\Exception\InvalidTaskStatusTransitionException;
+use App\Domain\Task\InProgressTask;
 use App\Domain\Task\TaskStatus;
 use App\Infrastructure\Persistence\InMemoryTaskRepository;
 use PHPUnit\Framework\TestCase;
@@ -40,6 +42,7 @@ final class ChangeTaskStatusHandlerTest extends TestCase
         $result = $this->handler->handle(new ChangeTaskStatusCommand(id: $task->id->value(), status: 'in_progress'));
 
         self::assertTrue($result->isSucceeded());
+        self::assertInstanceOf(InProgressTask::class, $result->getResult());
         self::assertSame(TaskStatus::InProgress, $result->getResult()->status);
     }
 
@@ -54,6 +57,7 @@ final class ChangeTaskStatusHandlerTest extends TestCase
         $result = $this->handler->handle(new ChangeTaskStatusCommand(id: $task->id->value(), status: 'done'));
 
         self::assertTrue($result->isSucceeded());
+        self::assertInstanceOf(DoneTask::class, $result->getResult());
         self::assertSame(TaskStatus::Done, $result->getResult()->status);
     }
 
