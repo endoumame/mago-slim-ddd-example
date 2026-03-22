@@ -71,21 +71,17 @@ final readonly class TaskController
         $params = $request->getQueryParams();
         $query = new ListTasksQuery(status: isset($params['status']) ? (string) $params['status'] : null);
 
-        $result = $this->listHandler->handle($query);
-
-        if ($result->isFailed()) {
-            return $this->errorResponse($result->getThrowable());
-        }
-
-        $tasks = $result->getResult();
-
-        return $this->jsonResponse([
-            'data' => Vec\map(
-                $tasks,
-                /** @return array<string, mixed> */
-                static fn(Task $task): array => $task->toArray(),
-            ),
-        ]);
+        return $this->handleResult(
+            $this->listHandler->handle($query),
+            /** @param list<Task> $tasks */
+            static fn(array $tasks): array => [
+                'data' => Vec\map(
+                    $tasks,
+                    /** @return array<string, mixed> */
+                    static fn(Task $task): array => $task->toArray(),
+                ),
+            ],
+        );
     }
 
     /**
@@ -113,13 +109,12 @@ final readonly class TaskController
     public function delete(ServerRequestInterface $request, ResponseInterface $response, string $id): ResponseInterface
     {
         $command = new DeleteTaskCommand(id: $id);
-        $result = $this->deleteHandler->handle($command);
 
-        if ($result->isFailed()) {
-            return $this->errorResponse($result->getThrowable());
-        }
-
-        return $this->jsonResponse(['data' => null], 204);
+        return $this->handleResult(
+            $this->deleteHandler->handle($command),
+            static fn(mixed $_): array => ['data' => null],
+            204,
+        );
     }
 
     /**
@@ -145,13 +140,27 @@ final readonly class TaskController
      */
     private function toResponse(ResultInterface $result, int $successCode = 200): ResponseInterface
     {
+        return $this->handleResult($result, static fn(Task $task): array => ['data' => $task->toArray()], $successCode);
+    }
+
+    /**
+     * @template T
+     *
+     * @param ResultInterface<T> $result
+     * @param \Closure(T): array<string, mixed> $onSuccess
+     *
+     * @throws \Throwable
+     */
+    private function handleResult(
+        ResultInterface $result,
+        \Closure $onSuccess,
+        int $successCode = 200,
+    ): ResponseInterface {
         if ($result->isFailed()) {
             return $this->errorResponse($result->getThrowable());
         }
 
-        $task = $result->getResult();
-
-        return $this->jsonResponse(['data' => $task->toArray()], $successCode);
+        return $this->jsonResponse($onSuccess($result->getResult()), $successCode);
     }
 
     /**
