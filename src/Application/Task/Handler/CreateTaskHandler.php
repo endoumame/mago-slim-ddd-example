@@ -35,9 +35,10 @@ final readonly class CreateTaskHandler
             |> bind(static fn(TaskTitle $_): ResultInterface => TaskDescription::create($command->description));
 
         $dueDateResult = $descriptionResult
-            |> bind(static fn(TaskDescription $_): ResultInterface => $command->dueDate
-                |> from_nullable(...)
-                |> traverse_with(DueDate::create(...)),
+            |> bind(
+                static fn(TaskDescription $_): ResultInterface => $command->dueDate
+                    |> from_nullable(...)
+                    |> traverse_with(DueDate::create(...)),
             );
 
         return $dueDateResult

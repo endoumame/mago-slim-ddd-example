@@ -28,9 +28,11 @@ final readonly class ChangeTaskStatusHandler
     {
         $statusResult = TaskStatus::tryFrom($command->status)
             |> from_nullable(...)
-            |> ok_or_err(new \InvalidArgumentException(
-                "Invalid status: '{$command->status}'. Must be one of: todo, in_progress, done.",
-            ));
+            |> ok_or_err(
+                new \InvalidArgumentException(
+                    "Invalid status: '{$command->status}'. Must be one of: todo, in_progress, done.",
+                ),
+            );
 
         $idResult = $statusResult |> bind(static fn(TaskStatus $_): ResultInterface => TaskId::create($command->id));
 
