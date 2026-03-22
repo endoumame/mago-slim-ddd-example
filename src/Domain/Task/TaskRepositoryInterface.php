@@ -6,6 +6,7 @@ namespace App\Domain\Task;
 
 use Psl\Result\ResultInterface;
 
+/** @api */
 interface TaskRepositoryInterface
 {
     /**

@@ -11,5 +11,7 @@ use DomainException;
  *
  * These are never thrown — they are always wrapped in Psl\Result\Failure
  * and returned as values for railway-oriented programming.
+ *
+ * @api
  */
 abstract class DomainError extends DomainException {}
