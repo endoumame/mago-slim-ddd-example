@@ -11,21 +11,10 @@
   "permissions": {
     "allow": [
       "Skill",
-      "Bash(brew info:*)",
-      "Bash(brew list:*)",
-      "Bash(brew search:*)",
-      "Bash(brew services:*)",
       "Bash(cat:*)",
-      "Bash(chezmoi diff:*)",
-      "Bash(chezmoi git log:*)",
-      "Bash(chezmoi git status:*)",
-      "Bash(chezmoi managed:*)",
-      "Bash(chezmoi source-path:*)",
-      "Bash(chezmoi status:*)",
-      "Bash(chezmoi update:*)",
-      "Bash(claude config --help:*)",
-      "Bash(claude mcp --help:*)",
-      "Bash(defaults read:*)",
+      "Bash(composer info:*)",
+      "Bash(composer show:*)",
+      "Bash(composer validate:*)",
       "Bash(dig:*)",
       "Bash(du:*)",
       "Bash(find:*)",
@@ -35,70 +24,34 @@
       "Bash(jq:*)",
       "Bash(ls:*)",
       "Bash(lsof:*)",
-      "Bash(node:*)",
-      "Bash(npm info:*)",
-      "Bash(npm init:*)",
-      "Bash(npm run build:*)",
-      "Bash(npm run dev:*)",
-      "Bash(npm run format:*)",
-      "Bash(npm test)",
-      "Bash(npx biome check:*)",
-      "Bash(npx lefthook install)",
-      "Bash(npx oxfmt:*)",
-      "Bash(npx textlint:*)",
-      "Bash(npx tsc --noEmit)",
-      "Bash(npx tsc:*)",
-      "Bash(npx tsx:*)",
-      "Bash(npx wrangler:*)",
       "Bash(paste:*)",
-      "Bash(plutil:*)",
+      "Bash(php:*)",
       "Bash(ps:*)",
-      "Bash(sips:*)",
       "Bash(sort:*)",
       "Bash(tail:*)",
       "Bash(tree:*)",
-      "Bash(whois:*)",
-      "Bash(wrangler --version:*)",
-      "Skill(frontend-design)",
+      "Bash(vendor/bin/mago:*)",
+      "Bash(vendor/bin/phpunit:*)",
       "WebFetch(domain:api.github.com)",
-      "WebFetch(domain:apify.com)",
       "WebFetch(domain:arxiv.org)",
-      "WebFetch(domain:cdn.jsdelivr.net)",
-      "WebFetch(domain:cdn.simpleicons.org)",
       "WebFetch(domain:code.claude.com)",
-      "WebFetch(domain:cookbook.openai.com)",
-      "WebFetch(domain:developers.cloudflare.com)",
       "WebFetch(domain:docs.anthropic.com)",
       "WebFetch(domain:docs.claude.com)",
-      "WebFetch(domain:docs.firecrawl.dev)",
-      "WebFetch(domain:empathyfirstmedia.com)",
       "WebFetch(domain:github.com)",
-      "WebFetch(domain:icons.getbootstrap.com)",
-      "WebFetch(domain:lefthook.dev)",
       "WebFetch(domain:medium.com)",
-      "WebFetch(domain:openai.com)",
+      "WebFetch(domain:packagist.org)",
+      "WebFetch(domain:php.net)",
       "WebFetch(domain:platform.claude.com)",
-      "WebFetch(domain:platform.openai.com)",
       "WebFetch(domain:pure.md)",
       "WebFetch(domain:qiita.com)",
-      "WebFetch(domain:railway.com)",
-      "WebFetch(domain:rapidapi.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
-      "WebFetch(domain:sakana.ai)",
-      "WebFetch(domain:simpleicons.org)",
-      "WebFetch(domain:spider.cloud)",
-      "WebFetch(domain:supadata.ai)",
-      "WebFetch(domain:vercel.com)",
       "WebFetch(domain:www.anthropic.com)",
-      "WebFetch(domain:www.firecrawl.dev)",
-      "WebFetch(domain:www.humanlayer.dev)",
-      "WebFetch(domain:www.npmjs.com)",
-      "WebFetch(domain:x.ai)",
+      "WebFetch(domain:www.php.net)",
+      "WebFetch(domain:www.slimframework.com)",
       "WebFetch(domain:zenn.dev)",
       "WebSearch"
     ],
     "deny": [
-      "Bash(bash -c:*)",
       "Bash(git commit --no-verify*)"
     ],
     "ask": [
@@ -124,14 +77,54 @@
         ]
       },
       {
-        "matcher": "Edit|Write|MultiEdit",
+        "matcher": "Write|Edit|MultiEdit",
         "hooks": [
           {
             "type": "command",
-            "command": "jq -r '.tool_input.file_path' | grep -qE '(\\.env|\\.git/|package-lock\\.json|credentials|secrets)' && { echo '⚠️ 保護されたファイルへの編集はブロックされました' >&2; exit 2; } || exit 0"
+            "command": "bash -c 'FILE=$(jq -r \".tool_input.file_path // .tool_input.path\" <<< \"$(cat)\"); PROTECTED=\"mago.toml phpunit.xml composer.lock .env\"; for p in $PROTECTED; do case \"$FILE\" in *$p*) echo \"BLOCKED: $FILE is a protected config file. Fix the code, not the linter/formatter config.\" >&2; exit 2;; esac; done'"
           }
         ]
-      },
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/install_pkgs.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/post-php-lint.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && vendor/bin/phpunit 2>&1 | tail -30"
+          },
+          {
+            "type": "command",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && vendor/bin/mago lint 2>&1 | tail -30"
+          },
+          {
+            "type": "command",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && vendor/bin/mago analyze 2>&1 | tail -30"
+          }
+        ]
+      }
     ],
     "UserPromptSubmit": [
       {
@@ -146,11 +139,9 @@
   },
   "enabledPlugins": {
     "context7@claude-plugins-official": true,
-    "frontend-design@claude-plugins-official": true,
     "code-review@claude-plugins-official": true,
     "commit-commands@claude-plugins-official": true,
-    "plugin-dev@claude-plugins-official": true,
-    "pr-review-toolkit@claude-plugins-official": true,
+    "pr-review-toolkit@claude-plugins-official": true
   },
   "outputStyle": "Explanatory",
   "sandbox": {
