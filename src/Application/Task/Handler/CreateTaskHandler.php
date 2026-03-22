@@ -30,25 +30,22 @@ final readonly class CreateTaskHandler
      */
     public function handle(CreateTaskCommand $command): ResultInterface
     {
-        $titleResult = TaskTitle::create($command->title);
-
-        $descriptionResult = $titleResult
-            |> bind(static fn(TaskTitle $_): ResultInterface => TaskDescription::create($command->description));
-
-        $dueDateResult = $descriptionResult
+        return TaskTitle::create($command->title)
             |> bind(
-                static fn(TaskDescription $_): ResultInterface => $command->dueDate
-                    |> from_nullable(...)
-                    |> traverse_with(DueDate::create(...)),
-            );
-
-        return $dueDateResult
-            |> bind(function (?DueDate $dueDate) use ($titleResult, $descriptionResult): ResultInterface {
-                $title = $titleResult->getResult();
-                $description = $descriptionResult->getResult();
-
-                return TodoTask::create($title, $description, $dueDate)
-                    |> bind(fn(Task $task): ResultInterface => $this->repository->save($task));
-            });
+                static fn(TaskTitle $title): ResultInterface => TaskDescription::create($command->description)
+                    |> bind(
+                        static fn(TaskDescription $description): ResultInterface => $command->dueDate
+                            |> from_nullable(...)
+                            |> traverse_with(DueDate::create(...))
+                            |> bind(
+                                static fn(?DueDate $dueDate): ResultInterface => TodoTask::create(
+                                    $title,
+                                    $description,
+                                    $dueDate,
+                                ),
+                            ),
+                    ),
+            )
+            |> bind(fn(Task $task): ResultInterface => $this->repository->save($task));
     }
 }

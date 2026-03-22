@@ -41,8 +41,7 @@ final readonly class TaskController
      */
     public function create(ServerRequestInterface $request): ResponseInterface
     {
-        /** @var array<string, mixed> $body */
-        $body = $request->getParsedBody() ?? [];
+        $body = $this->parsedBody($request);
 
         $command = new CreateTaskCommand(
             title: (string) ($body['title'] ?? ''),
@@ -72,21 +71,20 @@ final readonly class TaskController
         $params = $request->getQueryParams();
         $query = new ListTasksQuery(status: isset($params['status']) ? (string) $params['status'] : null);
 
-        $result = $this->listHandler->handle($query);
-
-        if ($result->isFailed()) {
-            return $this->errorResponse($result->getThrowable());
-        }
-
-        $tasks = $result->getResult();
-
-        return $this->jsonResponse([
-            'data' => Vec\map(
-                $tasks,
-                /** @return array<string, mixed> */
-                static fn(Task $task): array => $task->toArray(),
-            ),
-        ]);
+        return $this->handleResult(
+            $this->listHandler->handle($query),
+            /**
+             * @param list<Task> $tasks
+             * @return array<string, mixed>
+             */
+            static fn(array $tasks): array => [
+                'data' => Vec\map(
+                    $tasks,
+                    /** @return array<string, mixed> */
+                    static fn(Task $task): array => $task->toArray(),
+                ),
+            ],
+        );
     }
 
     /**
@@ -95,8 +93,7 @@ final readonly class TaskController
      */
     public function update(ServerRequestInterface $request, ResponseInterface $response, string $id): ResponseInterface
     {
-        /** @var array<string, mixed> $body */
-        $body = $request->getParsedBody() ?? [];
+        $body = $this->parsedBody($request);
 
         $command = new UpdateTaskCommand(
             id: $id,
@@ -115,13 +112,13 @@ final readonly class TaskController
     public function delete(ServerRequestInterface $request, ResponseInterface $response, string $id): ResponseInterface
     {
         $command = new DeleteTaskCommand(id: $id);
-        $result = $this->deleteHandler->handle($command);
 
-        if ($result->isFailed()) {
-            return $this->errorResponse($result->getThrowable());
-        }
-
-        return $this->jsonResponse(['data' => null], 204);
+        return $this->handleResult(
+            $this->deleteHandler->handle($command),
+            /** @return array<string, mixed> */
+            static fn(mixed $_): array => ['data' => null],
+            204,
+        );
     }
 
     /**
@@ -133,8 +130,7 @@ final readonly class TaskController
         ResponseInterface $response,
         string $id,
     ): ResponseInterface {
-        /** @var array<string, mixed> $body */
-        $body = $request->getParsedBody() ?? [];
+        $body = $this->parsedBody($request);
 
         $command = new ChangeTaskStatusCommand(id: $id, status: (string) ($body['status'] ?? ''));
 
@@ -148,13 +144,32 @@ final readonly class TaskController
      */
     private function toResponse(ResultInterface $result, int $successCode = 200): ResponseInterface
     {
+        return $this->handleResult(
+            $result,
+            /** @return array<string, mixed> */
+            static fn(Task $task): array => ['data' => $task->toArray()],
+            $successCode,
+        );
+    }
+
+    /**
+     * @template T
+     *
+     * @param ResultInterface<T> $result
+     * @param \Closure(T): array<string, mixed> $onSuccess
+     *
+     * @throws \Throwable
+     */
+    private function handleResult(
+        ResultInterface $result,
+        \Closure $onSuccess,
+        int $successCode = 200,
+    ): ResponseInterface {
         if ($result->isFailed()) {
             return $this->errorResponse($result->getThrowable());
         }
 
-        $task = $result->getResult();
-
-        return $this->jsonResponse(['data' => $task->toArray()], $successCode);
+        return $this->jsonResponse($onSuccess($result->getResult()), $successCode);
     }
 
     /**
@@ -164,16 +179,10 @@ final readonly class TaskController
      */
     private function errorResponse(\Throwable $error): ResponseInterface
     {
-        $statusCode = match (true) {
-            $error instanceof TaskNotFoundException => 404,
-            $error instanceof DomainError, $error instanceof \InvalidArgumentException => 422,
-            default => 500,
-        };
-
-        $type = match (true) {
-            $error instanceof TaskNotFoundException => 'not_found',
-            $error instanceof DomainError, $error instanceof \InvalidArgumentException => 'validation_error',
-            default => 'internal_error',
+        [$statusCode, $type] = match (true) {
+            $error instanceof TaskNotFoundException => [404, 'not_found'],
+            $error instanceof DomainError, $error instanceof \InvalidArgumentException => [422, 'validation_error'],
+            default => [500, 'internal_error'],
         };
 
         return $this->jsonResponse([
@@ -182,6 +191,15 @@ final readonly class TaskController
                 'message' => $error->getMessage(),
             ],
         ], $statusCode);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function parsedBody(ServerRequestInterface $request): array
+    {
+        /** @var array<string, mixed> */
+        return $request->getParsedBody() ?? [];
     }
 
     /**
