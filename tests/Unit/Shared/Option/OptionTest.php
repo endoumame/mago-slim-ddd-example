@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Shared\Option;
 
-use App\Shared\Option\None;
-use App\Shared\Option\OptionInterface;
-use App\Shared\Option\Some;
 use PHPUnit\Framework\TestCase;
+use Psl\Option\Exception\NoneException;
+use Psl\Option\Option;
 
-use function App\Shared\Option\none;
-use function App\Shared\Option\of;
-use function App\Shared\Option\some;
+use function Psl\Option\from_nullable;
+use function Psl\Option\none;
+use function Psl\Option\some;
 
 final class OptionTest extends TestCase
 {
@@ -31,17 +30,17 @@ final class OptionTest extends TestCase
         self::assertFalse($option->isSome());
     }
 
-    public function testOfWithValueReturnsSome(): void
+    public function testFromNullableWithValueReturnsSome(): void
     {
-        $option = of('hello');
+        $option = from_nullable('hello');
 
         self::assertTrue($option->isSome());
         self::assertSame('hello', $option->unwrap());
     }
 
-    public function testOfWithNullReturnsNone(): void
+    public function testFromNullableWithNullReturnsNone(): void
     {
-        $option = of(null);
+        $option = from_nullable(null);
 
         self::assertTrue($option->isNone());
     }
@@ -53,7 +52,7 @@ final class OptionTest extends TestCase
 
     public function testUnwrapThrowsOnNone(): void
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(NoneException::class);
         none()->unwrap();
     }
 
@@ -77,33 +76,33 @@ final class OptionTest extends TestCase
 
     public function testMapSkipsNone(): void
     {
-        /** @var OptionInterface<int> */
+        /** @var Option<int> */
         $none = none();
         $result = $none->map(static fn(int $v): int => $v * 2);
 
         self::assertTrue($result->isNone());
     }
 
-    public function testFlatMapChainsSome(): void
+    public function testAndThenChainsSome(): void
     {
-        $result = some(5)->flatMap(static fn(int $v): OptionInterface => some($v * 2));
+        $result = some(5)->andThen(static fn(int $v): Option => some($v * 2));
 
         self::assertTrue($result->isSome());
         self::assertSame(10, $result->unwrap());
     }
 
-    public function testFlatMapReturnsNoneWhenClosureReturnsNone(): void
+    public function testAndThenReturnsNoneWhenClosureReturnsNone(): void
     {
-        $result = some(5)->flatMap(static fn(int $_): OptionInterface => none());
+        $result = some(5)->andThen(static fn(int $_): Option => none());
 
         self::assertTrue($result->isNone());
     }
 
-    public function testFlatMapSkipsNone(): void
+    public function testAndThenSkipsNone(): void
     {
-        /** @var OptionInterface<int> */
+        /** @var Option<int> */
         $none = none();
-        $result = $none->flatMap(static fn(int $v): OptionInterface => some($v * 2));
+        $result = $none->andThen(static fn(int $v): Option => some($v * 2));
 
         self::assertTrue($result->isNone());
     }
@@ -125,30 +124,30 @@ final class OptionTest extends TestCase
 
     public function testFilterSkipsNone(): void
     {
-        /** @var OptionInterface<int> */
+        /** @var Option<int> */
         $none = none();
         $result = $none->filter(static fn(int $v): bool => $v > 5);
 
         self::assertTrue($result->isNone());
     }
 
-    public function testMatchCallsSomeOnSome(): void
+    public function testProceedCallsSomeOnSome(): void
     {
-        $result = some(42)->match(
-            some: static fn(int $v): string => "value: {$v}",
-            none: static fn(): string => 'empty',
+        $result = some(42)->proceed(
+            static fn(int $v): string => "value: {$v}",
+            static fn(): string => 'empty',
         );
 
         self::assertSame('value: 42', $result);
     }
 
-    public function testMatchCallsNoneOnNone(): void
+    public function testProceedCallsNoneOnNone(): void
     {
-        /** @var OptionInterface<int> */
+        /** @var Option<int> */
         $none = none();
-        $result = $none->match(
-            some: static fn(int $v): string => "value: {$v}",
-            none: static fn(): string => 'empty',
+        $result = $none->proceed(
+            static fn(int $v): string => "value: {$v}",
+            static fn(): string => 'empty',
         );
 
         self::assertSame('empty', $result);
@@ -157,14 +156,12 @@ final class OptionTest extends TestCase
     public function testSomeInstanceOf(): void
     {
         $option = some(1);
-        self::assertInstanceOf(Some::class, $option);
-        self::assertInstanceOf(OptionInterface::class, $option);
+        self::assertInstanceOf(Option::class, $option);
     }
 
     public function testNoneInstanceOf(): void
     {
         $option = none();
-        self::assertInstanceOf(None::class, $option);
-        self::assertInstanceOf(OptionInterface::class, $option);
+        self::assertInstanceOf(Option::class, $option);
     }
 }

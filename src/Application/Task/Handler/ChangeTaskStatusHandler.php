@@ -11,8 +11,8 @@ use App\Domain\Task\TaskRepositoryInterface;
 use App\Domain\Task\TaskStatus;
 use Psl\Result\ResultInterface;
 
-use function App\Shared\Option\of;
 use function App\Shared\Option\ok_or;
+use function Psl\Option\from_nullable;
 use function App\Shared\Result\bind;
 
 final readonly class ChangeTaskStatusHandler
@@ -27,7 +27,7 @@ final readonly class ChangeTaskStatusHandler
     public function handle(ChangeTaskStatusCommand $command): ResultInterface
     {
         $statusResult = ok_or(
-            of(TaskStatus::tryFrom($command->status)),
+            from_nullable(TaskStatus::tryFrom($command->status)),
             new \InvalidArgumentException(
                 "Invalid status: '{$command->status}'. Must be one of: todo, in_progress, done.",
             ),

@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Shared\Option;
 
-use App\Shared\Option\OptionInterface;
 use PHPUnit\Framework\TestCase;
+use Psl\Option\Option;
 use Psl\Result\ResultInterface;
 
-use function App\Shared\Option\none;
-use function App\Shared\Option\ok_or;
-use function App\Shared\Option\some;
-use function App\Shared\Option\traverse;
 use function App\Shared\Option\apply_if_some;
+use function App\Shared\Option\ok_or;
+use function App\Shared\Option\traverse;
 use function App\Shared\Result\succeed;
+use function Psl\Option\none;
+use function Psl\Option\some;
 
 final class OptionFunctionsTest extends TestCase
 {
@@ -43,7 +43,7 @@ final class OptionFunctionsTest extends TestCase
 
     public function testTraverseWithNoneReturnsSucceedNull(): void
     {
-        /** @var OptionInterface<string> */
+        /** @var Option<string> */
         $none = none();
         $result = traverse($none, static fn(string $s): ResultInterface => succeed(mb_strtoupper($s)));
 
@@ -68,7 +68,7 @@ final class OptionFunctionsTest extends TestCase
     {
         $initial = succeed(10);
 
-        /** @var OptionInterface<int> */
+        /** @var Option<int> */
         $none = none();
         $fn = apply_if_some($none, static fn(int $extra): \Closure =>
             static fn(int $current): ResultInterface => succeed($current + $extra));
