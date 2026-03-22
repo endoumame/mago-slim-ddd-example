@@ -11,7 +11,9 @@ use App\Domain\Task\TaskStatus;
 use Psl\Result\ResultInterface;
 use Psl\Vec;
 
+use function App\Shared\Result\bind;
 use function App\Shared\Result\succeed;
+use function Psl\Option\from_nullable;
 
 final readonly class ListTasksHandler
 {
@@ -24,21 +26,19 @@ final readonly class ListTasksHandler
      */
     public function handle(ListTasksQuery $query): ResultInterface
     {
-        $result = $this->repository->findAll();
+        return $this->repository->findAll()
+            |> bind(static function (array $tasks) use ($query): ResultInterface {
+                $filtered = from_nullable($query->status)
+                    ->andThen(static fn(string $s) => from_nullable(TaskStatus::tryFrom($s)))
+                    ->proceed(
+                        static fn(TaskStatus $status) => Vec\filter(
+                            $tasks,
+                            static fn(Task $task): bool => $task->status === $status,
+                        ),
+                        static fn() => $tasks,
+                    );
 
-        if ($result->isFailed()) {
-            return $result;
-        }
-
-        $tasks = $result->getResult();
-
-        if ($query->status !== null) {
-            $statusFilter = TaskStatus::tryFrom($query->status);
-            if ($statusFilter !== null) {
-                $tasks = Vec\filter($tasks, static fn(Task $task): bool => $task->status === $statusFilter);
-            }
-        }
-
-        return succeed($tasks);
+                return succeed($filtered);
+            });
     }
 }

@@ -11,8 +11,9 @@ use App\Domain\Task\TaskRepositoryInterface;
 use App\Domain\Task\TaskStatus;
 use Psl\Result\ResultInterface;
 
+use function App\Shared\Option\ok_or;
 use function App\Shared\Result\bind;
-use function App\Shared\Result\fail;
+use function Psl\Option\from_nullable;
 
 final readonly class ChangeTaskStatusHandler
 {
@@ -25,20 +26,18 @@ final readonly class ChangeTaskStatusHandler
      */
     public function handle(ChangeTaskStatusCommand $command): ResultInterface
     {
-        $status = TaskStatus::tryFrom($command->status);
-        if ($status === null) {
-            return fail(
-                new \InvalidArgumentException(
-                    "Invalid status: '{$command->status}'. Must be one of: todo, in_progress, done.",
-                ),
-            );
-        }
+        $statusResult = ok_or(
+            from_nullable(TaskStatus::tryFrom($command->status)),
+            new \InvalidArgumentException(
+                "Invalid status: '{$command->status}'. Must be one of: todo, in_progress, done.",
+            ),
+        );
 
-        $idResult = TaskId::create($command->id);
+        $idResult = $statusResult |> bind(static fn(TaskStatus $_): ResultInterface => TaskId::create($command->id));
 
         return $idResult
             |> bind(fn(TaskId $id): ResultInterface => $this->repository->findById($id))
-            |> bind(static fn(Task $task): ResultInterface => $task->changeStatus($status))
+            |> bind(static fn(Task $task): ResultInterface => $task->changeStatus($statusResult->getResult()))
             |> bind(fn(Task $updated): ResultInterface => $this->repository->save($updated));
     }
 }

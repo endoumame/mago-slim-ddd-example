@@ -13,8 +13,10 @@ use App\Domain\Task\TaskRepositoryInterface;
 use App\Domain\Task\TaskTitle;
 use Psl\Result\ResultInterface;
 
+use function App\Shared\Option\apply_if_some;
 use function App\Shared\Result\bind;
 use function App\Shared\Result\succeed;
+use function Psl\Option\from_nullable;
 
 final readonly class UpdateTaskHandler
 {
@@ -39,32 +41,24 @@ final readonly class UpdateTaskHandler
      */
     private function applyChanges(Task $task, UpdateTaskCommand $command): ResultInterface
     {
-        $result = succeed($task);
-
-        if ($command->title !== null) {
-            $result = $result
-                |> bind(
-                    static fn(Task $t): ResultInterface => TaskTitle::create($command->title)
-                        |> bind($t->changeTitle(...)),
-                );
-        }
-
-        if ($command->description !== null) {
-            $result = $result
-                |> bind(
-                    static fn(Task $t): ResultInterface => TaskDescription::create($command->description)
-                        |> bind($t->changeDescription(...)),
-                );
-        }
-
-        if ($command->dueDate !== null) {
-            $result = $result
-                |> bind(
-                    static fn(Task $t): ResultInterface => DueDate::create($command->dueDate)
-                        |> bind($t->changeDueDate(...)),
-                );
-        }
-
-        return $result |> bind(fn(Task $t): ResultInterface => $this->repository->save($t));
+        return succeed($task)
+            |> apply_if_some(
+                from_nullable($command->title),
+                static fn(string $title): \Closure => static fn(Task $t): ResultInterface => TaskTitle::create($title)
+                    |> bind($t->changeTitle(...)),
+            )
+            |> apply_if_some(
+                from_nullable($command->description),
+                static fn(string $description): \Closure => static fn(Task $t): ResultInterface => TaskDescription::create(
+                    $description,
+                )
+                    |> bind($t->changeDescription(...)),
+            )
+            |> apply_if_some(
+                from_nullable($command->dueDate),
+                static fn(string $date): \Closure => static fn(Task $t): ResultInterface => DueDate::create($date)
+                    |> bind($t->changeDueDate(...)),
+            )
+            |> bind(fn(Task $t): ResultInterface => $this->repository->save($t));
     }
 }
