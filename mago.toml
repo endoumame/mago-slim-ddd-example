@@ -1,7 +1,6 @@
 [source]
 paths = ["src", "tests", "config", "public"]
 includes = ["vendor"]
-excludes = ["vendor/nikic/fast-route/test/"]
 
 [linter]
 minimum-fail-level = "note"
@@ -31,7 +30,6 @@ trust-existence-checks = false
 check-property-initialization = true
 class-initializers = ["setUp"]
 check-use-statements = true
-excludes = ["tests/Property/"]
 
 [formatter]
-excludes = ["public/index.php", "tests/Integration/Infrastructure/Http/TaskEndpointTest.php"]
+
