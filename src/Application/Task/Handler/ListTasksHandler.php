@@ -12,7 +12,7 @@ use Psl\Option\Option;
 use Psl\Result\ResultInterface;
 use Psl\Vec;
 
-use function App\Shared\Result\bind;
+use function App\Shared\Result\flat_map;
 use function App\Shared\Result\succeed;
 use function Psl\Option\from_nullable;
 
@@ -27,27 +27,27 @@ final readonly class ListTasksHandler
      */
     public function handle(ListTasksQuery $query): ResultInterface
     {
-        return $this->repository->findAll()
-            |> bind(
-                /**
-                 * @param list<Task> $tasks
-                 * @return ResultInterface<list<Task>>
-                 */
-                static function (array $tasks) use ($query): ResultInterface {
-                    $filtered = from_nullable($query->status)
-                        ->andThen(static fn(string $s): Option => TaskStatus::tryFrom($s) |> from_nullable(...))
-                        ->proceed(
-                            /** @return list<Task> */
-                            static fn(TaskStatus $status): array => Vec\filter(
-                                $tasks,
-                                static fn(Task $task): bool => $task->status === $status,
-                            ),
-                            /** @return list<Task> */
-                            static fn(): array => $tasks,
-                        );
+        return flat_map(
+            $this->repository->findAll(),
+            /**
+             * @param list<Task> $tasks
+             * @return ResultInterface<list<Task>>
+             */
+            static function (array $tasks) use ($query): ResultInterface {
+                $filtered = from_nullable($query->status)
+                    ->andThen(static fn(string $s): Option => from_nullable(TaskStatus::tryFrom($s)))
+                    ->proceed(
+                        /** @return list<Task> */
+                        static fn(TaskStatus $status): array => Vec\filter(
+                            $tasks,
+                            static fn(Task $task): bool => $task->status === $status,
+                        ),
+                        /** @return list<Task> */
+                        static fn(): array => $tasks,
+                    );
 
-                    return succeed($filtered);
-                },
-            );
+                return succeed($filtered);
+            },
+        );
     }
 }

@@ -9,7 +9,7 @@ use App\Domain\Task\TaskId;
 use App\Domain\Task\TaskRepositoryInterface;
 use Psl\Result\ResultInterface;
 
-use function App\Shared\Result\bind;
+use function App\Shared\Result\flat_map;
 
 final readonly class DeleteTaskHandler
 {
@@ -24,10 +24,9 @@ final readonly class DeleteTaskHandler
     {
         $idResult = TaskId::create($command->id);
 
-        return $idResult
-            |> bind(
-                fn(TaskId $id): ResultInterface => $this->repository->findById($id)
-                    |> bind(fn(): ResultInterface => $this->repository->delete($id)),
-            );
+        return flat_map($idResult, fn(TaskId $id): ResultInterface => flat_map(
+            $this->repository->findById($id),
+            fn(): ResultInterface => $this->repository->delete($id),
+        ));
     }
 }

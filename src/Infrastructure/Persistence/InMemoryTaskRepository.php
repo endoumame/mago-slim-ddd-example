@@ -42,7 +42,7 @@ final class InMemoryTaskRepository implements TaskRepositoryInterface
     #[Override]
     public function findAll(): ResultInterface
     {
-        return $this->tasks |> Vec\values(...) |> succeed(...);
+        return succeed(Vec\values($this->tasks));
     }
 
     /**

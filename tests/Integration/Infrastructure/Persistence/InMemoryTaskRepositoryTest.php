@@ -9,6 +9,7 @@ use App\Domain\Task\Task;
 use App\Domain\Task\TaskDescription;
 use App\Domain\Task\TaskId;
 use App\Domain\Task\TaskTitle;
+use App\Domain\Task\TodoTask;
 use App\Infrastructure\Persistence\InMemoryTaskRepository;
 use PHPUnit\Framework\TestCase;
 
@@ -129,6 +130,6 @@ final class InMemoryTaskRepositoryTest extends TestCase
         $title = TaskTitle::create($titleStr)->getResult();
         $description = TaskDescription::empty();
 
-        return Task::create($title, $description)->getResult();
+        return TodoTask::create($title, $description)->getResult();
     }
 }

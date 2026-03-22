@@ -7,20 +7,24 @@ namespace App\Domain\Task;
 use DateTimeImmutable;
 use Psl\Result\ResultInterface;
 
-use function App\Shared\Result\bind;
 use function App\Shared\Result\succeed;
 
 /**
- * Task aggregate root. Always valid — can only be constructed through
- * factory methods that return ResultInterface.
+ * Abstract Task aggregate root. Always valid — can only be constructed through
+ * factory methods on concrete subclasses (TodoTask, InProgressTask, DoneTask).
+ *
+ * Each status has its own type, making invalid state transitions impossible at the type level.
+ * - TodoTask can only start() → InProgressTask
+ * - InProgressTask can only complete() → DoneTask
+ * - DoneTask is terminal — no transitions available
  *
  * Immutable: all mutation methods return a new Task instance.
  *
  * @psalm-immutable
  */
-final readonly class Task
+abstract readonly class Task
 {
-    private function __construct(
+    protected function __construct(
         public TaskId $id,
         public TaskTitle $title,
         public TaskDescription $description,
@@ -31,33 +35,8 @@ final readonly class Task
     ) {}
 
     /**
-     * Create a new Task. Status defaults to Todo.
-     *
-     * @return ResultInterface<Task>
-     */
-    public static function create(
-        TaskTitle $title,
-        TaskDescription $description,
-        ?DueDate $dueDate = null,
-    ): ResultInterface {
-        $now = new DateTimeImmutable();
-
-        return succeed(
-            new self(
-                id: TaskId::generate(),
-                title: $title,
-                description: $description,
-                status: TaskStatus::Todo,
-                dueDate: $dueDate,
-                createdAt: $now,
-                updatedAt: $now,
-            ),
-        );
-    }
-
-    /**
-     * Reconstitute a Task from persistence. No validation — data is already trusted.
-     *
+     * Reconstitute a Task from persistence. Dispatches to the correct concrete type
+     * based on status.
      */
     public static function reconstitute(
         TaskId $id,
@@ -68,84 +47,47 @@ final readonly class Task
         DateTimeImmutable $createdAt,
         DateTimeImmutable $updatedAt,
     ): self {
-        return new self($id, $title, $description, $status, $dueDate, $createdAt, $updatedAt);
+        return match ($status) {
+            TaskStatus::Todo => new TodoTask($id, $title, $description, $dueDate, $createdAt, $updatedAt),
+            TaskStatus::InProgress => new InProgressTask($id, $title, $description, $dueDate, $createdAt, $updatedAt),
+            TaskStatus::Done => new DoneTask($id, $title, $description, $dueDate, $createdAt, $updatedAt),
+        };
     }
 
     /**
-     * @return ResultInterface<Task>
+     * Rebuild this task with updated properties, preserving the concrete type.
+     *
+     * @return static
+     */
+    abstract protected function rebuild(
+        TaskTitle $title,
+        TaskDescription $description,
+        ?DueDate $dueDate,
+        DateTimeImmutable $updatedAt,
+    ): static;
+
+    /**
+     * @return ResultInterface<static>
      */
     public function changeTitle(TaskTitle $newTitle): ResultInterface
     {
-        return succeed(
-            new self(
-                $this->id,
-                $newTitle,
-                $this->description,
-                $this->status,
-                $this->dueDate,
-                $this->createdAt,
-                new DateTimeImmutable(),
-            ),
-        );
+        return succeed($this->rebuild($newTitle, $this->description, $this->dueDate, new DateTimeImmutable()));
     }
 
     /**
-     * @return ResultInterface<Task>
+     * @return ResultInterface<static>
      */
     public function changeDescription(TaskDescription $newDescription): ResultInterface
     {
-        return succeed(
-            new self(
-                $this->id,
-                $this->title,
-                $newDescription,
-                $this->status,
-                $this->dueDate,
-                $this->createdAt,
-                new DateTimeImmutable(),
-            ),
-        );
+        return succeed($this->rebuild($this->title, $newDescription, $this->dueDate, new DateTimeImmutable()));
     }
 
     /**
-     * Transition status. Only forward transitions allowed: Todo -> InProgress -> Done.
-     *
-     * @return ResultInterface<Task>
-     *
-     * @throws \Throwable
-     */
-    public function changeStatus(TaskStatus $newStatus): ResultInterface
-    {
-        return $this->status->transitionTo($newStatus)
-            |> bind(fn(TaskStatus $validatedStatus): ResultInterface => succeed(
-                new self(
-                    $this->id,
-                    $this->title,
-                    $this->description,
-                    $validatedStatus,
-                    $this->dueDate,
-                    $this->createdAt,
-                    new DateTimeImmutable(),
-                ),
-            ));
-    }
-
-    /**
-     * @return ResultInterface<Task>
+     * @return ResultInterface<static>
      */
     public function changeDueDate(?DueDate $newDueDate): ResultInterface
     {
-        return succeed(
-            new self(
-                $this->id,
-                $this->title,
-                $this->description,
-                $this->status,
-                $newDueDate,
-                $this->createdAt,
-                new DateTimeImmutable(),
-            ),
-        );
+        return succeed($this->rebuild($this->title, $this->description, $newDueDate, new DateTimeImmutable()));
     }
 
     /**
