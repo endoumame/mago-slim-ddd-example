@@ -12,7 +12,7 @@ use App\Domain\Task\TaskRepositoryInterface;
 use App\Domain\Task\TaskTitle;
 use Psl\Result\ResultInterface;
 
-use function App\Shared\Option\traverse;
+use function App\Shared\Option\traverse_with;
 use function App\Shared\Result\bind;
 use function Psl\Option\from_nullable;
 
@@ -35,10 +35,10 @@ final readonly class CreateTaskHandler
             |> bind(static fn(TaskTitle $_): ResultInterface => TaskDescription::create($command->description));
 
         $dueDateResult = $descriptionResult
-            |> bind(static fn(TaskDescription $_): ResultInterface => traverse(
-                from_nullable($command->dueDate),
-                DueDate::create(...),
-            ));
+            |> bind(static fn(TaskDescription $_): ResultInterface => $command->dueDate
+                |> from_nullable(...)
+                |> traverse_with(DueDate::create(...)),
+            );
 
         return $dueDateResult
             |> bind(function (?DueDate $dueDate) use ($titleResult, $descriptionResult): ResultInterface {

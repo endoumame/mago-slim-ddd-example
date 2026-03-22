@@ -75,6 +75,37 @@ function traverse(Option $option, Closure $fn): ResultInterface
  *
  * @return (Closure(ResultInterface<V>): ResultInterface<V|W>)
  */
+/**
+ * Curried form of ok_or for use with the pipeline operator (|>).
+ *
+ * Usage: $nullable |> from_nullable(...) |> ok_or_err($error)
+ *
+ * @template T
+ *
+ * @return (Closure(Option<T>): ResultInterface<T>)
+ */
+function ok_or_err(Throwable $error): Closure
+{
+    return static fn(Option $option): ResultInterface => ok_or($option, $error);
+}
+
+/**
+ * Curried form of traverse for use with the pipeline operator (|>).
+ *
+ * Usage: $nullable |> from_nullable(...) |> traverse_with(DueDate::create(...))
+ *
+ * @template T
+ * @template U
+ *
+ * @param (Closure(T): ResultInterface<U>) $fn
+ *
+ * @return (Closure(Option<T>): ResultInterface<U|null>)
+ */
+function traverse_with(Closure $fn): Closure
+{
+    return static fn(Option $option): ResultInterface => traverse($option, $fn);
+}
+
 function apply_if_some(Option $option, Closure $fn): Closure
 {
     return $option->proceed(

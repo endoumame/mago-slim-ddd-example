@@ -189,7 +189,9 @@ final readonly class TaskController
         $response = $response->withHeader('Content-Type', 'application/json');
 
         if ($statusCode !== 204) {
-            $response->getBody()->write(json_encode($data, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE));
+            $data
+                |> (static fn(array $d): string => json_encode($d, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE))
+                |> $response->getBody()->write(...);
         }
 
         return $response;

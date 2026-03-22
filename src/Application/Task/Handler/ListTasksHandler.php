@@ -35,7 +35,7 @@ final readonly class ListTasksHandler
                  */
                 static function (array $tasks) use ($query): ResultInterface {
                     $filtered = from_nullable($query->status)
-                        ->andThen(static fn(string $s): Option => from_nullable(TaskStatus::tryFrom($s)))
+                        ->andThen(static fn(string $s): Option => TaskStatus::tryFrom($s) |> from_nullable(...))
                         ->proceed(
                             static fn(TaskStatus $status): array => Vec\filter(
                                 $tasks,
