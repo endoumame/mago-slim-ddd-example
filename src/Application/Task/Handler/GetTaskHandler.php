@@ -10,7 +10,7 @@ use App\Domain\Task\TaskId;
 use App\Domain\Task\TaskRepositoryInterface;
 use Psl\Result\ResultInterface;
 
-use function App\Shared\Result\flat_map;
+use function App\Shared\Result\bind;
 
 final readonly class GetTaskHandler
 {
@@ -23,8 +23,6 @@ final readonly class GetTaskHandler
      */
     public function handle(GetTaskQuery $query): ResultInterface
     {
-        return flat_map(TaskId::create($query->id), fn(TaskId $id): ResultInterface => $this->repository->findById(
-            $id,
-        ));
+        return TaskId::create($query->id) |> bind(fn(TaskId $id): ResultInterface => $this->repository->findById($id));
     }
 }

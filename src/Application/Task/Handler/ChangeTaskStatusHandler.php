@@ -11,8 +11,8 @@ use App\Domain\Task\TaskRepositoryInterface;
 use App\Domain\Task\TaskStatus;
 use Psl\Result\ResultInterface;
 
+use function App\Shared\Result\bind;
 use function App\Shared\Result\fail;
-use function App\Shared\Result\flat_map;
 
 final readonly class ChangeTaskStatusHandler
 {
@@ -36,12 +36,9 @@ final readonly class ChangeTaskStatusHandler
 
         $idResult = TaskId::create($command->id);
 
-        return flat_map($idResult, fn(TaskId $id): ResultInterface => flat_map(
-            $this->repository->findById($id),
-            fn(Task $task): ResultInterface => flat_map(
-                $task->changeStatus($status),
-                fn(Task $updated): ResultInterface => $this->repository->save($updated),
-            ),
-        ));
+        return $idResult
+            |> bind(fn(TaskId $id): ResultInterface => $this->repository->findById($id))
+            |> bind(static fn(Task $task): ResultInterface => $task->changeStatus($status))
+            |> bind(fn(Task $updated): ResultInterface => $this->repository->save($updated));
     }
 }

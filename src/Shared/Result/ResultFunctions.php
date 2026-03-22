@@ -43,6 +43,25 @@ function flat_map(ResultInterface $result, Closure $fn): ResultInterface
 }
 
 /**
+ * Curried form of flat_map for use with the pipeline operator (|>).
+ *
+ * Returns a closure that accepts a ResultInterface and applies flat_map with the given $fn.
+ *
+ * Usage: $result |> bind(fn($value) => someOperation($value))
+ *
+ * @template T
+ * @template U
+ *
+ * @param (Closure(T): ResultInterface<U>) $fn
+ *
+ * @return (Closure(ResultInterface<T>): ResultInterface<U>)
+ */
+function bind(Closure $fn): Closure
+{
+    return static fn(ResultInterface $result): ResultInterface => flat_map($result, $fn);
+}
+
+/**
  * Compose multiple functions into a railway pipeline.
  *
  * Each function receives the unwrapped value from the previous Success
