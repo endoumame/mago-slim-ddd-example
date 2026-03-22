@@ -13,8 +13,8 @@ use App\Domain\Task\TaskTitle;
 use App\Domain\Task\TodoTask;
 use Psl\Result\ResultInterface;
 
-use function App\Shared\Option\traverse;
-use function App\Shared\Result\flat_map;
+use function App\Shared\Option\traverse_with;
+use function App\Shared\Result\bind;
 use function Psl\Option\from_nullable;
 
 final readonly class CreateTaskHandler
@@ -32,24 +32,23 @@ final readonly class CreateTaskHandler
     {
         $titleResult = TaskTitle::create($command->title);
 
-        $descriptionResult = flat_map($titleResult, static fn(TaskTitle $_): ResultInterface => TaskDescription::create($command->description));
+        $descriptionResult = $titleResult
+            |> bind(static fn(TaskTitle $_): ResultInterface => TaskDescription::create($command->description));
 
-        $dueDateResult = flat_map($descriptionResult, static fn(TaskDescription $_): ResultInterface => traverse(
-            from_nullable($command->dueDate),
-            DueDate::create(...),
-        ));
-
-        return flat_map($dueDateResult, function (?DueDate $dueDate) use (
-            $titleResult,
-            $descriptionResult,
-        ): ResultInterface {
-            $title = $titleResult->getResult();
-            $description = $descriptionResult->getResult();
-
-            return flat_map(
-                TodoTask::create($title, $description, $dueDate),
-                fn(Task $task): ResultInterface => $this->repository->save($task),
+        $dueDateResult = $descriptionResult
+            |> bind(
+                static fn(TaskDescription $_): ResultInterface => $command->dueDate
+                    |> from_nullable(...)
+                    |> traverse_with(DueDate::create(...)),
             );
-        });
+
+        return $dueDateResult
+            |> bind(function (?DueDate $dueDate) use ($titleResult, $descriptionResult): ResultInterface {
+                $title = $titleResult->getResult();
+                $description = $descriptionResult->getResult();
+
+                return TodoTask::create($title, $description, $dueDate)
+                    |> bind(fn(Task $task): ResultInterface => $this->repository->save($task));
+            });
     }
 }

@@ -14,9 +14,9 @@ use App\Domain\Task\TaskStatus;
 use App\Domain\Task\TodoTask;
 use Psl\Result\ResultInterface;
 
-use function App\Shared\Option\ok_or;
+use function App\Shared\Option\ok_or_err;
+use function App\Shared\Result\bind;
 use function App\Shared\Result\fail;
-use function App\Shared\Result\flat_map;
 use function Psl\Option\from_nullable;
 
 final readonly class ChangeTaskStatusHandler
@@ -31,22 +31,20 @@ final readonly class ChangeTaskStatusHandler
     public function handle(ChangeTaskStatusCommand $command): ResultInterface
     {
         /** @var ResultInterface<TaskStatus> $statusResult */
-        $statusResult = ok_or(
-            from_nullable(TaskStatus::tryFrom($command->status)),
-            new \InvalidArgumentException(
-                "Invalid status: '{$command->status}'. Must be one of: todo, in_progress, done.",
-            ),
-        );
+        $statusResult = TaskStatus::tryFrom($command->status)
+            |> from_nullable(...)
+            |> ok_or_err(
+                new \InvalidArgumentException(
+                    "Invalid status: '{$command->status}'. Must be one of: todo, in_progress, done.",
+                ),
+            );
 
-        $idResult = flat_map($statusResult, static fn(TaskStatus $_): ResultInterface => TaskId::create($command->id));
+        $idResult = $statusResult |> bind(static fn(TaskStatus $_): ResultInterface => TaskId::create($command->id));
 
-        return flat_map(
-            flat_map($idResult, fn(TaskId $id): ResultInterface => $this->repository->findById($id)),
-            fn(Task $task): ResultInterface => flat_map(
-                $this->transitionTo($task, $statusResult->getResult()),
-                fn(Task $updated): ResultInterface => $this->repository->save($updated),
-            ),
-        );
+        return $idResult
+            |> bind(fn(TaskId $id): ResultInterface => $this->repository->findById($id))
+            |> bind(fn(Task $task): ResultInterface => $this->transitionTo($task, $statusResult->getResult()))
+            |> bind(fn(Task $updated): ResultInterface => $this->repository->save($updated));
     }
 
     /**
