@@ -164,16 +164,10 @@ final readonly class TaskController
      */
     private function errorResponse(\Throwable $error): ResponseInterface
     {
-        $statusCode = match (true) {
-            $error instanceof TaskNotFoundException => 404,
-            $error instanceof DomainError, $error instanceof \InvalidArgumentException => 422,
-            default => 500,
-        };
-
-        $type = match (true) {
-            $error instanceof TaskNotFoundException => 'not_found',
-            $error instanceof DomainError, $error instanceof \InvalidArgumentException => 'validation_error',
-            default => 'internal_error',
+        [$statusCode, $type] = match (true) {
+            $error instanceof TaskNotFoundException => [404, 'not_found'],
+            $error instanceof DomainError, $error instanceof \InvalidArgumentException => [422, 'validation_error'],
+            default => [500, 'internal_error'],
         };
 
         return $this->jsonResponse([
