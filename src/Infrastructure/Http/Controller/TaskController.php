@@ -41,8 +41,7 @@ final readonly class TaskController
      */
     public function create(ServerRequestInterface $request): ResponseInterface
     {
-        /** @var array<string, mixed> $body */
-        $body = $request->getParsedBody() ?? [];
+        $body = $this->parsedBody($request);
 
         $command = new CreateTaskCommand(
             title: (string) ($body['title'] ?? ''),
@@ -95,8 +94,7 @@ final readonly class TaskController
      */
     public function update(ServerRequestInterface $request, ResponseInterface $response, string $id): ResponseInterface
     {
-        /** @var array<string, mixed> $body */
-        $body = $request->getParsedBody() ?? [];
+        $body = $this->parsedBody($request);
 
         $command = new UpdateTaskCommand(
             id: $id,
@@ -133,8 +131,7 @@ final readonly class TaskController
         ResponseInterface $response,
         string $id,
     ): ResponseInterface {
-        /** @var array<string, mixed> $body */
-        $body = $request->getParsedBody() ?? [];
+        $body = $this->parsedBody($request);
 
         $command = new ChangeTaskStatusCommand(id: $id, status: (string) ($body['status'] ?? ''));
 
@@ -176,6 +173,15 @@ final readonly class TaskController
                 'message' => $error->getMessage(),
             ],
         ], $statusCode);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function parsedBody(ServerRequestInterface $request): array
+    {
+        /** @var array<string, mixed> */
+        return $request->getParsedBody() ?? [];
     }
 
     /**
