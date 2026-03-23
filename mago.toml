@@ -2,6 +2,9 @@
 paths = ["src", "tests", "config", "public"]
 includes = ["vendor"]
 
+[formatter]
+preset = "default"
+
 [linter]
 minimum-fail-level = "note"
 
@@ -11,25 +14,79 @@ too-many-methods = { threshold = 25 }
 no-isset = { enabled = false }
 literal-named-argument = { enabled = false }
 
+# =============================================================================
+# [analyzer] 静的解析設定
+# =============================================================================
+# スキル: domain-primitives-and-always-valid, error-handling,
+#         clean-architecture, aggregate-design
+#
+# 全オプションを最大限厳格に設定
 [analyzer]
+# 全ての問題を "note" レベルで報告 — 最高の厳格さでコード品質を向上
+minimum-fail-level = "note"
+
+# 未使用式の検出 — 副作用のない式を禁止
 find-unused-expressions = true
+
+# 未使用定義の検出 — デッドコードの完全排除
 find-unused-definitions = true
+
+# デッドコード分析 — 到達不能コードの検出
 analyze-dead-code = true
-check-throws = true
+
+# @override チェック — 継承関係の明示を強制
+# aggregate-design: 集約ルートの責任を明確にする
 check-missing-override = true
+
+# 未使用パラメータの検出 — インターフェース分離原則
 find-unused-parameters = true
+
+# 型ヒントの必須化 — domain-primitives-and-always-valid の根幹
+# 全ての関数・メソッドに型宣言を強制する
 check-missing-type-hints = true
+
+# クロージャの型ヒント必須化 — 例外なく型を強制
 check-closure-missing-type-hints = true
+
+# アロー関数の型ヒント必須化 — 例外なく型を強制
 check-arrow-function-missing-type-hints = true
-enforce-class-finality = true
-require-api-or-internal = true
+
+# 厳格なリストインデックスチェック — 配列アクセスの安全性
 strict-list-index-checks = true
+
+# bool リテラル比較の禁止 — if ($x === true) → if ($x)
 no-boolean-literal-comparison = true
+
+# 未定義配列キーを許容しない — parse-dont-validate
 allow-possibly-undefined-array-keys = false
+
+# 存在チェックを信頼しない — 厳格な型推論
 trust-existence-checks = false
-check-property-initialization = true
-class-initializers = ["setUp"]
+
+# use 文のチェック — 未使用 import の検出
 check-use-statements = true
 
-[formatter]
+# 例外ハンドリングの検証 — error-classification スキル
+# 未キャッチの例外を報告する
+check-throws = true
 
+# プロパティ初期化の検証 — aggregate-design (完全コンストラクタ)
+# 全プロパティがコンストラクタで初期化されていることを確認
+check-property-initialization = true
+
+# クラスの final 強制 — aggregate-design (Evans Rule: 集約の保護)
+# 全クラスを final, abstract, または @api のいずれかにする
+enforce-class-finality = true
+
+# @api/@internal の要求 — package-design (公開API境界の明確化)
+# 抽象クラス/インターフェース/トレイトに @api または @internal を要求
+require-api-or-internal = true
+
+# スーパーグローバルの登録を無効化 — clean-architecture (ドメイン層の純粋性)
+# $_GET, $_POST 等の使用を検出可能にする
+register-super-globals = false
+
+# ・missing-constructor：型指定されたプロパティを持つクラスにおいて、それらを初期化するコンストラクタが存在しない場合。 ・uninitialized-property：型指定されたプロパティがコンストラクタ内で初期化されていない場合。
+# 「class-initializers」設定を使用すると、初期化メソッドとして扱うべき追加のメソッドを指定できます。これらのメソッド内で初期化されたプロパティは、__construct内と同様に「確実に初期化されている」ものとみなされます。これは、以下のようなライフサイクルメソッドを利用するフレームワークにおいて便利です。
+# ・PHPUnitのテストクラスにおけるsetUp()メソッド ・フレームワーク固有のboot()やinitialize()メソッド
+class-initializers = ["setUp"]
