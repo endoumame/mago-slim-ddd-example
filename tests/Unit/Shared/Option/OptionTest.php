@@ -15,25 +15,51 @@ use function EndouMame\PhpMonad\Option\some;
 final class OptionTest extends TestCase
 {
     /**
-     * @return iterable<string, array{Option<int>, bool, bool}>
+     * @return iterable<string, array{Option<int>}>
      */
-    public static function isSomeIsNoneProvider(): iterable
+    public static function someOptionProvider(): iterable
     {
-        yield 'some' => [some(42), true, false];
-        yield 'none' => [none(), false, true];
+        yield 'some(42)' => [some(42)];
     }
 
     /**
-     * @dataProvider isSomeIsNoneProvider
+     * @return iterable<string, array{Option<never>}>
+     */
+    public static function noneOptionProvider(): iterable
+    {
+        yield 'none()' => [none()];
+    }
+
+    /**
+     * @dataProvider someOptionProvider
      *
      * @param Option<int> $option
      *
      * @throws \Throwable
      */
-    public function testIsSomeAndIsNone(Option $option, bool $expectedIsSome, bool $expectedIsNone): void
+    public function testSomeIsSome(Option $option): void
     {
-        self::assertSame($expectedIsSome, $option->isSome());
-        self::assertSame($expectedIsNone, $option->isNone());
+        $isSome = $option->isSome();
+        $isNone = $option->isNone();
+
+        self::assertTrue($isSome);
+        self::assertFalse($isNone);
+    }
+
+    /**
+     * @dataProvider noneOptionProvider
+     *
+     * @param Option<never> $option
+     *
+     * @throws \Throwable
+     */
+    public function testNoneIsNone(Option $option): void
+    {
+        $isNone = $option->isNone();
+        $isSome = $option->isSome();
+
+        self::assertTrue($isNone);
+        self::assertFalse($isSome);
     }
 
     /**
