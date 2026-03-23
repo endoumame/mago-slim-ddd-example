@@ -28,8 +28,6 @@ final class TaskPropertyTest extends PropertyTestCase
 
             $result = TodoTask::create($title, $description);
 
-            // @mago-expect analysis:impossible-type-comparison
-            self::assertTrue($result->isOk());
             self::assertInstanceOf(TodoTask::class, $result->unwrap());
             self::assertSame(TaskStatus::Todo, $result->unwrap()->status);
         });
@@ -73,15 +71,10 @@ final class TaskPropertyTest extends PropertyTestCase
             self::assertSame(TaskStatus::Todo, $task->status);
 
             $inProgress = $task->start();
-            // @mago-expect analysis:impossible-type-comparison
-            self::assertTrue($inProgress->isOk());
             self::assertInstanceOf(InProgressTask::class, $inProgress->unwrap());
             self::assertSame(TaskStatus::InProgress, $inProgress->unwrap()->status);
 
             $done = $inProgress->unwrap()->complete();
-            // @mago-expect analysis:impossible-type-comparison
-            // @mago-expect analysis:impossible-type-comparison
-            self::assertTrue($done->isOk());
             self::assertInstanceOf(DoneTask::class, $done->unwrap());
             self::assertSame(TaskStatus::Done, $done->unwrap()->status);
         });

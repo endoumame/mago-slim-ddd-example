@@ -22,8 +22,6 @@ final class ValueObjectPropertyTest extends PropertyTestCase
             self::string(),
         ))->then(static function (string $value): void {
             $result = TaskTitle::create($value);
-            // @mago-expect analysis:impossible-type-comparison
-            self::assertTrue($result->isOk(), "Expected success for: '{$value}'");
             self::assertSame(trim($value), $result->unwrap()->value());
         });
     }
@@ -38,8 +36,7 @@ final class ValueObjectPropertyTest extends PropertyTestCase
             self::choose(0, 100),
         ))->then(static function (string $value): void {
             $result = TaskTitle::create($value);
-            // @mago-expect analysis:impossible-type-comparison
-            self::assertTrue($result->isErr());
+            self::assertInstanceOf(\Throwable::class, $result->unwrapErr());
         });
     }
 
@@ -50,8 +47,7 @@ final class ValueObjectPropertyTest extends PropertyTestCase
     {
         $this->forAll(self::constant(''))->then(static function (string $value): void {
             $result = TaskTitle::create($value);
-            // @mago-expect analysis:impossible-type-comparison
-            self::assertTrue($result->isErr());
+            self::assertInstanceOf(\Throwable::class, $result->unwrapErr());
         });
     }
 
@@ -65,8 +61,7 @@ final class ValueObjectPropertyTest extends PropertyTestCase
             self::string(),
         ))->then(static function (string $value): void {
             $result = TaskDescription::create($value);
-            // @mago-expect analysis:impossible-type-comparison
-            self::assertTrue($result->isOk());
+            self::assertNotNull($result->unwrap());
         });
     }
 
@@ -80,8 +75,7 @@ final class ValueObjectPropertyTest extends PropertyTestCase
             self::choose(0, 100),
         ))->then(static function (string $value): void {
             $result = TaskDescription::create($value);
-            // @mago-expect analysis:impossible-type-comparison
-            self::assertTrue($result->isErr());
+            self::assertInstanceOf(\Throwable::class, $result->unwrapErr());
         });
     }
 
@@ -95,8 +89,6 @@ final class ValueObjectPropertyTest extends PropertyTestCase
             self::choose(0, 100),
         ))->then(static function (string $uuid): void {
             $result = TaskId::create($uuid);
-            // @mago-expect analysis:impossible-type-comparison
-            self::assertTrue($result->isOk());
             self::assertSame($uuid, $result->unwrap()->value());
             self::assertSame($uuid, (string) $result->unwrap());
         });
@@ -110,8 +102,7 @@ final class ValueObjectPropertyTest extends PropertyTestCase
         $this->forAll(self::choose(0, 365))->then(static function (int $daysFromNow): void {
             $date = new \DateTimeImmutable("+{$daysFromNow} days")->format('Y-m-d');
             $result = DueDate::create($date);
-            // @mago-expect analysis:impossible-type-comparison
-            self::assertTrue($result->isOk(), "Expected success for: {$date}");
+            self::assertNotNull($result->unwrap());
         });
     }
 
@@ -123,8 +114,7 @@ final class ValueObjectPropertyTest extends PropertyTestCase
         $this->forAll(self::choose(1, 365))->then(static function (int $daysAgo): void {
             $date = new \DateTimeImmutable("-{$daysAgo} days")->format('Y-m-d');
             $result = DueDate::create($date);
-            // @mago-expect analysis:impossible-type-comparison
-            self::assertTrue($result->isErr(), "Expected failure for past date: {$date}");
+            self::assertInstanceOf(\Throwable::class, $result->unwrapErr());
         });
     }
 }

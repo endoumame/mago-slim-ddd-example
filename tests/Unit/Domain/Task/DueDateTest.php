@@ -18,8 +18,6 @@ final class DueDateTest extends TestCase
         $today = new \DateTimeImmutable('today')->format('Y-m-d');
         $result = DueDate::create($today);
 
-        // @mago-expect analysis:impossible-type-comparison
-        self::assertTrue($result->isOk());
         self::assertSame($today, $result->unwrap()->format());
     }
 
@@ -31,8 +29,6 @@ final class DueDateTest extends TestCase
         $future = new \DateTimeImmutable('+30 days')->format('Y-m-d');
         $result = DueDate::create($future);
 
-        // @mago-expect analysis:impossible-type-comparison
-        self::assertTrue($result->isOk());
         self::assertSame($future, $result->unwrap()->format());
     }
 
@@ -44,8 +40,6 @@ final class DueDateTest extends TestCase
         $past = new \DateTimeImmutable('-1 day')->format('Y-m-d');
         $result = DueDate::create($past);
 
-        // @mago-expect analysis:impossible-type-comparison
-        self::assertTrue($result->isErr());
         self::assertInstanceOf(InvalidDueDateException::class, $result->unwrapErr());
         self::assertStringContainsString('past', $result->unwrapErr()->getMessage());
     }
@@ -57,8 +51,6 @@ final class DueDateTest extends TestCase
     {
         $result = DueDate::create('not-a-date');
 
-        // @mago-expect analysis:impossible-type-comparison
-        self::assertTrue($result->isErr());
         self::assertInstanceOf(InvalidDueDateException::class, $result->unwrapErr());
         self::assertStringContainsString('format', $result->unwrapErr()->getMessage());
     }
@@ -70,8 +62,6 @@ final class DueDateTest extends TestCase
     {
         $result = DueDate::create('2025-13-45');
 
-        // @mago-expect analysis:impossible-type-comparison
-        self::assertTrue($result->isErr());
         self::assertInstanceOf(InvalidDueDateException::class, $result->unwrapErr());
     }
 

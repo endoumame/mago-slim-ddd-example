@@ -19,8 +19,6 @@ final class TaskIdTest extends TestCase
         $uuid = Uuid::uuid4()->toString();
         $result = TaskId::create($uuid);
 
-        // @mago-expect analysis:impossible-type-comparison
-        self::assertTrue($result->isOk());
         self::assertSame($uuid, $result->unwrap()->value());
     }
 
@@ -31,8 +29,6 @@ final class TaskIdTest extends TestCase
     {
         $result = TaskId::create('not-a-uuid');
 
-        // @mago-expect analysis:impossible-type-comparison
-        self::assertTrue($result->isErr());
         self::assertInstanceOf(InvalidTaskIdException::class, $result->unwrapErr());
     }
 
@@ -43,8 +39,6 @@ final class TaskIdTest extends TestCase
     {
         $result = TaskId::create('');
 
-        // @mago-expect analysis:impossible-type-comparison
-        self::assertTrue($result->isErr());
         self::assertInstanceOf(InvalidTaskIdException::class, $result->unwrapErr());
     }
 
