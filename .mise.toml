@@ -37,6 +37,10 @@ run = "./vendor/bin/mago analyze"
 description = "Run all checks (lint, format check, analyze, test)"
 depends = ["lint", "format:check", "analyze", "test"]
 
+[tasks."lefthook:install"]
+description = "Install lefthook git hooks"
+run = "lefthook install"
+
 [tasks.serve]
 description = "Start PHP built-in development server"
 run = "php -S localhost:8080 -t public"
