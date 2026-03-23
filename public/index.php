@@ -13,7 +13,7 @@ $containerBuilder = new ContainerBuilder();
 $containerBuilder->addDefinitions(__DIR__ . '/../config/container.php');
 $container = $containerBuilder->build();
 
-$app = new App(new ResponseFactory(), $container, new CallableResolver($container));
+$app = new App(new ResponseFactory(), $container, new CallableResolver());
 
 /** @var (callable(App): void) $middleware */
 $middleware = require __DIR__ . '/../config/middleware.php';

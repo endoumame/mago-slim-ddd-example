@@ -28,7 +28,7 @@ final class TaskEndpointTest extends TestCase
         $this->app = new App(
             new \Slim\Psr7\Factory\ResponseFactory(),
             $container,
-            new \App\Infrastructure\Http\CallableResolver($container),
+            new \App\Infrastructure\Http\CallableResolver(),
         );
 
         /** @var callable(App): void $middleware */
