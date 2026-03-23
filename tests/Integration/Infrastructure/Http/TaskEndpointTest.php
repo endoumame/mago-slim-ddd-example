@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Infrastructure\Http;
 
-use DI\Bridge\Slim\Bridge;
 use DI\ContainerBuilder;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -26,7 +25,7 @@ final class TaskEndpointTest extends TestCase
         $containerBuilder->addDefinitions(__DIR__ . '/../../../../config/container.php');
         $container = $containerBuilder->build();
 
-        $this->app = Bridge::create($container);
+        $this->app = new App(new \Slim\Psr7\Factory\ResponseFactory(), $container);
 
         /** @var callable(App): void $middleware */
         $middleware = require __DIR__ . '/../../../../config/middleware.php';
