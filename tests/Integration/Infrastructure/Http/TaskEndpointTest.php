@@ -25,7 +25,11 @@ final class TaskEndpointTest extends TestCase
         $containerBuilder->addDefinitions(__DIR__ . '/../../../../config/container.php');
         $container = $containerBuilder->build();
 
-        $this->app = new App(new \Slim\Psr7\Factory\ResponseFactory(), $container);
+        $this->app = new App(
+            new \Slim\Psr7\Factory\ResponseFactory(),
+            $container,
+            new \App\Infrastructure\Http\CallableResolver($container),
+        );
 
         /** @var callable(App): void $middleware */
         $middleware = require __DIR__ . '/../../../../config/middleware.php';
