@@ -23,7 +23,7 @@ jobs:
         run: composer install --prefer-dist --no-progress
 
       - name: Run Mago Lint
-        run: ./vendor/bin/mago lint
+        run: ./vendor/bin/mago lint -m warning
 
   format:
     name: Format Check
@@ -59,7 +59,7 @@ jobs:
         run: composer install --prefer-dist --no-progress
 
       - name: Run Mago Analyze
-        run: ./vendor/bin/mago analyze
+        run: ./vendor/bin/mago analyze -m warning
 
   test-unit:
     name: Unit Tests
