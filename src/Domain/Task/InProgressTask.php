@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Domain\Task;
 
 use DateTimeImmutable;
+use EndouMame\PhpMonad\Result;
 use Override;
-use Psl\Result\ResultInterface;
 
-use function App\Shared\Result\succeed;
+use function EndouMame\PhpMonad\Result\ok;
 
 /**
  * A Task in InProgress status. The only valid transition is complete() → DoneTask.
@@ -32,12 +32,12 @@ final readonly class InProgressTask extends Task
     /**
      * Complete this task. Transitions to Done.
      *
-     * @return ResultInterface<DoneTask>
+     * @return Result<DoneTask, never>
      */
-    public function complete(): ResultInterface
+    public function complete(): Result
     {
-        /** @var ResultInterface<DoneTask> */
-        return succeed(Task::reconstitute(
+        /** @var Result<DoneTask, never> */
+        return ok(Task::reconstitute(
             $this->id,
             $this->title,
             $this->description,

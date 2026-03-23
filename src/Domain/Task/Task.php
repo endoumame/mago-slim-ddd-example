@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Domain\Task;
 
 use DateTimeImmutable;
-use Psl\Result\ResultInterface;
+use EndouMame\PhpMonad\Result;
 
-use function App\Shared\Result\succeed;
+use function EndouMame\PhpMonad\Result\ok;
 
 /**
  * Abstract Task aggregate root. Always valid — can only be constructed through
@@ -69,27 +69,27 @@ abstract readonly class Task
     ): static;
 
     /**
-     * @return ResultInterface<static>
+     * @return Result<static, never>
      */
-    public function changeTitle(TaskTitle $newTitle): ResultInterface
+    public function changeTitle(TaskTitle $newTitle): Result
     {
-        return succeed($this->rebuild($newTitle, $this->description, $this->dueDate, new DateTimeImmutable()));
+        return ok($this->rebuild($newTitle, $this->description, $this->dueDate, new DateTimeImmutable()));
     }
 
     /**
-     * @return ResultInterface<static>
+     * @return Result<static, never>
      */
-    public function changeDescription(TaskDescription $newDescription): ResultInterface
+    public function changeDescription(TaskDescription $newDescription): Result
     {
-        return succeed($this->rebuild($this->title, $newDescription, $this->dueDate, new DateTimeImmutable()));
+        return ok($this->rebuild($this->title, $newDescription, $this->dueDate, new DateTimeImmutable()));
     }
 
     /**
-     * @return ResultInterface<static>
+     * @return Result<static, never>
      */
-    public function changeDueDate(?DueDate $newDueDate): ResultInterface
+    public function changeDueDate(?DueDate $newDueDate): Result
     {
-        return succeed($this->rebuild($this->title, $this->description, $newDueDate, new DateTimeImmutable()));
+        return ok($this->rebuild($this->title, $this->description, $newDueDate, new DateTimeImmutable()));
     }
 
     /**

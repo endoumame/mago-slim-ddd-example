@@ -4,44 +4,70 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Shared\Option;
 
+use EndouMame\PhpMonad\Option;
 use PHPUnit\Framework\TestCase;
-use Psl\Option\Exception\NoneException;
-use Psl\Option\Option;
+use RuntimeException;
 
-use function Psl\Option\from_nullable;
-use function Psl\Option\none;
-use function Psl\Option\some;
+use function EndouMame\PhpMonad\Option\fromValue;
+use function EndouMame\PhpMonad\Option\none;
+use function EndouMame\PhpMonad\Option\some;
 
 final class OptionTest extends TestCase
 {
     /**
+     * @return iterable<string, array{Option<int>}>
+     */
+    public static function someOptionProvider(): iterable
+    {
+        yield 'some(42)' => [some(42)];
+    }
+
+    /**
+     * @return iterable<string, array{Option<never>}>
+     */
+    public static function noneOptionProvider(): iterable
+    {
+        yield 'none()' => [none()];
+    }
+
+    /**
+     * @dataProvider someOptionProvider
+     *
+     * @param Option<int> $option
+     *
      * @throws \Throwable
      */
-    public function testSomeIsSome(): void
+    public function testSomeIsSome(Option $option): void
     {
-        $option = some(42);
+        $isSome = $option->isSome();
+        $isNone = $option->isNone();
 
-        self::assertTrue($option->isSome());
-        self::assertFalse($option->isNone());
+        self::assertTrue($isSome);
+        self::assertFalse($isNone);
+    }
+
+    /**
+     * @dataProvider noneOptionProvider
+     *
+     * @param Option<never> $option
+     *
+     * @throws \Throwable
+     */
+    public function testNoneIsNone(Option $option): void
+    {
+        $isNone = $option->isNone();
+        $isSome = $option->isSome();
+
+        self::assertTrue($isNone);
+        self::assertFalse($isSome);
     }
 
     /**
      * @throws \Throwable
      */
-    public function testNoneIsNone(): void
+    public function testFromValueWithValueReturnsSome(): void
     {
-        $option = none();
-
-        self::assertTrue($option->isNone());
-        self::assertFalse($option->isSome());
-    }
-
-    /**
-     * @throws \Throwable
-     */
-    public function testFromNullableWithValueReturnsSome(): void
-    {
-        $option = from_nullable('hello');
+        $option = fromValue('hello');
 
         self::assertTrue($option->isSome());
         self::assertSame('hello', $option->unwrap());
@@ -50,9 +76,9 @@ final class OptionTest extends TestCase
     /**
      * @throws \Throwable
      */
-    public function testFromNullableWithNullReturnsNone(): void
+    public function testFromValueWithNullReturnsNone(): void
     {
-        $option = from_nullable(null);
+        $option = fromValue(null);
 
         self::assertTrue($option->isNone());
     }
@@ -70,7 +96,7 @@ final class OptionTest extends TestCase
      */
     public function testUnwrapThrowsOnNone(): void
     {
-        $this->expectException(NoneException::class);
+        $this->expectException(RuntimeException::class);
         none()->unwrap();
     }
 
@@ -182,9 +208,9 @@ final class OptionTest extends TestCase
     /**
      * @throws \Throwable
      */
-    public function testProceedCallsSomeOnSome(): void
+    public function testMapOrElseCallsSomeOnSome(): void
     {
-        $result = some(42)->proceed(static fn(int $v): string => "value: {$v}", static fn(): string => 'empty');
+        $result = some(42)->mapOrElse(static fn(int $v): string => "value: {$v}", static fn(): string => 'empty');
 
         self::assertSame('value: 42', $result);
     }
@@ -192,11 +218,11 @@ final class OptionTest extends TestCase
     /**
      * @throws \Throwable
      */
-    public function testProceedCallsNoneOnNone(): void
+    public function testMapOrElseCallsNoneOnNone(): void
     {
         /** @var Option<int> */
         $none = none();
-        $result = $none->proceed(static fn(int $v): string => "value: {$v}", static fn(): string => 'empty');
+        $result = $none->mapOrElse(static fn(int $v): string => "value: {$v}", static fn(): string => 'empty');
 
         self::assertSame('empty', $result);
     }

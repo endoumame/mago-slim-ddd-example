@@ -8,9 +8,7 @@ use App\Application\Task\Query\GetTaskQuery;
 use App\Domain\Task\Task;
 use App\Domain\Task\TaskId;
 use App\Domain\Task\TaskRepositoryInterface;
-use Psl\Result\ResultInterface;
-
-use function App\Shared\Result\bind;
+use EndouMame\PhpMonad\Result;
 
 final readonly class GetTaskHandler
 {
@@ -19,10 +17,10 @@ final readonly class GetTaskHandler
     ) {}
 
     /**
-     * @return ResultInterface<Task>
+     * @return Result<Task, \Throwable>
      */
-    public function handle(GetTaskQuery $query): ResultInterface
+    public function handle(GetTaskQuery $query): Result
     {
-        return TaskId::create($query->id) |> bind(fn(TaskId $id): ResultInterface => $this->repository->findById($id));
+        return TaskId::create($query->id)->andThen(fn(TaskId $id): Result => $this->repository->findById($id));
     }
 }

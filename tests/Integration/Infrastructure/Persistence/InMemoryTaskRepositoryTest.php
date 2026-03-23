@@ -31,12 +31,12 @@ final class InMemoryTaskRepositoryTest extends TestCase
         $task = $this->createTask('Test task');
 
         $saveResult = $this->repository->save($task);
-        self::assertTrue($saveResult->isSucceeded());
+        self::assertTrue($saveResult->isOk());
 
         $findResult = $this->repository->findById($task->id);
-        self::assertTrue($findResult->isSucceeded());
-        self::assertSame($task->id->value(), $findResult->getResult()->id->value());
-        self::assertSame('Test task', $findResult->getResult()->title->value());
+        self::assertTrue($findResult->isOk());
+        self::assertSame($task->id->value(), $findResult->unwrap()->id->value());
+        self::assertSame('Test task', $findResult->unwrap()->title->value());
     }
 
     /**
@@ -48,8 +48,8 @@ final class InMemoryTaskRepositoryTest extends TestCase
 
         $result = $this->repository->findById($id);
 
-        self::assertTrue($result->isFailed());
-        self::assertInstanceOf(TaskNotFoundException::class, $result->getThrowable());
+        self::assertTrue($result->isErr());
+        self::assertInstanceOf(TaskNotFoundException::class, $result->unwrapErr());
     }
 
     /**
@@ -59,8 +59,8 @@ final class InMemoryTaskRepositoryTest extends TestCase
     {
         $result = $this->repository->findAll();
 
-        self::assertTrue($result->isSucceeded());
-        self::assertCount(0, $result->getResult());
+        self::assertTrue($result->isOk());
+        self::assertCount(0, $result->unwrap());
     }
 
     /**
@@ -74,8 +74,8 @@ final class InMemoryTaskRepositoryTest extends TestCase
 
         $result = $this->repository->findAll();
 
-        self::assertTrue($result->isSucceeded());
-        self::assertCount(3, $result->getResult());
+        self::assertTrue($result->isOk());
+        self::assertCount(3, $result->unwrap());
     }
 
     /**
@@ -86,14 +86,14 @@ final class InMemoryTaskRepositoryTest extends TestCase
         $task = $this->createTask('Original');
         $this->repository->save($task);
 
-        $updated = $task->changeTitle(TaskTitle::create('Updated')->getResult())->getResult();
+        $updated = $task->changeTitle(TaskTitle::create('Updated')->unwrap())->unwrap();
         $this->repository->save($updated);
 
         $result = $this->repository->findById($task->id);
-        self::assertSame('Updated', $result->getResult()->title->value());
+        self::assertSame('Updated', $result->unwrap()->title->value());
 
         $allResult = $this->repository->findAll();
-        self::assertCount(1, $allResult->getResult());
+        self::assertCount(1, $allResult->unwrap());
     }
 
     /**
@@ -105,10 +105,10 @@ final class InMemoryTaskRepositoryTest extends TestCase
         $this->repository->save($task);
 
         $deleteResult = $this->repository->delete($task->id);
-        self::assertTrue($deleteResult->isSucceeded());
+        self::assertTrue($deleteResult->isOk());
 
         $findResult = $this->repository->findById($task->id);
-        self::assertTrue($findResult->isFailed());
+        self::assertTrue($findResult->isErr());
     }
 
     /**
@@ -118,8 +118,8 @@ final class InMemoryTaskRepositoryTest extends TestCase
     {
         $result = $this->repository->delete(TaskId::generate());
 
-        self::assertTrue($result->isFailed());
-        self::assertInstanceOf(TaskNotFoundException::class, $result->getThrowable());
+        self::assertTrue($result->isErr());
+        self::assertInstanceOf(TaskNotFoundException::class, $result->unwrapErr());
     }
 
     /**
@@ -127,9 +127,9 @@ final class InMemoryTaskRepositoryTest extends TestCase
      */
     private function createTask(string $titleStr): Task
     {
-        $title = TaskTitle::create($titleStr)->getResult();
+        $title = TaskTitle::create($titleStr)->unwrap();
         $description = TaskDescription::empty();
 
-        return TodoTask::create($title, $description)->getResult();
+        return TodoTask::create($title, $description)->unwrap();
     }
 }

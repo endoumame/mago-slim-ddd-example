@@ -9,7 +9,7 @@ use DomainException;
 /**
  * Base class for domain errors.
  *
- * These are never thrown — they are always wrapped in Psl\Result\Failure
+ * These are never thrown — they are always wrapped in EndouMame\PhpMonad\Result\Err
  * and returned as values for railway-oriented programming.
  *
  * @api

@@ -10,35 +10,27 @@ use App\Domain\Task\TaskDescription;
 use App\Domain\Task\TaskStatus;
 use App\Domain\Task\TaskTitle;
 use App\Domain\Task\TodoTask;
-use Eris\TestTrait;
-use PHPUnit\Framework\TestCase;
+use App\Tests\Support\PropertyTestCase;
 
-use function Eris\Generator\choose;
-use function Eris\Generator\map;
-use function Eris\Generator\string;
-use function Eris\Generator\suchThat;
-
-final class TaskPropertyTest extends TestCase
+final class TaskPropertyTest extends PropertyTestCase
 {
-    use TestTrait;
-
     /**
      * @throws \Throwable
      */
     public function testTaskAlwaysCreatedAsTodoTask(): void
     {
-        $this->forAll(suchThat(
+        $this->forAll(self::suchThat(
             static fn(string $s): bool => trim($s) !== '' && mb_strlen(trim($s)) <= 255,
-            string(),
+            self::string(),
         ))->then(static function (string $titleStr): void {
-            $title = TaskTitle::create($titleStr)->getResult();
+            $title = TaskTitle::create($titleStr)->unwrap();
             $description = TaskDescription::empty();
 
             $result = TodoTask::create($title, $description);
 
-            self::assertTrue($result->isSucceeded());
-            self::assertInstanceOf(TodoTask::class, $result->getResult());
-            self::assertSame(TaskStatus::Todo, $result->getResult()->status);
+            self::assertTrue($result->isOk());
+            self::assertInstanceOf(TodoTask::class, $result->unwrap());
+            self::assertSame(TaskStatus::Todo, $result->unwrap()->status);
         });
     }
 
@@ -48,13 +40,13 @@ final class TaskPropertyTest extends TestCase
     public function testTaskSerializationRoundTrip(): void
     {
         $this->forAll(
-            suchThat(static fn(string $s): bool => trim($s) !== '' && mb_strlen(trim($s)) <= 255, string()),
-            suchThat(static fn(string $s): bool => mb_strlen(trim($s)) <= 1000, string()),
+            self::suchThat(static fn(string $s): bool => trim($s) !== '' && mb_strlen(trim($s)) <= 255, self::string()),
+            self::suchThat(static fn(string $s): bool => mb_strlen(trim($s)) <= 1000, self::string()),
         )->then(static function (string $titleStr, string $descStr): void {
-            $title = TaskTitle::create($titleStr)->getResult();
-            $description = TaskDescription::create($descStr)->getResult();
+            $title = TaskTitle::create($titleStr)->unwrap();
+            $description = TaskDescription::create($descStr)->unwrap();
 
-            $task = TodoTask::create($title, $description)->getResult();
+            $task = TodoTask::create($title, $description)->unwrap();
             /** @var array{title: string, description: string, status: string, due_date: string|null} $array */
             $array = $task->toArray();
 
@@ -70,24 +62,24 @@ final class TaskPropertyTest extends TestCase
      */
     public function testStatusTransitionChainTodoToInProgressToDone(): void
     {
-        $this->forAll(map(
+        $this->forAll(self::map(
             static fn(int $_): TodoTask => TodoTask::create(
-                TaskTitle::create('Task')->getResult(),
+                TaskTitle::create('Task')->unwrap(),
                 TaskDescription::empty(),
-            )->getResult(),
-            choose(0, 50),
+            )->unwrap(),
+            self::choose(0, 50),
         ))->then(static function (TodoTask $task): void {
             self::assertSame(TaskStatus::Todo, $task->status);
 
             $inProgress = $task->start();
-            self::assertTrue($inProgress->isSucceeded());
-            self::assertInstanceOf(InProgressTask::class, $inProgress->getResult());
-            self::assertSame(TaskStatus::InProgress, $inProgress->getResult()->status);
+            self::assertTrue($inProgress->isOk());
+            self::assertInstanceOf(InProgressTask::class, $inProgress->unwrap());
+            self::assertSame(TaskStatus::InProgress, $inProgress->unwrap()->status);
 
-            $done = $inProgress->getResult()->complete();
-            self::assertTrue($done->isSucceeded());
-            self::assertInstanceOf(DoneTask::class, $done->getResult());
-            self::assertSame(TaskStatus::Done, $done->getResult()->status);
+            $done = $inProgress->unwrap()->complete();
+            self::assertTrue($done->isOk());
+            self::assertInstanceOf(DoneTask::class, $done->unwrap());
+            self::assertSame(TaskStatus::Done, $done->unwrap()->status);
         });
     }
 
@@ -97,14 +89,14 @@ final class TaskPropertyTest extends TestCase
     public function testImmutabilityPreservedAcrossMutations(): void
     {
         $this->forAll(
-            suchThat(static fn(string $s): bool => trim($s) !== '' && mb_strlen(trim($s)) <= 255, string()),
-            suchThat(static fn(string $s): bool => trim($s) !== '' && mb_strlen(trim($s)) <= 255, string()),
+            self::suchThat(static fn(string $s): bool => trim($s) !== '' && mb_strlen(trim($s)) <= 255, self::string()),
+            self::suchThat(static fn(string $s): bool => trim($s) !== '' && mb_strlen(trim($s)) <= 255, self::string()),
         )->then(static function (string $original, string $updated): void {
-            $originalTitle = TaskTitle::create($original)->getResult();
-            $task = TodoTask::create($originalTitle, TaskDescription::empty())->getResult();
+            $originalTitle = TaskTitle::create($original)->unwrap();
+            $task = TodoTask::create($originalTitle, TaskDescription::empty())->unwrap();
 
-            $updatedTitle = TaskTitle::create($updated)->getResult();
-            $updatedTask = $task->changeTitle($updatedTitle)->getResult();
+            $updatedTitle = TaskTitle::create($updated)->unwrap();
+            $updatedTask = $task->changeTitle($updatedTitle)->unwrap();
 
             self::assertSame(trim($original), $task->title->value());
             self::assertSame(trim($updated), $updatedTask->title->value());
@@ -117,20 +109,20 @@ final class TaskPropertyTest extends TestCase
      */
     public function testConcreteTypePreservedAfterPropertyChanges(): void
     {
-        $this->forAll(suchThat(
+        $this->forAll(self::suchThat(
             static fn(string $s): bool => trim($s) !== '' && mb_strlen(trim($s)) <= 255,
-            string(),
+            self::string(),
         ))->then(static function (string $newTitleStr): void {
-            $newTitle = TaskTitle::create($newTitleStr)->getResult();
+            $newTitle = TaskTitle::create($newTitleStr)->unwrap();
 
-            $todoTask = TodoTask::create(TaskTitle::create('task')->getResult(), TaskDescription::empty())->getResult();
-            self::assertInstanceOf(TodoTask::class, $todoTask->changeTitle($newTitle)->getResult());
+            $todoTask = TodoTask::create(TaskTitle::create('task')->unwrap(), TaskDescription::empty())->unwrap();
+            self::assertInstanceOf(TodoTask::class, $todoTask->changeTitle($newTitle)->unwrap());
 
-            $inProgressTask = $todoTask->start()->getResult();
-            self::assertInstanceOf(InProgressTask::class, $inProgressTask->changeTitle($newTitle)->getResult());
+            $inProgressTask = $todoTask->start()->unwrap();
+            self::assertInstanceOf(InProgressTask::class, $inProgressTask->changeTitle($newTitle)->unwrap());
 
-            $doneTask = $inProgressTask->complete()->getResult();
-            self::assertInstanceOf(DoneTask::class, $doneTask->changeTitle($newTitle)->getResult());
+            $doneTask = $inProgressTask->complete()->unwrap();
+            self::assertInstanceOf(DoneTask::class, $doneTask->changeTitle($newTitle)->unwrap());
         });
     }
 }

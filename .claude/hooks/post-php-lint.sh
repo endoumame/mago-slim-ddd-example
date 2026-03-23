@@ -15,12 +15,14 @@ cd "$CLAUDE_PROJECT_DIR"
 # Format the file (suppress errors)
 vendor/bin/mago fmt "$file" >/dev/null 2>&1 || true
 
-# Lint + analyze: only capture output when the command fails (exit code != 0)
+# Lint + analyze: capture output containing warnings or errors regardless of exit code
 diag=""
-if ! lint="$(vendor/bin/mago lint "$file" 2>&1 | head -20)"; then
+lint="$(vendor/bin/mago lint "$file" 2>&1 | head -20)" || true
+if echo "$lint" | grep -qE '(error|warning|help)\['; then
   diag="$lint"
 fi
-if ! analyze="$(vendor/bin/mago analyze "$file" 2>&1 | head -20)"; then
+analyze="$(vendor/bin/mago analyze "$file" 2>&1 | head -20)" || true
+if echo "$analyze" | grep -qE '(error|warning|help)\['; then
   diag="$diag"$'\n'"$analyze"
 fi
 

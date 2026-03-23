@@ -19,8 +19,7 @@ use App\Application\Task\Query\ListTasksQuery;
 use App\Domain\Task\Exception\DomainError;
 use App\Domain\Task\Exception\TaskNotFoundException;
 use App\Domain\Task\Task;
-use Psl\Result\ResultInterface;
-use Psl\Vec;
+use EndouMame\PhpMonad\Result;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Psr7\Response;
@@ -78,10 +77,10 @@ final readonly class TaskController
              * @return array<string, mixed>
              */
             static fn(array $tasks): array => [
-                'data' => Vec\map(
-                    $tasks,
+                'data' => array_map(
                     /** @return array<string, mixed> */
                     static fn(Task $task): array => $task->toArray(),
+                    $tasks,
                 ),
             ],
         );
@@ -138,11 +137,11 @@ final readonly class TaskController
     }
 
     /**
-     * @param ResultInterface<Task> $result
+     * @param Result<Task, \Throwable> $result
      *
      * @throws \Throwable
      */
-    private function toResponse(ResultInterface $result, int $successCode = 200): ResponseInterface
+    private function toResponse(Result $result, int $successCode = 200): ResponseInterface
     {
         return $this->handleResult(
             $result,
@@ -155,21 +154,18 @@ final readonly class TaskController
     /**
      * @template T
      *
-     * @param ResultInterface<T> $result
+     * @param Result<T, \Throwable> $result
      * @param \Closure(T): array<string, mixed> $onSuccess
      *
      * @throws \Throwable
      */
-    private function handleResult(
-        ResultInterface $result,
-        \Closure $onSuccess,
-        int $successCode = 200,
-    ): ResponseInterface {
-        if ($result->isFailed()) {
-            return $this->errorResponse($result->getThrowable());
+    private function handleResult(Result $result, \Closure $onSuccess, int $successCode = 200): ResponseInterface
+    {
+        if ($result->isErr()) {
+            return $this->errorResponse($result->unwrapErr());
         }
 
-        return $this->jsonResponse($onSuccess($result->getResult()), $successCode);
+        return $this->jsonResponse($onSuccess($result->unwrap()), $successCode);
     }
 
     /**

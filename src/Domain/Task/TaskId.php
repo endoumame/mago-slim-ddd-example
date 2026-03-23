@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Domain\Task;
 
 use App\Domain\Task\Exception\InvalidTaskIdException;
-use Psl\Result\ResultInterface;
+use EndouMame\PhpMonad\Result;
 use Ramsey\Uuid\Uuid;
 
-use function App\Shared\Result\fail;
-use function App\Shared\Result\succeed;
+use function EndouMame\PhpMonad\Result\err;
+use function EndouMame\PhpMonad\Result\ok;
 
 /**
  * @psalm-immutable
@@ -21,18 +21,18 @@ final readonly class TaskId
     ) {}
 
     /**
-     * Parse a string into a TaskId. Returns Failure for invalid UUIDs.
+     * Parse a string into a TaskId. Returns Err for invalid UUIDs.
      *
-     * @return ResultInterface<TaskId>
+     * @return Result<TaskId, InvalidTaskIdException>
      */
-    public static function create(string $value): ResultInterface
+    public static function create(string $value): Result
     {
         if (!Uuid::isValid($value)) {
-            /** @var ResultInterface<TaskId> */
-            return fail(InvalidTaskIdException::invalidFormat($value));
+            /** @var Result<TaskId, InvalidTaskIdException> */
+            return err(InvalidTaskIdException::invalidFormat($value));
         }
 
-        return succeed(new self($value));
+        return ok(new self($value));
     }
 
     /**

@@ -7,9 +7,7 @@ namespace App\Application\Task\Handler;
 use App\Application\Task\Command\DeleteTaskCommand;
 use App\Domain\Task\TaskId;
 use App\Domain\Task\TaskRepositoryInterface;
-use Psl\Result\ResultInterface;
-
-use function App\Shared\Result\bind;
+use EndouMame\PhpMonad\Result;
 
 final readonly class DeleteTaskHandler
 {
@@ -18,16 +16,12 @@ final readonly class DeleteTaskHandler
     ) {}
 
     /**
-     * @return ResultInterface<true>
+     * @return Result<true, \Throwable>
      */
-    public function handle(DeleteTaskCommand $command): ResultInterface
+    public function handle(DeleteTaskCommand $command): Result
     {
-        $idResult = TaskId::create($command->id);
-
-        return $idResult
-            |> bind(
-                fn(TaskId $id): ResultInterface => $this->repository->findById($id)
-                    |> bind(fn(): ResultInterface => $this->repository->delete($id)),
-            );
+        return TaskId::create($command->id)->andThen(fn(TaskId $id): Result => $this->repository
+            ->findById($id)
+            ->andThen(fn(): Result => $this->repository->delete($id)));
     }
 }

@@ -20,14 +20,14 @@ final class TaskTest extends TestCase
      */
     public function testCreateTask(): void
     {
-        $title = TaskTitle::create('Test task')->getResult();
-        $description = TaskDescription::create('A description')->getResult();
+        $title = TaskTitle::create('Test task')->unwrap();
+        $description = TaskDescription::create('A description')->unwrap();
 
         $result = TodoTask::create($title, $description);
 
-        self::assertTrue($result->isSucceeded());
+        self::assertTrue($result->isOk());
 
-        $task = $result->getResult();
+        $task = $result->unwrap();
         self::assertInstanceOf(TodoTask::class, $task);
         self::assertSame('Test task', $task->title->value());
         self::assertSame('A description', $task->description->value());
@@ -40,15 +40,15 @@ final class TaskTest extends TestCase
      */
     public function testCreateTaskWithDueDate(): void
     {
-        $title = TaskTitle::create('Test task')->getResult();
+        $title = TaskTitle::create('Test task')->unwrap();
         $description = TaskDescription::empty();
         $futureDate = new \DateTimeImmutable('+7 days')->format('Y-m-d');
-        $dueDate = DueDate::create($futureDate)->getResult();
+        $dueDate = DueDate::create($futureDate)->unwrap();
 
         $result = TodoTask::create($title, $description, $dueDate);
 
-        self::assertTrue($result->isSucceeded());
-        $task = $result->getResult();
+        self::assertTrue($result->isOk());
+        $task = $result->unwrap();
         $dueDate = $task->dueDate;
         self::assertNotNull($dueDate);
         self::assertSame($futureDate, $dueDate->format());
@@ -60,14 +60,14 @@ final class TaskTest extends TestCase
     public function testChangeTitle(): void
     {
         $task = $this->createTestTask();
-        $newTitle = TaskTitle::create('Updated title')->getResult();
+        $newTitle = TaskTitle::create('Updated title')->unwrap();
 
         $result = $task->changeTitle($newTitle);
 
-        self::assertTrue($result->isSucceeded());
-        self::assertInstanceOf(TodoTask::class, $result->getResult());
-        self::assertSame('Updated title', $result->getResult()->title->value());
-        self::assertSame($task->id->value(), $result->getResult()->id->value());
+        self::assertTrue($result->isOk());
+        self::assertInstanceOf(TodoTask::class, $result->unwrap());
+        self::assertSame('Updated title', $result->unwrap()->title->value());
+        self::assertSame($task->id->value(), $result->unwrap()->id->value());
     }
 
     /**
@@ -76,12 +76,12 @@ final class TaskTest extends TestCase
     public function testChangeDescription(): void
     {
         $task = $this->createTestTask();
-        $newDesc = TaskDescription::create('Updated description')->getResult();
+        $newDesc = TaskDescription::create('Updated description')->unwrap();
 
         $result = $task->changeDescription($newDesc);
 
-        self::assertTrue($result->isSucceeded());
-        self::assertSame('Updated description', $result->getResult()->description->value());
+        self::assertTrue($result->isOk());
+        self::assertSame('Updated description', $result->unwrap()->description->value());
     }
 
     /**
@@ -93,9 +93,9 @@ final class TaskTest extends TestCase
 
         $result = $task->start();
 
-        self::assertTrue($result->isSucceeded());
-        self::assertInstanceOf(InProgressTask::class, $result->getResult());
-        self::assertSame(TaskStatus::InProgress, $result->getResult()->status);
+        self::assertTrue($result->isOk());
+        self::assertInstanceOf(InProgressTask::class, $result->unwrap());
+        self::assertSame(TaskStatus::InProgress, $result->unwrap()->status);
     }
 
     /**
@@ -104,13 +104,13 @@ final class TaskTest extends TestCase
     public function testCompleteTransitionsInProgressToDone(): void
     {
         $task = $this->createTestTask();
-        $inProgressTask = $task->start()->getResult();
+        $inProgressTask = $task->start()->unwrap();
 
         $result = $inProgressTask->complete();
 
-        self::assertTrue($result->isSucceeded());
-        self::assertInstanceOf(DoneTask::class, $result->getResult());
-        self::assertSame(TaskStatus::Done, $result->getResult()->status);
+        self::assertTrue($result->isOk());
+        self::assertInstanceOf(DoneTask::class, $result->unwrap());
+        self::assertSame(TaskStatus::Done, $result->unwrap()->status);
     }
 
     /**
@@ -119,8 +119,8 @@ final class TaskTest extends TestCase
     public function testInvalidTransitionsPreventedByTypeSystem(): void
     {
         $todoTask = $this->createTestTask();
-        $inProgressTask = $todoTask->start()->getResult();
-        $doneTask = $inProgressTask->complete()->getResult();
+        $inProgressTask = $todoTask->start()->unwrap();
+        $doneTask = $inProgressTask->complete()->unwrap();
 
         self::assertFalse(method_exists($todoTask, 'complete'));
         self::assertFalse(method_exists($inProgressTask, 'start'));
@@ -134,9 +134,9 @@ final class TaskTest extends TestCase
     public function testImmutability(): void
     {
         $task = $this->createTestTask();
-        $newTitle = TaskTitle::create('New title')->getResult();
+        $newTitle = TaskTitle::create('New title')->unwrap();
 
-        $updatedTask = $task->changeTitle($newTitle)->getResult();
+        $updatedTask = $task->changeTitle($newTitle)->unwrap();
 
         self::assertSame('Test task', $task->title->value());
         self::assertSame('New title', $updatedTask->title->value());
@@ -149,14 +149,14 @@ final class TaskTest extends TestCase
     public function testChangeTitlePreservesConcreteType(): void
     {
         $todoTask = $this->createTestTask();
-        $inProgressTask = $todoTask->start()->getResult();
-        $doneTask = $inProgressTask->complete()->getResult();
+        $inProgressTask = $todoTask->start()->unwrap();
+        $doneTask = $inProgressTask->complete()->unwrap();
 
-        $newTitle = TaskTitle::create('New title')->getResult();
+        $newTitle = TaskTitle::create('New title')->unwrap();
 
-        self::assertInstanceOf(TodoTask::class, $todoTask->changeTitle($newTitle)->getResult());
-        self::assertInstanceOf(InProgressTask::class, $inProgressTask->changeTitle($newTitle)->getResult());
-        self::assertInstanceOf(DoneTask::class, $doneTask->changeTitle($newTitle)->getResult());
+        self::assertInstanceOf(TodoTask::class, $todoTask->changeTitle($newTitle)->unwrap());
+        self::assertInstanceOf(InProgressTask::class, $inProgressTask->changeTitle($newTitle)->unwrap());
+        self::assertInstanceOf(DoneTask::class, $doneTask->changeTitle($newTitle)->unwrap());
     }
 
     /**
@@ -183,9 +183,9 @@ final class TaskTest extends TestCase
      */
     private function createTestTask(): TodoTask
     {
-        $title = TaskTitle::create('Test task')->getResult();
+        $title = TaskTitle::create('Test task')->unwrap();
         $description = TaskDescription::empty();
 
-        return TodoTask::create($title, $description)->getResult();
+        return TodoTask::create($title, $description)->unwrap();
     }
 }

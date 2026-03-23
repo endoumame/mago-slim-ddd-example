@@ -227,7 +227,8 @@ final class TaskEndpointTest extends TestCase
 
         $body = $streamFactory->createStream(json_encode($data, JSON_THROW_ON_ERROR));
 
-        $request = $requestFactory->createServerRequest($method, $uri)
+        $request = $requestFactory
+            ->createServerRequest($method, $uri)
             ->withHeader('Content-Type', 'application/json')
             ->withBody($body);
 
