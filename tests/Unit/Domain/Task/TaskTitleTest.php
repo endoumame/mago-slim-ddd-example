@@ -17,7 +17,6 @@ final class TaskTitleTest extends TestCase
     {
         $result = TaskTitle::create('Buy groceries');
 
-        self::assertTrue($result->isOk());
         self::assertSame('Buy groceries', $result->unwrap()->value());
     }
 
@@ -28,7 +27,6 @@ final class TaskTitleTest extends TestCase
     {
         $result = TaskTitle::create('  Buy groceries  ');
 
-        self::assertTrue($result->isOk());
         self::assertSame('Buy groceries', $result->unwrap()->value());
     }
 
@@ -39,7 +37,6 @@ final class TaskTitleTest extends TestCase
     {
         $result = TaskTitle::create('');
 
-        self::assertTrue($result->isErr());
         self::assertInstanceOf(InvalidTaskTitleException::class, $result->unwrapErr());
         self::assertStringContainsString('empty', $result->unwrapErr()->getMessage());
     }
@@ -51,7 +48,6 @@ final class TaskTitleTest extends TestCase
     {
         $result = TaskTitle::create('   ');
 
-        self::assertTrue($result->isErr());
         self::assertInstanceOf(InvalidTaskTitleException::class, $result->unwrapErr());
     }
 
@@ -63,7 +59,7 @@ final class TaskTitleTest extends TestCase
         $title = str_repeat(string: 'a', times: 255);
         $result = TaskTitle::create($title);
 
-        self::assertTrue($result->isOk());
+        self::assertNotNull($result->unwrap());
     }
 
     /**
@@ -74,7 +70,6 @@ final class TaskTitleTest extends TestCase
         $title = str_repeat(string: 'a', times: 256);
         $result = TaskTitle::create($title);
 
-        self::assertTrue($result->isErr());
         self::assertInstanceOf(InvalidTaskTitleException::class, $result->unwrapErr());
         self::assertStringContainsString('255', $result->unwrapErr()->getMessage());
     }

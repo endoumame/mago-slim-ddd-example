@@ -24,7 +24,6 @@ final class OptionFunctionsTest extends TestCase
     {
         $result = ok_or(none(), new \InvalidArgumentException('missing'));
 
-        self::assertTrue($result->isErr());
         self::assertInstanceOf(\InvalidArgumentException::class, $result->unwrapErr());
     }
 
@@ -35,7 +34,6 @@ final class OptionFunctionsTest extends TestCase
     {
         $result = ok_or(some(42), new \InvalidArgumentException('missing'));
 
-        self::assertTrue($result->isOk());
         self::assertSame(42, $result->unwrap());
     }
 
@@ -46,7 +44,6 @@ final class OptionFunctionsTest extends TestCase
     {
         $result = traverse(some('hello'), static fn(string $s): Result => ok(mb_strtoupper($s)));
 
-        self::assertTrue($result->isOk());
         self::assertSame('HELLO', $result->unwrap());
     }
 
@@ -59,7 +56,6 @@ final class OptionFunctionsTest extends TestCase
         $none = none();
         $result = traverse($none, static fn(string $s): Result => ok(mb_strtoupper($s)));
 
-        self::assertTrue($result->isOk());
         self::assertNull($result->unwrap());
     }
 
@@ -75,10 +71,8 @@ final class OptionFunctionsTest extends TestCase
             static fn(int $extra): \Closure => static fn(int $current): Result => ok($current + $extra),
         );
 
-        /** @var Result<int, never> $result */
         $result = $fn($initial);
 
-        self::assertTrue($result->isOk());
         self::assertSame(15, $result->unwrap());
     }
 
@@ -96,10 +90,8 @@ final class OptionFunctionsTest extends TestCase
             static fn(int $extra): \Closure => static fn(int $current): Result => ok($current + $extra),
         );
 
-        /** @var Result<int, never> $result */
         $result = $fn($initial);
 
-        self::assertTrue($result->isOk());
         self::assertSame(10, $result->unwrap());
     }
 
@@ -116,10 +108,8 @@ final class OptionFunctionsTest extends TestCase
 
         $step3 = apply_if_some(some(3), static fn(int $v): \Closure => static fn(int $acc): Result => ok($acc + $v));
 
-        /** @var Result<int, never> $result */
         $result = $step3($step2($step1($initial)));
 
-        self::assertTrue($result->isOk());
         self::assertSame(4, $result->unwrap());
     }
 }

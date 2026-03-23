@@ -31,10 +31,9 @@ final class InMemoryTaskRepositoryTest extends TestCase
         $task = $this->createTask('Test task');
 
         $saveResult = $this->repository->save($task);
-        self::assertTrue($saveResult->isOk());
+        self::assertNotNull($saveResult->unwrap());
 
         $findResult = $this->repository->findById($task->id);
-        self::assertTrue($findResult->isOk());
         self::assertSame($task->id->value(), $findResult->unwrap()->id->value());
         self::assertSame('Test task', $findResult->unwrap()->title->value());
     }
@@ -48,7 +47,6 @@ final class InMemoryTaskRepositoryTest extends TestCase
 
         $result = $this->repository->findById($id);
 
-        self::assertTrue($result->isErr());
         self::assertInstanceOf(TaskNotFoundException::class, $result->unwrapErr());
     }
 
@@ -59,7 +57,6 @@ final class InMemoryTaskRepositoryTest extends TestCase
     {
         $result = $this->repository->findAll();
 
-        self::assertTrue($result->isOk());
         self::assertCount(0, $result->unwrap());
     }
 
@@ -74,7 +71,6 @@ final class InMemoryTaskRepositoryTest extends TestCase
 
         $result = $this->repository->findAll();
 
-        self::assertTrue($result->isOk());
         self::assertCount(3, $result->unwrap());
     }
 
@@ -105,10 +101,10 @@ final class InMemoryTaskRepositoryTest extends TestCase
         $this->repository->save($task);
 
         $deleteResult = $this->repository->delete($task->id);
-        self::assertTrue($deleteResult->isOk());
+        self::assertNotNull($deleteResult->unwrap());
 
         $findResult = $this->repository->findById($task->id);
-        self::assertTrue($findResult->isErr());
+        self::assertInstanceOf(TaskNotFoundException::class, $findResult->unwrapErr());
     }
 
     /**
@@ -118,7 +114,6 @@ final class InMemoryTaskRepositoryTest extends TestCase
     {
         $result = $this->repository->delete(TaskId::generate());
 
-        self::assertTrue($result->isErr());
         self::assertInstanceOf(TaskNotFoundException::class, $result->unwrapErr());
     }
 

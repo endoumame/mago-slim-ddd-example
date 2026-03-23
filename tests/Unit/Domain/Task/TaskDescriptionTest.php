@@ -17,7 +17,6 @@ final class TaskDescriptionTest extends TestCase
     {
         $result = TaskDescription::create('A detailed task description');
 
-        self::assertTrue($result->isOk());
         self::assertSame('A detailed task description', $result->unwrap()->value());
     }
 
@@ -28,7 +27,6 @@ final class TaskDescriptionTest extends TestCase
     {
         $result = TaskDescription::create('');
 
-        self::assertTrue($result->isOk());
         self::assertSame('', $result->unwrap()->value());
     }
 
@@ -39,7 +37,6 @@ final class TaskDescriptionTest extends TestCase
     {
         $result = TaskDescription::create('  description  ');
 
-        self::assertTrue($result->isOk());
         self::assertSame('description', $result->unwrap()->value());
     }
 
@@ -51,7 +48,7 @@ final class TaskDescriptionTest extends TestCase
         $desc = str_repeat(string: 'a', times: 1000);
         $result = TaskDescription::create($desc);
 
-        self::assertTrue($result->isOk());
+        self::assertNotNull($result->unwrap());
     }
 
     /**
@@ -62,7 +59,6 @@ final class TaskDescriptionTest extends TestCase
         $desc = str_repeat(string: 'a', times: 1001);
         $result = TaskDescription::create($desc);
 
-        self::assertTrue($result->isErr());
         self::assertInstanceOf(InvalidTaskDescriptionException::class, $result->unwrapErr());
         self::assertStringContainsString('1000', $result->unwrapErr()->getMessage());
     }

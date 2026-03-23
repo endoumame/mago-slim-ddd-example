@@ -69,7 +69,6 @@ final class OptionTest extends TestCase
     {
         $option = fromValue('hello');
 
-        self::assertTrue($option->isSome());
         self::assertSame('hello', $option->unwrap());
     }
 
@@ -80,7 +79,7 @@ final class OptionTest extends TestCase
     {
         $option = fromValue(null);
 
-        self::assertTrue($option->isNone());
+        self::assertNull($option->unwrapOr(null));
     }
 
     /**
@@ -123,7 +122,6 @@ final class OptionTest extends TestCase
     {
         $result = some(5)->map(static fn(int $v): int => $v * 2);
 
-        self::assertTrue($result->isSome());
         self::assertSame(10, $result->unwrap());
     }
 
@@ -136,7 +134,7 @@ final class OptionTest extends TestCase
         $none = none();
         $result = $none->map(static fn(int $v): int => $v * 2);
 
-        self::assertTrue($result->isNone());
+        self::assertNull($result->unwrapOr(null));
     }
 
     /**
@@ -146,7 +144,6 @@ final class OptionTest extends TestCase
     {
         $result = some(5)->andThen(static fn(int $v): Option => some($v * 2));
 
-        self::assertTrue($result->isSome());
         self::assertSame(10, $result->unwrap());
     }
 
@@ -157,7 +154,7 @@ final class OptionTest extends TestCase
     {
         $result = some(5)->andThen(static fn(int $_): Option => none());
 
-        self::assertTrue($result->isNone());
+        self::assertNull($result->unwrapOr(null));
     }
 
     /**
@@ -169,7 +166,7 @@ final class OptionTest extends TestCase
         $none = none();
         $result = $none->andThen(static fn(int $v): Option => some($v * 2));
 
-        self::assertTrue($result->isNone());
+        self::assertNull($result->unwrapOr(null));
     }
 
     /**
@@ -179,7 +176,6 @@ final class OptionTest extends TestCase
     {
         $result = some(10)->filter(static fn(int $v): bool => $v > 5);
 
-        self::assertTrue($result->isSome());
         self::assertSame(10, $result->unwrap());
     }
 
@@ -190,7 +186,7 @@ final class OptionTest extends TestCase
     {
         $result = some(3)->filter(static fn(int $v): bool => $v > 5);
 
-        self::assertTrue($result->isNone());
+        self::assertNull($result->unwrapOr(null));
     }
 
     /**
@@ -202,7 +198,7 @@ final class OptionTest extends TestCase
         $none = none();
         $result = $none->filter(static fn(int $v): bool => $v > 5);
 
-        self::assertTrue($result->isNone());
+        self::assertNull($result->unwrapOr(null));
     }
 
     /**
@@ -210,6 +206,7 @@ final class OptionTest extends TestCase
      */
     public function testMapOrElseCallsSomeOnSome(): void
     {
+        /** @var string $result */
         $result = some(42)->mapOrElse(static fn(int $v): string => "value: {$v}", static fn(): string => 'empty');
 
         self::assertSame('value: 42', $result);

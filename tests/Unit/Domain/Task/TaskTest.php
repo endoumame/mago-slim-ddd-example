@@ -25,8 +25,6 @@ final class TaskTest extends TestCase
 
         $result = TodoTask::create($title, $description);
 
-        self::assertTrue($result->isOk());
-
         $task = $result->unwrap();
         self::assertInstanceOf(TodoTask::class, $task);
         self::assertSame('Test task', $task->title->value());
@@ -47,7 +45,6 @@ final class TaskTest extends TestCase
 
         $result = TodoTask::create($title, $description, $dueDate);
 
-        self::assertTrue($result->isOk());
         $task = $result->unwrap();
         $dueDate = $task->dueDate;
         self::assertNotNull($dueDate);
@@ -64,7 +61,6 @@ final class TaskTest extends TestCase
 
         $result = $task->changeTitle($newTitle);
 
-        self::assertTrue($result->isOk());
         self::assertInstanceOf(TodoTask::class, $result->unwrap());
         self::assertSame('Updated title', $result->unwrap()->title->value());
         self::assertSame($task->id->value(), $result->unwrap()->id->value());
@@ -80,7 +76,6 @@ final class TaskTest extends TestCase
 
         $result = $task->changeDescription($newDesc);
 
-        self::assertTrue($result->isOk());
         self::assertSame('Updated description', $result->unwrap()->description->value());
     }
 
@@ -93,7 +88,6 @@ final class TaskTest extends TestCase
 
         $result = $task->start();
 
-        self::assertTrue($result->isOk());
         self::assertInstanceOf(InProgressTask::class, $result->unwrap());
         self::assertSame(TaskStatus::InProgress, $result->unwrap()->status);
     }
@@ -108,7 +102,6 @@ final class TaskTest extends TestCase
 
         $result = $inProgressTask->complete();
 
-        self::assertTrue($result->isOk());
         self::assertInstanceOf(DoneTask::class, $result->unwrap());
         self::assertSame(TaskStatus::Done, $result->unwrap()->status);
     }

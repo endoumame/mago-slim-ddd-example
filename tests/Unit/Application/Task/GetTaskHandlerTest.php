@@ -39,7 +39,6 @@ final class GetTaskHandlerTest extends TestCase
 
         $result = $this->handler->handle(new GetTaskQuery(id: $task->id->value()));
 
-        self::assertTrue($result->isOk());
         self::assertSame('Find me', $result->unwrap()->title->value());
     }
 
@@ -50,7 +49,6 @@ final class GetTaskHandlerTest extends TestCase
     {
         $result = $this->handler->handle(new GetTaskQuery(id: Uuid::uuid4()->toString()));
 
-        self::assertTrue($result->isErr());
         self::assertInstanceOf(TaskNotFoundException::class, $result->unwrapErr());
     }
 
@@ -61,7 +59,6 @@ final class GetTaskHandlerTest extends TestCase
     {
         $result = $this->handler->handle(new GetTaskQuery(id: 'not-a-uuid'));
 
-        self::assertTrue($result->isErr());
         self::assertInstanceOf(InvalidTaskIdException::class, $result->unwrapErr());
     }
 }

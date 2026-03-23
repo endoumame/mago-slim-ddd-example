@@ -53,9 +53,8 @@ final readonly class TaskController
 
     /**
      * @throws \Throwable
-     *
      */
-    public function get(ServerRequestInterface $request, ResponseInterface $response, string $id): ResponseInterface
+    public function get(string $id): ResponseInterface
     {
         $query = new GetTaskQuery(id: $id);
 
@@ -88,9 +87,8 @@ final readonly class TaskController
 
     /**
      * @throws \Throwable
-     *
      */
-    public function update(ServerRequestInterface $request, ResponseInterface $response, string $id): ResponseInterface
+    public function update(ServerRequestInterface $request, string $id): ResponseInterface
     {
         $body = $this->parsedBody($request);
 
@@ -106,9 +104,8 @@ final readonly class TaskController
 
     /**
      * @throws \Throwable
-     *
      */
-    public function delete(ServerRequestInterface $request, ResponseInterface $response, string $id): ResponseInterface
+    public function delete(string $id): ResponseInterface
     {
         $command = new DeleteTaskCommand(id: $id);
 
@@ -122,13 +119,9 @@ final readonly class TaskController
 
     /**
      * @throws \Throwable
-     *
      */
-    public function changeStatus(
-        ServerRequestInterface $request,
-        ResponseInterface $response,
-        string $id,
-    ): ResponseInterface {
+    public function changeStatus(ServerRequestInterface $request, string $id): ResponseInterface
+    {
         $body = $this->parsedBody($request);
 
         $command = new ChangeTaskStatusCommand(id: $id, status: (string) ($body['status'] ?? ''));

@@ -38,7 +38,6 @@ final class ListTasksHandlerTest extends TestCase
     {
         $result = $this->handler->handle(new ListTasksQuery());
 
-        self::assertTrue($result->isOk());
         self::assertCount(0, $result->unwrap());
     }
 
@@ -53,7 +52,6 @@ final class ListTasksHandlerTest extends TestCase
 
         $result = $this->handler->handle(new ListTasksQuery());
 
-        self::assertTrue($result->isOk());
         self::assertCount(3, $result->unwrap());
     }
 
@@ -69,7 +67,6 @@ final class ListTasksHandlerTest extends TestCase
 
         $result = $this->handler->handle(new ListTasksQuery(status: 'in_progress'));
 
-        self::assertTrue($result->isOk());
         self::assertCount(1, $result->unwrap());
         self::assertSame('Task 1', $result->unwrap()[0]->title->value());
     }

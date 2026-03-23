@@ -6,7 +6,6 @@
     "require": {
         "php": ">=8.4",
         "php-di/php-di": "^7.0",
-        "php-di/slim-bridge": "^3.4",
         "endoumame/php-monad": "^1.0",
         "ramsey/uuid": "^4.7",
         "slim/psr7": "^1.7",
