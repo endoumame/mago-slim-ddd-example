@@ -13,9 +13,6 @@ use App\Domain\Task\TaskRepositoryInterface;
 use App\Domain\Task\TaskTitle;
 use EndouMame\PhpMonad\Result;
 
-use function App\Shared\Option\apply_if_some;
-use function App\Shared\Result\bind;
-use function EndouMame\PhpMonad\Option\fromValue;
 use function EndouMame\PhpMonad\Result\ok;
 
 final readonly class UpdateTaskHandler
@@ -29,11 +26,9 @@ final readonly class UpdateTaskHandler
      */
     public function handle(UpdateTaskCommand $command): Result
     {
-        $idResult = TaskId::create($command->id);
-
-        return $idResult
-            |> bind(fn(TaskId $id): Result => $this->repository->findById($id))
-            |> bind(fn(Task $task): Result => $this->applyChanges($task, $command));
+        return TaskId::create($command->id)
+            ->andThen(fn(TaskId $id): Result => $this->repository->findById($id))
+            ->andThen(fn(Task $task): Result => $this->applyChanges($task, $command));
     }
 
     /**
@@ -42,25 +37,29 @@ final readonly class UpdateTaskHandler
     private function applyChanges(Task $task, UpdateTaskCommand $command): Result
     {
         /** @var Result<Task, \Throwable> $result */
-        $result = ok($task)
-            |> apply_if_some(
-                fromValue($command->title),
-                static fn(string $title): \Closure => static fn(Task $t): Result => TaskTitle::create($title)
-                    |> bind($t->changeTitle(...)),
-            )
-            |> apply_if_some(
-                fromValue($command->description),
-                static fn(string $description): \Closure => static fn(Task $t): Result => TaskDescription::create(
-                    $description,
-                )
-                    |> bind($t->changeDescription(...)),
-            )
-            |> apply_if_some(
-                fromValue($command->dueDate),
-                static fn(string $date): \Closure => static fn(Task $t): Result => DueDate::create($date)
-                    |> bind($t->changeDueDate(...)),
-            );
+        $result = ok($task);
 
-        return $result |> bind(fn(Task $t): Result => $this->repository->save($t));
+        if ($command->title !== null) {
+            $title = $command->title;
+            $result = $result->andThen(static fn(Task $t): Result => TaskTitle::create($title)->andThen(
+                $t->changeTitle(...),
+            ));
+        }
+
+        if ($command->description !== null) {
+            $description = $command->description;
+            $result = $result->andThen(static fn(Task $t): Result => TaskDescription::create($description)->andThen(
+                $t->changeDescription(...),
+            ));
+        }
+
+        if ($command->dueDate !== null) {
+            $dueDate = $command->dueDate;
+            $result = $result->andThen(static fn(Task $t): Result => DueDate::create($dueDate)->andThen(
+                $t->changeDueDate(...),
+            ));
+        }
+
+        return $result->andThen(fn(Task $t): Result => $this->repository->save($t));
     }
 }

@@ -10,26 +10,18 @@ use App\Domain\Task\TaskDescription;
 use App\Domain\Task\TaskStatus;
 use App\Domain\Task\TaskTitle;
 use App\Domain\Task\TodoTask;
-use Eris\TestTrait;
-use PHPUnit\Framework\TestCase;
+use App\Tests\Support\PropertyTestCase;
 
-use function Eris\Generator\choose;
-use function Eris\Generator\map;
-use function Eris\Generator\string;
-use function Eris\Generator\suchThat;
-
-final class TaskPropertyTest extends TestCase
+final class TaskPropertyTest extends PropertyTestCase
 {
-    use TestTrait;
-
     /**
      * @throws \Throwable
      */
     public function testTaskAlwaysCreatedAsTodoTask(): void
     {
-        $this->forAll(suchThat(
+        $this->forAll(self::suchThat(
             static fn(string $s): bool => trim($s) !== '' && mb_strlen(trim($s)) <= 255,
-            string(),
+            self::string(),
         ))->then(static function (string $titleStr): void {
             $title = TaskTitle::create($titleStr)->unwrap();
             $description = TaskDescription::empty();
@@ -48,8 +40,8 @@ final class TaskPropertyTest extends TestCase
     public function testTaskSerializationRoundTrip(): void
     {
         $this->forAll(
-            suchThat(static fn(string $s): bool => trim($s) !== '' && mb_strlen(trim($s)) <= 255, string()),
-            suchThat(static fn(string $s): bool => mb_strlen(trim($s)) <= 1000, string()),
+            self::suchThat(static fn(string $s): bool => trim($s) !== '' && mb_strlen(trim($s)) <= 255, self::string()),
+            self::suchThat(static fn(string $s): bool => mb_strlen(trim($s)) <= 1000, self::string()),
         )->then(static function (string $titleStr, string $descStr): void {
             $title = TaskTitle::create($titleStr)->unwrap();
             $description = TaskDescription::create($descStr)->unwrap();
@@ -70,12 +62,12 @@ final class TaskPropertyTest extends TestCase
      */
     public function testStatusTransitionChainTodoToInProgressToDone(): void
     {
-        $this->forAll(map(
+        $this->forAll(self::map(
             static fn(int $_): TodoTask => TodoTask::create(
                 TaskTitle::create('Task')->unwrap(),
                 TaskDescription::empty(),
             )->unwrap(),
-            choose(0, 50),
+            self::choose(0, 50),
         ))->then(static function (TodoTask $task): void {
             self::assertSame(TaskStatus::Todo, $task->status);
 
@@ -97,8 +89,8 @@ final class TaskPropertyTest extends TestCase
     public function testImmutabilityPreservedAcrossMutations(): void
     {
         $this->forAll(
-            suchThat(static fn(string $s): bool => trim($s) !== '' && mb_strlen(trim($s)) <= 255, string()),
-            suchThat(static fn(string $s): bool => trim($s) !== '' && mb_strlen(trim($s)) <= 255, string()),
+            self::suchThat(static fn(string $s): bool => trim($s) !== '' && mb_strlen(trim($s)) <= 255, self::string()),
+            self::suchThat(static fn(string $s): bool => trim($s) !== '' && mb_strlen(trim($s)) <= 255, self::string()),
         )->then(static function (string $original, string $updated): void {
             $originalTitle = TaskTitle::create($original)->unwrap();
             $task = TodoTask::create($originalTitle, TaskDescription::empty())->unwrap();
@@ -117,9 +109,9 @@ final class TaskPropertyTest extends TestCase
      */
     public function testConcreteTypePreservedAfterPropertyChanges(): void
     {
-        $this->forAll(suchThat(
+        $this->forAll(self::suchThat(
             static fn(string $s): bool => trim($s) !== '' && mb_strlen(trim($s)) <= 255,
-            string(),
+            self::string(),
         ))->then(static function (string $newTitleStr): void {
             $newTitle = TaskTitle::create($newTitleStr)->unwrap();
 

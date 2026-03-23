@@ -10,8 +10,6 @@ use App\Domain\Task\TaskId;
 use App\Domain\Task\TaskRepositoryInterface;
 use EndouMame\PhpMonad\Result;
 
-use function App\Shared\Result\bind;
-
 final readonly class GetTaskHandler
 {
     public function __construct(
@@ -23,6 +21,6 @@ final readonly class GetTaskHandler
      */
     public function handle(GetTaskQuery $query): Result
     {
-        return TaskId::create($query->id) |> bind(fn(TaskId $id): Result => $this->repository->findById($id));
+        return TaskId::create($query->id)->andThen(fn(TaskId $id): Result => $this->repository->findById($id));
     }
 }

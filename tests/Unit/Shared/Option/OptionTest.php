@@ -15,25 +15,25 @@ use function EndouMame\PhpMonad\Option\some;
 final class OptionTest extends TestCase
 {
     /**
-     * @throws \Throwable
+     * @return iterable<string, array{Option<int>, bool, bool}>
      */
-    public function testSomeIsSome(): void
+    public static function isSomeIsNoneProvider(): iterable
     {
-        $option = some(42);
-
-        self::assertTrue($option->isSome());
-        self::assertFalse($option->isNone());
+        yield 'some' => [some(42), true, false];
+        yield 'none' => [none(), false, true];
     }
 
     /**
+     * @dataProvider isSomeIsNoneProvider
+     *
+     * @param Option<int> $option
+     *
      * @throws \Throwable
      */
-    public function testNoneIsNone(): void
+    public function testIsSomeAndIsNone(Option $option, bool $expectedIsSome, bool $expectedIsNone): void
     {
-        $option = none();
-
-        self::assertTrue($option->isNone());
-        self::assertFalse($option->isSome());
+        self::assertSame($expectedIsSome, $option->isSome());
+        self::assertSame($expectedIsNone, $option->isNone());
     }
 
     /**

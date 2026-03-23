@@ -15,7 +15,6 @@ use App\Domain\Task\TodoTask;
 use EndouMame\PhpMonad\Result;
 
 use function App\Shared\Option\ok_or_err;
-use function App\Shared\Result\bind;
 use function EndouMame\PhpMonad\Option\fromValue;
 use function EndouMame\PhpMonad\Result\err;
 
@@ -39,12 +38,11 @@ final readonly class ChangeTaskStatusHandler
                 ),
             );
 
-        $idResult = $statusResult |> bind(static fn(TaskStatus $_): Result => TaskId::create($command->id));
-
-        return $idResult
-            |> bind(fn(TaskId $id): Result => $this->repository->findById($id))
-            |> bind(fn(Task $task): Result => $this->transitionTo($task, $statusResult->unwrap()))
-            |> bind(fn(Task $updated): Result => $this->repository->save($updated));
+        return $statusResult
+            ->andThen(static fn(TaskStatus $_): Result => TaskId::create($command->id))
+            ->andThen(fn(TaskId $id): Result => $this->repository->findById($id))
+            ->andThen(fn(Task $task): Result => $this->transitionTo($task, $statusResult->unwrap()))
+            ->andThen(fn(Task $updated): Result => $this->repository->save($updated));
     }
 
     /**

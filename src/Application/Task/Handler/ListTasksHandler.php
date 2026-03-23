@@ -11,7 +11,6 @@ use App\Domain\Task\TaskStatus;
 use EndouMame\PhpMonad\Option;
 use EndouMame\PhpMonad\Result;
 
-use function App\Shared\Result\bind;
 use function EndouMame\PhpMonad\Option\fromValue;
 use function EndouMame\PhpMonad\Result\ok;
 
@@ -26,8 +25,9 @@ final readonly class ListTasksHandler
      */
     public function handle(ListTasksQuery $query): Result
     {
-        return $this->repository->findAll()
-            |> bind(
+        return $this->repository
+            ->findAll()
+            ->andThen(
                 /**
                  * @param list<Task> $tasks
                  * @return Result<list<Task>, \Throwable>

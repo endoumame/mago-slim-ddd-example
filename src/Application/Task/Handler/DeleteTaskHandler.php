@@ -9,8 +9,6 @@ use App\Domain\Task\TaskId;
 use App\Domain\Task\TaskRepositoryInterface;
 use EndouMame\PhpMonad\Result;
 
-use function App\Shared\Result\bind;
-
 final readonly class DeleteTaskHandler
 {
     public function __construct(
@@ -22,12 +20,8 @@ final readonly class DeleteTaskHandler
      */
     public function handle(DeleteTaskCommand $command): Result
     {
-        $idResult = TaskId::create($command->id);
-
-        return $idResult
-            |> bind(
-                fn(TaskId $id): Result => $this->repository->findById($id)
-                    |> bind(fn(): Result => $this->repository->delete($id)),
-            );
+        return TaskId::create($command->id)->andThen(fn(TaskId $id): Result => $this->repository
+            ->findById($id)
+            ->andThen(fn(): Result => $this->repository->delete($id)));
     }
 }
