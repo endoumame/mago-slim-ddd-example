@@ -51,3 +51,11 @@ fi
 # -------------------------------------------------------
 cd "$CLAUDE_PROJECT_DIR"
 composer install --no-interaction --prefer-dist
+
+# -------------------------------------------------------
+# lefthook のインストール
+# -------------------------------------------------------
+if ! command -v lefthook &>/dev/null; then
+  npm install -g @evilmartians/lefthook
+fi
+lefthook install
