@@ -37,6 +37,7 @@ final class CreateTaskHandlerTest extends TestCase
 
         $result = $this->handler->handle($command);
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isOk());
 
         $task = $result->unwrap();
@@ -61,6 +62,7 @@ final class CreateTaskHandlerTest extends TestCase
 
         $result = $this->handler->handle($command);
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isOk());
 
         $task = $result->unwrap();
@@ -80,6 +82,7 @@ final class CreateTaskHandlerTest extends TestCase
         $task = $result->unwrap();
 
         $found = $this->repository->findById($task->id);
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($found->isOk());
         self::assertSame($task->id->value(), $found->unwrap()->id->value());
     }
@@ -93,6 +96,7 @@ final class CreateTaskHandlerTest extends TestCase
 
         $result = $this->handler->handle($command);
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isErr());
         self::assertInstanceOf(InvalidTaskTitleException::class, $result->unwrapErr());
     }
@@ -106,6 +110,7 @@ final class CreateTaskHandlerTest extends TestCase
 
         $result = $this->handler->handle($command);
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isErr());
         self::assertInstanceOf(InvalidDueDateException::class, $result->unwrapErr());
     }

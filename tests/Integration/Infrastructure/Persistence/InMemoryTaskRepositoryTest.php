@@ -31,9 +31,12 @@ final class InMemoryTaskRepositoryTest extends TestCase
         $task = $this->createTask('Test task');
 
         $saveResult = $this->repository->save($task);
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($saveResult->isOk());
 
         $findResult = $this->repository->findById($task->id);
+        // @mago-expect analysis:impossible-type-comparison
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($findResult->isOk());
         self::assertSame($task->id->value(), $findResult->unwrap()->id->value());
         self::assertSame('Test task', $findResult->unwrap()->title->value());
@@ -48,6 +51,7 @@ final class InMemoryTaskRepositoryTest extends TestCase
 
         $result = $this->repository->findById($id);
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isErr());
         self::assertInstanceOf(TaskNotFoundException::class, $result->unwrapErr());
     }
@@ -59,6 +63,7 @@ final class InMemoryTaskRepositoryTest extends TestCase
     {
         $result = $this->repository->findAll();
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isOk());
         self::assertCount(0, $result->unwrap());
     }
@@ -74,6 +79,7 @@ final class InMemoryTaskRepositoryTest extends TestCase
 
         $result = $this->repository->findAll();
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isOk());
         self::assertCount(3, $result->unwrap());
     }
@@ -105,9 +111,12 @@ final class InMemoryTaskRepositoryTest extends TestCase
         $this->repository->save($task);
 
         $deleteResult = $this->repository->delete($task->id);
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($deleteResult->isOk());
 
         $findResult = $this->repository->findById($task->id);
+        // @mago-expect analysis:impossible-type-comparison
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($findResult->isErr());
     }
 
@@ -118,6 +127,7 @@ final class InMemoryTaskRepositoryTest extends TestCase
     {
         $result = $this->repository->delete(TaskId::generate());
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isErr());
         self::assertInstanceOf(TaskNotFoundException::class, $result->unwrapErr());
     }

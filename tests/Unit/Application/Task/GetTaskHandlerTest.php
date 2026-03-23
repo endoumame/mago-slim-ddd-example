@@ -39,6 +39,7 @@ final class GetTaskHandlerTest extends TestCase
 
         $result = $this->handler->handle(new GetTaskQuery(id: $task->id->value()));
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isOk());
         self::assertSame('Find me', $result->unwrap()->title->value());
     }
@@ -50,6 +51,7 @@ final class GetTaskHandlerTest extends TestCase
     {
         $result = $this->handler->handle(new GetTaskQuery(id: Uuid::uuid4()->toString()));
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isErr());
         self::assertInstanceOf(TaskNotFoundException::class, $result->unwrapErr());
     }
@@ -61,6 +63,7 @@ final class GetTaskHandlerTest extends TestCase
     {
         $result = $this->handler->handle(new GetTaskQuery(id: 'not-a-uuid'));
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isErr());
         self::assertInstanceOf(InvalidTaskIdException::class, $result->unwrapErr());
     }

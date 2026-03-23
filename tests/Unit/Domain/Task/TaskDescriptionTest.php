@@ -17,6 +17,7 @@ final class TaskDescriptionTest extends TestCase
     {
         $result = TaskDescription::create('A detailed task description');
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isOk());
         self::assertSame('A detailed task description', $result->unwrap()->value());
     }
@@ -28,6 +29,7 @@ final class TaskDescriptionTest extends TestCase
     {
         $result = TaskDescription::create('');
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isOk());
         self::assertSame('', $result->unwrap()->value());
     }
@@ -39,6 +41,7 @@ final class TaskDescriptionTest extends TestCase
     {
         $result = TaskDescription::create('  description  ');
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isOk());
         self::assertSame('description', $result->unwrap()->value());
     }
@@ -51,6 +54,7 @@ final class TaskDescriptionTest extends TestCase
         $desc = str_repeat(string: 'a', times: 1000);
         $result = TaskDescription::create($desc);
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isOk());
     }
 
@@ -62,6 +66,7 @@ final class TaskDescriptionTest extends TestCase
         $desc = str_repeat(string: 'a', times: 1001);
         $result = TaskDescription::create($desc);
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isErr());
         self::assertInstanceOf(InvalidTaskDescriptionException::class, $result->unwrapErr());
         self::assertStringContainsString('1000', $result->unwrapErr()->getMessage());

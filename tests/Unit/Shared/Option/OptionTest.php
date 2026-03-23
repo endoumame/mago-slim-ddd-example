@@ -69,6 +69,7 @@ final class OptionTest extends TestCase
     {
         $option = fromValue('hello');
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($option->isSome());
         self::assertSame('hello', $option->unwrap());
     }
@@ -80,6 +81,7 @@ final class OptionTest extends TestCase
     {
         $option = fromValue(null);
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($option->isNone());
     }
 
@@ -123,6 +125,7 @@ final class OptionTest extends TestCase
     {
         $result = some(5)->map(static fn(int $v): int => $v * 2);
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isSome());
         self::assertSame(10, $result->unwrap());
     }
@@ -136,6 +139,7 @@ final class OptionTest extends TestCase
         $none = none();
         $result = $none->map(static fn(int $v): int => $v * 2);
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isNone());
     }
 
@@ -146,6 +150,7 @@ final class OptionTest extends TestCase
     {
         $result = some(5)->andThen(static fn(int $v): Option => some($v * 2));
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isSome());
         self::assertSame(10, $result->unwrap());
     }
@@ -157,6 +162,7 @@ final class OptionTest extends TestCase
     {
         $result = some(5)->andThen(static fn(int $_): Option => none());
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isNone());
     }
 
@@ -169,6 +175,7 @@ final class OptionTest extends TestCase
         $none = none();
         $result = $none->andThen(static fn(int $v): Option => some($v * 2));
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isNone());
     }
 
@@ -179,6 +186,7 @@ final class OptionTest extends TestCase
     {
         $result = some(10)->filter(static fn(int $v): bool => $v > 5);
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isSome());
         self::assertSame(10, $result->unwrap());
     }
@@ -190,6 +198,7 @@ final class OptionTest extends TestCase
     {
         $result = some(3)->filter(static fn(int $v): bool => $v > 5);
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isNone());
     }
 
@@ -202,6 +211,7 @@ final class OptionTest extends TestCase
         $none = none();
         $result = $none->filter(static fn(int $v): bool => $v > 5);
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isNone());
     }
 
@@ -210,6 +220,7 @@ final class OptionTest extends TestCase
      */
     public function testMapOrElseCallsSomeOnSome(): void
     {
+        /** @var string $result */
         $result = some(42)->mapOrElse(static fn(int $v): string => "value: {$v}", static fn(): string => 'empty');
 
         self::assertSame('value: 42', $result);

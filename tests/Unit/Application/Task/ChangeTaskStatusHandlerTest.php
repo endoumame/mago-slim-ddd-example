@@ -41,6 +41,7 @@ final class ChangeTaskStatusHandlerTest extends TestCase
 
         $result = $this->handler->handle(new ChangeTaskStatusCommand(id: $task->id->value(), status: 'in_progress'));
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isOk());
         self::assertInstanceOf(InProgressTask::class, $result->unwrap());
         self::assertSame(TaskStatus::InProgress, $result->unwrap()->status);
@@ -56,6 +57,7 @@ final class ChangeTaskStatusHandlerTest extends TestCase
 
         $result = $this->handler->handle(new ChangeTaskStatusCommand(id: $task->id->value(), status: 'done'));
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isOk());
         self::assertInstanceOf(DoneTask::class, $result->unwrap());
         self::assertSame(TaskStatus::Done, $result->unwrap()->status);
@@ -70,6 +72,7 @@ final class ChangeTaskStatusHandlerTest extends TestCase
 
         $result = $this->handler->handle(new ChangeTaskStatusCommand(id: $task->id->value(), status: 'done'));
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isErr());
         self::assertInstanceOf(InvalidTaskStatusTransitionException::class, $result->unwrapErr());
     }
@@ -83,6 +86,7 @@ final class ChangeTaskStatusHandlerTest extends TestCase
 
         $result = $this->handler->handle(new ChangeTaskStatusCommand(id: $task->id->value(), status: 'invalid'));
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isErr());
         self::assertInstanceOf(\InvalidArgumentException::class, $result->unwrapErr());
     }

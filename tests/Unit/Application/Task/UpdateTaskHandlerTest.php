@@ -40,6 +40,7 @@ final class UpdateTaskHandlerTest extends TestCase
 
         $result = $this->handler->handle(new UpdateTaskCommand(id: $task->id->value(), title: 'Updated'));
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isOk());
         self::assertSame('Updated', $result->unwrap()->title->value());
     }
@@ -53,6 +54,7 @@ final class UpdateTaskHandlerTest extends TestCase
 
         $result = $this->handler->handle(new UpdateTaskCommand(id: $task->id->value(), description: 'New description'));
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isOk());
         self::assertSame('New description', $result->unwrap()->description->value());
     }
@@ -64,6 +66,7 @@ final class UpdateTaskHandlerTest extends TestCase
     {
         $result = $this->handler->handle(new UpdateTaskCommand(id: Uuid::uuid4()->toString(), title: 'Will fail'));
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isErr());
         self::assertInstanceOf(TaskNotFoundException::class, $result->unwrapErr());
     }
@@ -77,6 +80,7 @@ final class UpdateTaskHandlerTest extends TestCase
 
         $result = $this->handler->handle(new UpdateTaskCommand(id: $task->id->value(), title: ''));
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isErr());
         self::assertInstanceOf(InvalidTaskTitleException::class, $result->unwrapErr());
     }

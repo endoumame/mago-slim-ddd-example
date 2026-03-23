@@ -25,6 +25,7 @@ final class TaskTest extends TestCase
 
         $result = TodoTask::create($title, $description);
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isOk());
 
         $task = $result->unwrap();
@@ -47,6 +48,7 @@ final class TaskTest extends TestCase
 
         $result = TodoTask::create($title, $description, $dueDate);
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isOk());
         $task = $result->unwrap();
         $dueDate = $task->dueDate;
@@ -64,6 +66,7 @@ final class TaskTest extends TestCase
 
         $result = $task->changeTitle($newTitle);
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isOk());
         self::assertInstanceOf(TodoTask::class, $result->unwrap());
         self::assertSame('Updated title', $result->unwrap()->title->value());
@@ -80,6 +83,7 @@ final class TaskTest extends TestCase
 
         $result = $task->changeDescription($newDesc);
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isOk());
         self::assertSame('Updated description', $result->unwrap()->description->value());
     }
@@ -93,6 +97,7 @@ final class TaskTest extends TestCase
 
         $result = $task->start();
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isOk());
         self::assertInstanceOf(InProgressTask::class, $result->unwrap());
         self::assertSame(TaskStatus::InProgress, $result->unwrap()->status);
@@ -108,6 +113,7 @@ final class TaskTest extends TestCase
 
         $result = $inProgressTask->complete();
 
+        // @mago-expect analysis:impossible-type-comparison
         self::assertTrue($result->isOk());
         self::assertInstanceOf(DoneTask::class, $result->unwrap());
         self::assertSame(TaskStatus::Done, $result->unwrap()->status);

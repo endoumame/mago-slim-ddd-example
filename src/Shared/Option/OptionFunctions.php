@@ -47,7 +47,6 @@ function ok_or(Option $option, mixed $error): Result
  */
 function traverse(Option $option, Closure $fn): Result
 {
-    /** @var Result<U|null, E> */
     return $option->mapOrElse(
         /** @param T $value */
         static fn(mixed $value): Result => $fn($value),
