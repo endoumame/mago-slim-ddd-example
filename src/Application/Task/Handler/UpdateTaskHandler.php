@@ -13,7 +13,10 @@ use App\Domain\Task\TaskRepositoryInterface;
 use App\Domain\Task\TaskTitle;
 use EndouMame\PhpMonad\Result;
 
+use function EndouMame\PhpMonad\Option\fromValue;
+use function EndouMame\PhpMonad\Option\traverse;
 use function EndouMame\PhpMonad\Result\andThen;
+use function EndouMame\PhpMonad\Result\flat_map_all;
 use function EndouMame\PhpMonad\Result\ok;
 
 final readonly class UpdateTaskHandler
@@ -27,39 +30,46 @@ final readonly class UpdateTaskHandler
      */
     public function handle(UpdateTaskCommand $command): Result
     {
+        $id = TaskId::create($command->id);
+        $title = traverse(fromValue($command->title), TaskTitle::create(...));
+        $description = traverse(fromValue($command->description), TaskDescription::create(...));
+        $dueDate = traverse(fromValue($command->dueDate), DueDate::create(...));
+
         /** @var Result<Task, \Throwable> */
-        return TaskId::create($command->id)
-            |> andThen(fn(TaskId $id): Result => $this->repository->findById($id))
-            |> andThen(fn(Task $task): Result => $this->applyChanges($task, $command));
+        return flat_map_all(
+            fn(TaskId $taskId, ?TaskTitle $t, ?TaskDescription $d, ?DueDate $dd): Result => $this->repository->findById(
+                $taskId,
+            )
+                |> andThen(fn(Task $task): Result => $this->applyChanges($task, $t, $d, $dd)),
+            $id,
+            $title,
+            $description,
+            $dueDate,
+        );
     }
 
     /**
      * @return Result<Task, \Throwable>
      */
-    private function applyChanges(Task $task, UpdateTaskCommand $command): Result
-    {
+    private function applyChanges(
+        Task $task,
+        ?TaskTitle $newTitle,
+        ?TaskDescription $newDescription,
+        ?DueDate $newDueDate,
+    ): Result {
         /** @var Result<Task, \Throwable> $result */
         $result = ok($task);
 
-        if ($command->title !== null) {
-            $title = $command->title;
-            $result = $result
-                |> andThen(static fn(Task $t): Result => TaskTitle::create($title) |> andThen($t->changeTitle(...)));
+        if ($newTitle !== null) {
+            $result = $result |> andThen(static fn(Task $t): Result => $t->changeTitle($newTitle));
         }
 
-        if ($command->description !== null) {
-            $description = $command->description;
-            $result = $result
-                |> andThen(
-                    static fn(Task $t): Result => TaskDescription::create($description)
-                        |> andThen($t->changeDescription(...)),
-                );
+        if ($newDescription !== null) {
+            $result = $result |> andThen(static fn(Task $t): Result => $t->changeDescription($newDescription));
         }
 
-        if ($command->dueDate !== null) {
-            $dueDate = $command->dueDate;
-            $result = $result
-                |> andThen(static fn(Task $t): Result => DueDate::create($dueDate) |> andThen($t->changeDueDate(...)));
+        if ($newDueDate !== null) {
+            $result = $result |> andThen(static fn(Task $t): Result => $t->changeDueDate($newDueDate));
         }
 
         /** @var Result<Task, \Throwable> */
