@@ -31,11 +31,13 @@ abstract class PropertyTestCase extends TestCase
 
     /**
      * @param Generator<mixed> ...$generators
+     *
+     * @throws \ReflectionException
      */
     public function forAll(Generator ...$generators): ForAll
     {
         /** @var ForAll */
-        return call_user_func_array([$this, 'traitForAll'], $generators);
+        return new \ReflectionMethod($this, 'traitForAll')->invokeArgs($this, $generators);
     }
 
     /**

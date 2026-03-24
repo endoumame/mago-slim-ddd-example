@@ -27,7 +27,7 @@ final class InMemoryTaskRepository implements TaskRepositoryInterface
     {
         $key = $id->value();
 
-        if (!isset($this->tasks[$key])) {
+        if (!\array_key_exists($key, $this->tasks)) {
             /** @var Result<Task, \Throwable> */
             return err(TaskNotFoundException::withId($key));
         }
@@ -41,7 +41,7 @@ final class InMemoryTaskRepository implements TaskRepositoryInterface
     #[Override]
     public function findAll(): Result
     {
-        return $this->tasks |> array_values(...) |> ok(...);
+        return $this->tasks |> \array_values(...) |> ok(...);
     }
 
     /**
@@ -63,7 +63,7 @@ final class InMemoryTaskRepository implements TaskRepositoryInterface
     {
         $key = $id->value();
 
-        if (!isset($this->tasks[$key])) {
+        if (!\array_key_exists($key, $this->tasks)) {
             /** @var Result<true, \Throwable> */
             return err(TaskNotFoundException::withId($key));
         }

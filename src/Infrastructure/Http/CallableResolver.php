@@ -28,7 +28,7 @@ final class CallableResolver implements AdvancedCallableResolverInterface
             return $toResolve;
         }
 
-        throw new \RuntimeException(sprintf('Expected Closure, got %s', get_debug_type($toResolve)));
+        throw new \RuntimeException(\sprintf('Expected Closure, got %s', \get_debug_type($toResolve)));
     }
 
     /**

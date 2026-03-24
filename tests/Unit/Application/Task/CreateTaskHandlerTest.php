@@ -38,11 +38,11 @@ final class CreateTaskHandlerTest extends TestCase
         $result = $this->handler->handle($command);
 
         $task = $result->unwrap();
-        self::assertInstanceOf(TodoTask::class, $task);
-        self::assertSame('Buy groceries', $task->title->value());
-        self::assertSame('', $task->description->value());
-        self::assertSame(TaskStatus::Todo, $task->status);
-        self::assertNull($task->dueDate);
+        static::assertInstanceOf(TodoTask::class, $task);
+        static::assertSame('Buy groceries', $task->title->value());
+        static::assertSame('', $task->description->value());
+        static::assertSame(TaskStatus::Todo, $task->status);
+        static::assertNull($task->dueDate);
     }
 
     /**
@@ -60,10 +60,10 @@ final class CreateTaskHandlerTest extends TestCase
         $result = $this->handler->handle($command);
 
         $task = $result->unwrap();
-        self::assertSame('Important task', $task->title->value());
-        self::assertSame('This is important', $task->description->value());
-        self::assertNotNull($task->dueDate);
-        self::assertSame($futureDate, $task->dueDate->format());
+        static::assertSame('Important task', $task->title->value());
+        static::assertSame('This is important', $task->description->value());
+        static::assertNotNull($task->dueDate);
+        static::assertSame($futureDate, $task->dueDate->format());
     }
 
     /**
@@ -76,7 +76,7 @@ final class CreateTaskHandlerTest extends TestCase
         $task = $result->unwrap();
 
         $found = $this->repository->findById($task->id);
-        self::assertSame($task->id->value(), $found->unwrap()->id->value());
+        static::assertSame($task->id->value(), $found->unwrap()->id->value());
     }
 
     /**
@@ -88,7 +88,7 @@ final class CreateTaskHandlerTest extends TestCase
 
         $result = $this->handler->handle($command);
 
-        self::assertInstanceOf(InvalidTaskTitleException::class, $result->unwrapErr());
+        static::assertInstanceOf(InvalidTaskTitleException::class, $result->unwrapErr());
     }
 
     /**
@@ -100,6 +100,6 @@ final class CreateTaskHandlerTest extends TestCase
 
         $result = $this->handler->handle($command);
 
-        self::assertInstanceOf(InvalidDueDateException::class, $result->unwrapErr());
+        static::assertInstanceOf(InvalidDueDateException::class, $result->unwrapErr());
     }
 }

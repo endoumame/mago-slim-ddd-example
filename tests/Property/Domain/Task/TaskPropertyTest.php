@@ -20,7 +20,7 @@ final class TaskPropertyTest extends PropertyTestCase
     public function testTaskAlwaysCreatedAsTodoTask(): void
     {
         $this->forAll(self::suchThat(
-            static fn(string $s): bool => trim($s) !== '' && mb_strlen(trim($s)) <= 255,
+            static fn(string $s): bool => \trim($s) !== '' && \mb_strlen(\trim($s)) <= 255,
             self::string(),
         ))->then(static function (string $titleStr): void {
             $title = TaskTitle::create($titleStr)->unwrap();
@@ -39,8 +39,11 @@ final class TaskPropertyTest extends PropertyTestCase
     public function testTaskSerializationRoundTrip(): void
     {
         $this->forAll(
-            self::suchThat(static fn(string $s): bool => trim($s) !== '' && mb_strlen(trim($s)) <= 255, self::string()),
-            self::suchThat(static fn(string $s): bool => mb_strlen(trim($s)) <= 1000, self::string()),
+            self::suchThat(
+                static fn(string $s): bool => \trim($s) !== '' && \mb_strlen(\trim($s)) <= 255,
+                self::string(),
+            ),
+            self::suchThat(static fn(string $s): bool => \mb_strlen(\trim($s)) <= 1000, self::string()),
         )->then(static function (string $titleStr, string $descStr): void {
             $title = TaskTitle::create($titleStr)->unwrap();
             $description = TaskDescription::create($descStr)->unwrap();
@@ -49,8 +52,8 @@ final class TaskPropertyTest extends PropertyTestCase
             /** @var array{title: string, description: string, status: string, due_date: string|null} $array */
             $array = $task->toArray();
 
-            self::assertSame(trim($titleStr), $array['title']);
-            self::assertSame(trim($descStr), $array['description']);
+            self::assertSame(\trim($titleStr), $array['title']);
+            self::assertSame(\trim($descStr), $array['description']);
             self::assertSame('todo', $array['status']);
             self::assertNull($array['due_date']);
         });
@@ -86,8 +89,14 @@ final class TaskPropertyTest extends PropertyTestCase
     public function testImmutabilityPreservedAcrossMutations(): void
     {
         $this->forAll(
-            self::suchThat(static fn(string $s): bool => trim($s) !== '' && mb_strlen(trim($s)) <= 255, self::string()),
-            self::suchThat(static fn(string $s): bool => trim($s) !== '' && mb_strlen(trim($s)) <= 255, self::string()),
+            self::suchThat(
+                static fn(string $s): bool => \trim($s) !== '' && \mb_strlen(\trim($s)) <= 255,
+                self::string(),
+            ),
+            self::suchThat(
+                static fn(string $s): bool => \trim($s) !== '' && \mb_strlen(\trim($s)) <= 255,
+                self::string(),
+            ),
         )->then(static function (string $original, string $updated): void {
             $originalTitle = TaskTitle::create($original)->unwrap();
             $task = TodoTask::create($originalTitle, TaskDescription::empty())->unwrap();
@@ -95,8 +104,8 @@ final class TaskPropertyTest extends PropertyTestCase
             $updatedTitle = TaskTitle::create($updated)->unwrap();
             $updatedTask = $task->changeTitle($updatedTitle)->unwrap();
 
-            self::assertSame(trim($original), $task->title->value());
-            self::assertSame(trim($updated), $updatedTask->title->value());
+            self::assertSame(\trim($original), $task->title->value());
+            self::assertSame(\trim($updated), $updatedTask->title->value());
             self::assertTrue($task->id->equals($updatedTask->id));
         });
     }
@@ -107,7 +116,7 @@ final class TaskPropertyTest extends PropertyTestCase
     public function testConcreteTypePreservedAfterPropertyChanges(): void
     {
         $this->forAll(self::suchThat(
-            static fn(string $s): bool => trim($s) !== '' && mb_strlen(trim($s)) <= 255,
+            static fn(string $s): bool => \trim($s) !== '' && \mb_strlen(\trim($s)) <= 255,
             self::string(),
         ))->then(static function (string $newTitleStr): void {
             $newTitle = TaskTitle::create($newTitleStr)->unwrap();

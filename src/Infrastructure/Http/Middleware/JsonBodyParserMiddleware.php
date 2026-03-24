@@ -20,14 +20,14 @@ final class JsonBodyParserMiddleware implements MiddlewareInterface
     {
         $contentType = $request->getHeaderLine('Content-Type');
 
-        if (str_contains($contentType, 'application/json')) {
+        if (\str_contains($contentType, 'application/json')) {
             $body = (string) $request->getBody();
 
             if ($body !== '') {
                 /** @var array<string, mixed>|null $decoded */
-                $decoded = json_decode($body, associative: true);
+                $decoded = \json_decode($body, associative: true);
 
-                if (is_array($decoded)) {
+                if (\is_array($decoded)) {
                     $request = $request->withParsedBody($decoded);
                 }
             }

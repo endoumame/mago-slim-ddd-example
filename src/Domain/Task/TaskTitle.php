@@ -28,14 +28,14 @@ final readonly class TaskTitle
      */
     public static function create(string $value): Result
     {
-        $trimmed = trim($value);
+        $trimmed = \trim($value);
 
         if ($trimmed === '') {
             /** @var Result<TaskTitle, InvalidTaskTitleException> */
             return err(InvalidTaskTitleException::empty());
         }
 
-        $length = mb_strlen($trimmed);
+        $length = \mb_strlen($trimmed);
         if ($length > self::MAX_LENGTH) {
             /** @var Result<TaskTitle, InvalidTaskTitleException> */
             return err(InvalidTaskTitleException::tooLong($length));

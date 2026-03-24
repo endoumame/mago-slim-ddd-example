@@ -40,7 +40,7 @@ final class UpdateTaskHandlerTest extends TestCase
 
         $result = $this->handler->handle(new UpdateTaskCommand(id: $task->id->value(), title: 'Updated'));
 
-        self::assertSame('Updated', $result->unwrap()->title->value());
+        static::assertSame('Updated', $result->unwrap()->title->value());
     }
 
     /**
@@ -52,7 +52,7 @@ final class UpdateTaskHandlerTest extends TestCase
 
         $result = $this->handler->handle(new UpdateTaskCommand(id: $task->id->value(), description: 'New description'));
 
-        self::assertSame('New description', $result->unwrap()->description->value());
+        static::assertSame('New description', $result->unwrap()->description->value());
     }
 
     /**
@@ -62,7 +62,7 @@ final class UpdateTaskHandlerTest extends TestCase
     {
         $result = $this->handler->handle(new UpdateTaskCommand(id: Uuid::uuid4()->toString(), title: 'Will fail'));
 
-        self::assertInstanceOf(TaskNotFoundException::class, $result->unwrapErr());
+        static::assertInstanceOf(TaskNotFoundException::class, $result->unwrapErr());
     }
 
     /**
@@ -74,6 +74,6 @@ final class UpdateTaskHandlerTest extends TestCase
 
         $result = $this->handler->handle(new UpdateTaskCommand(id: $task->id->value(), title: ''));
 
-        self::assertInstanceOf(InvalidTaskTitleException::class, $result->unwrapErr());
+        static::assertInstanceOf(InvalidTaskTitleException::class, $result->unwrapErr());
     }
 }
