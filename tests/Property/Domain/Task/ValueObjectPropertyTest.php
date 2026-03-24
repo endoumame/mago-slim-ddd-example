@@ -18,11 +18,11 @@ final class ValueObjectPropertyTest extends PropertyTestCase
     public function testAnyNonEmptyStringUpTo255CharsCreatesValidTaskTitle(): void
     {
         $this->forAll(self::suchThat(
-            static fn(string $s): bool => trim($s) !== '' && mb_strlen(trim($s)) <= 255,
+            static fn(string $s): bool => \trim($s) !== '' && \mb_strlen(\trim($s)) <= 255,
             self::string(),
         ))->then(static function (string $value): void {
             $result = TaskTitle::create($value);
-            self::assertSame(trim($value), $result->unwrap()->value());
+            self::assertSame(\trim($value), $result->unwrap()->value());
         });
     }
 
@@ -32,7 +32,7 @@ final class ValueObjectPropertyTest extends PropertyTestCase
     public function testAnyStringOver255CharsFailsTaskTitle(): void
     {
         $this->forAll(self::map(
-            static fn(int $extra): string => str_repeat(string: 'a', times: 256 + $extra),
+            static fn(int $extra): string => \str_repeat(string: 'a', times: 256 + $extra),
             self::choose(0, 100),
         ))->then(static function (string $value): void {
             $result = TaskTitle::create($value);
@@ -57,7 +57,7 @@ final class ValueObjectPropertyTest extends PropertyTestCase
     public function testAnyStringUpTo1000CharsCreatesValidTaskDescription(): void
     {
         $this->forAll(self::suchThat(
-            static fn(string $s): bool => mb_strlen(trim($s)) <= 1000,
+            static fn(string $s): bool => \mb_strlen(\trim($s)) <= 1000,
             self::string(),
         ))->then(static function (string $value): void {
             $result = TaskDescription::create($value);
@@ -71,7 +71,7 @@ final class ValueObjectPropertyTest extends PropertyTestCase
     public function testAnyStringOver1000CharsFailsTaskDescription(): void
     {
         $this->forAll(self::map(
-            static fn(int $extra): string => str_repeat(string: 'x', times: 1001 + $extra),
+            static fn(int $extra): string => \str_repeat(string: 'x', times: 1001 + $extra),
             self::choose(0, 100),
         ))->then(static function (string $value): void {
             $result = TaskDescription::create($value);

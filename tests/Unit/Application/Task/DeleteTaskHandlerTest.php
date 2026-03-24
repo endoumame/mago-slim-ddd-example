@@ -39,7 +39,7 @@ final class DeleteTaskHandlerTest extends TestCase
 
         $result = $this->handler->handle(new DeleteTaskCommand(id: $task->id->value()));
 
-        self::assertNotNull($result->unwrap());
+        static::assertNotNull($result->unwrap());
     }
 
     /**
@@ -52,7 +52,7 @@ final class DeleteTaskHandlerTest extends TestCase
         $this->handler->handle(new DeleteTaskCommand(id: $task->id->value()));
 
         $findResult = $this->repository->findById($task->id);
-        self::assertInstanceOf(TaskNotFoundException::class, $findResult->unwrapErr());
+        static::assertInstanceOf(TaskNotFoundException::class, $findResult->unwrapErr());
     }
 
     /**
@@ -62,6 +62,6 @@ final class DeleteTaskHandlerTest extends TestCase
     {
         $result = $this->handler->handle(new DeleteTaskCommand(id: Uuid::uuid4()->toString()));
 
-        self::assertInstanceOf(TaskNotFoundException::class, $result->unwrapErr());
+        static::assertInstanceOf(TaskNotFoundException::class, $result->unwrapErr());
     }
 }

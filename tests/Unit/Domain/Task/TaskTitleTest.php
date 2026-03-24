@@ -17,7 +17,7 @@ final class TaskTitleTest extends TestCase
     {
         $result = TaskTitle::create('Buy groceries');
 
-        self::assertSame('Buy groceries', $result->unwrap()->value());
+        static::assertSame('Buy groceries', $result->unwrap()->value());
     }
 
     /**
@@ -27,7 +27,7 @@ final class TaskTitleTest extends TestCase
     {
         $result = TaskTitle::create('  Buy groceries  ');
 
-        self::assertSame('Buy groceries', $result->unwrap()->value());
+        static::assertSame('Buy groceries', $result->unwrap()->value());
     }
 
     /**
@@ -37,8 +37,8 @@ final class TaskTitleTest extends TestCase
     {
         $result = TaskTitle::create('');
 
-        self::assertInstanceOf(InvalidTaskTitleException::class, $result->unwrapErr());
-        self::assertStringContainsString('empty', $result->unwrapErr()->getMessage());
+        static::assertInstanceOf(InvalidTaskTitleException::class, $result->unwrapErr());
+        static::assertStringContainsString('empty', $result->unwrapErr()->getMessage());
     }
 
     /**
@@ -48,7 +48,7 @@ final class TaskTitleTest extends TestCase
     {
         $result = TaskTitle::create('   ');
 
-        self::assertInstanceOf(InvalidTaskTitleException::class, $result->unwrapErr());
+        static::assertInstanceOf(InvalidTaskTitleException::class, $result->unwrapErr());
     }
 
     /**
@@ -56,10 +56,10 @@ final class TaskTitleTest extends TestCase
      */
     public function testCreateWithMaxLengthSucceeds(): void
     {
-        $title = str_repeat(string: 'a', times: 255);
+        $title = \str_repeat(string: 'a', times: 255);
         $result = TaskTitle::create($title);
 
-        self::assertNotNull($result->unwrap());
+        static::assertNotNull($result->unwrap());
     }
 
     /**
@@ -67,11 +67,11 @@ final class TaskTitleTest extends TestCase
      */
     public function testCreateWithTooLongTitleFails(): void
     {
-        $title = str_repeat(string: 'a', times: 256);
+        $title = \str_repeat(string: 'a', times: 256);
         $result = TaskTitle::create($title);
 
-        self::assertInstanceOf(InvalidTaskTitleException::class, $result->unwrapErr());
-        self::assertStringContainsString('255', $result->unwrapErr()->getMessage());
+        static::assertInstanceOf(InvalidTaskTitleException::class, $result->unwrapErr());
+        static::assertStringContainsString('255', $result->unwrapErr()->getMessage());
     }
 
     /**
@@ -82,7 +82,7 @@ final class TaskTitleTest extends TestCase
         $title1 = TaskTitle::create('Same title')->unwrap();
         $title2 = TaskTitle::create('Same title')->unwrap();
 
-        self::assertTrue($title1->equals($title2));
+        static::assertTrue($title1->equals($title2));
     }
 
     /**
@@ -93,6 +93,6 @@ final class TaskTitleTest extends TestCase
         $title1 = TaskTitle::create('Title A')->unwrap();
         $title2 = TaskTitle::create('Title B')->unwrap();
 
-        self::assertFalse($title1->equals($title2));
+        static::assertFalse($title1->equals($title2));
     }
 }

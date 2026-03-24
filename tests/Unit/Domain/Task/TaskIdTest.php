@@ -19,7 +19,7 @@ final class TaskIdTest extends TestCase
         $uuid = Uuid::uuid4()->toString();
         $result = TaskId::create($uuid);
 
-        self::assertSame($uuid, $result->unwrap()->value());
+        static::assertSame($uuid, $result->unwrap()->value());
     }
 
     /**
@@ -29,7 +29,7 @@ final class TaskIdTest extends TestCase
     {
         $result = TaskId::create('not-a-uuid');
 
-        self::assertInstanceOf(InvalidTaskIdException::class, $result->unwrapErr());
+        static::assertInstanceOf(InvalidTaskIdException::class, $result->unwrapErr());
     }
 
     /**
@@ -39,7 +39,7 @@ final class TaskIdTest extends TestCase
     {
         $result = TaskId::create('');
 
-        self::assertInstanceOf(InvalidTaskIdException::class, $result->unwrapErr());
+        static::assertInstanceOf(InvalidTaskIdException::class, $result->unwrapErr());
     }
 
     /**
@@ -49,7 +49,7 @@ final class TaskIdTest extends TestCase
     {
         $id = TaskId::generate();
 
-        self::assertTrue(Uuid::isValid($id->value()));
+        static::assertTrue(Uuid::isValid($id->value()));
     }
 
     /**
@@ -60,7 +60,7 @@ final class TaskIdTest extends TestCase
         $id1 = TaskId::generate();
         $id2 = TaskId::generate();
 
-        self::assertFalse($id1->equals($id2));
+        static::assertFalse($id1->equals($id2));
     }
 
     /**
@@ -72,7 +72,7 @@ final class TaskIdTest extends TestCase
         $id1 = TaskId::create($uuid)->unwrap();
         $id2 = TaskId::create($uuid)->unwrap();
 
-        self::assertTrue($id1->equals($id2));
+        static::assertTrue($id1->equals($id2));
     }
 
     /**
@@ -83,6 +83,6 @@ final class TaskIdTest extends TestCase
         $uuid = Uuid::uuid4()->toString();
         $id = TaskId::create($uuid)->unwrap();
 
-        self::assertSame($uuid, (string) $id);
+        static::assertSame($uuid, (string) $id);
     }
 }

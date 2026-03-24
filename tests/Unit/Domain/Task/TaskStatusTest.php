@@ -27,7 +27,7 @@ final class TaskStatusTest extends TestCase
     public function testValidStatusFromString(string $value, TaskStatus $expected): void
     {
         $status = TaskStatus::from($value);
-        self::assertSame($expected, $status);
+        static::assertSame($expected, $status);
     }
 
     /**
@@ -36,6 +36,6 @@ final class TaskStatusTest extends TestCase
     public function testInvalidStatusFromString(): void
     {
         $status = TaskStatus::tryFrom('invalid');
-        self::assertNull($status);
+        static::assertNull($status);
     }
 }

@@ -17,7 +17,7 @@ final class TaskDescriptionTest extends TestCase
     {
         $result = TaskDescription::create('A detailed task description');
 
-        self::assertSame('A detailed task description', $result->unwrap()->value());
+        static::assertSame('A detailed task description', $result->unwrap()->value());
     }
 
     /**
@@ -27,7 +27,7 @@ final class TaskDescriptionTest extends TestCase
     {
         $result = TaskDescription::create('');
 
-        self::assertSame('', $result->unwrap()->value());
+        static::assertSame('', $result->unwrap()->value());
     }
 
     /**
@@ -37,7 +37,7 @@ final class TaskDescriptionTest extends TestCase
     {
         $result = TaskDescription::create('  description  ');
 
-        self::assertSame('description', $result->unwrap()->value());
+        static::assertSame('description', $result->unwrap()->value());
     }
 
     /**
@@ -45,10 +45,10 @@ final class TaskDescriptionTest extends TestCase
      */
     public function testCreateWithMaxLengthSucceeds(): void
     {
-        $desc = str_repeat(string: 'a', times: 1000);
+        $desc = \str_repeat(string: 'a', times: 1000);
         $result = TaskDescription::create($desc);
 
-        self::assertNotNull($result->unwrap());
+        static::assertNotNull($result->unwrap());
     }
 
     /**
@@ -56,11 +56,11 @@ final class TaskDescriptionTest extends TestCase
      */
     public function testCreateWithTooLongDescriptionFails(): void
     {
-        $desc = str_repeat(string: 'a', times: 1001);
+        $desc = \str_repeat(string: 'a', times: 1001);
         $result = TaskDescription::create($desc);
 
-        self::assertInstanceOf(InvalidTaskDescriptionException::class, $result->unwrapErr());
-        self::assertStringContainsString('1000', $result->unwrapErr()->getMessage());
+        static::assertInstanceOf(InvalidTaskDescriptionException::class, $result->unwrapErr());
+        static::assertStringContainsString('1000', $result->unwrapErr()->getMessage());
     }
 
     /**
@@ -70,7 +70,7 @@ final class TaskDescriptionTest extends TestCase
     {
         $desc = TaskDescription::empty();
 
-        self::assertSame('', $desc->value());
+        static::assertSame('', $desc->value());
     }
 
     /**
@@ -81,6 +81,6 @@ final class TaskDescriptionTest extends TestCase
         $desc1 = TaskDescription::create('Same')->unwrap();
         $desc2 = TaskDescription::create('Same')->unwrap();
 
-        self::assertTrue($desc1->equals($desc2));
+        static::assertTrue($desc1->equals($desc2));
     }
 }

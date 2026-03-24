@@ -28,8 +28,8 @@ final readonly class TaskDescription
      */
     public static function create(string $value): Result
     {
-        $trimmed = trim($value);
-        $length = mb_strlen($trimmed);
+        $trimmed = \trim($value);
+        $length = \mb_strlen($trimmed);
 
         if ($length > self::MAX_LENGTH) {
             /** @var Result<TaskDescription, InvalidTaskDescriptionException> */

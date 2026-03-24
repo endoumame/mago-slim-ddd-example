@@ -38,7 +38,7 @@ final readonly class ListTasksHandler
                         ->andThen(static fn(string $s): Option => TaskStatus::tryFrom($s) |> fromValue(...))
                         ->mapOrElse(
                             /** @return list<Task> */
-                            static fn(TaskStatus $status): array => array_values(array_filter(
+                            static fn(TaskStatus $status): array => \array_values(\array_filter(
                                 $tasks,
                                 static fn(Task $task): bool => $task->status === $status,
                             )),

@@ -41,8 +41,8 @@ final class ChangeTaskStatusHandlerTest extends TestCase
 
         $result = $this->handler->handle(new ChangeTaskStatusCommand(id: $task->id->value(), status: 'in_progress'));
 
-        self::assertInstanceOf(InProgressTask::class, $result->unwrap());
-        self::assertSame(TaskStatus::InProgress, $result->unwrap()->status);
+        static::assertInstanceOf(InProgressTask::class, $result->unwrap());
+        static::assertSame(TaskStatus::InProgress, $result->unwrap()->status);
     }
 
     /**
@@ -55,8 +55,8 @@ final class ChangeTaskStatusHandlerTest extends TestCase
 
         $result = $this->handler->handle(new ChangeTaskStatusCommand(id: $task->id->value(), status: 'done'));
 
-        self::assertInstanceOf(DoneTask::class, $result->unwrap());
-        self::assertSame(TaskStatus::Done, $result->unwrap()->status);
+        static::assertInstanceOf(DoneTask::class, $result->unwrap());
+        static::assertSame(TaskStatus::Done, $result->unwrap()->status);
     }
 
     /**
@@ -68,7 +68,7 @@ final class ChangeTaskStatusHandlerTest extends TestCase
 
         $result = $this->handler->handle(new ChangeTaskStatusCommand(id: $task->id->value(), status: 'done'));
 
-        self::assertInstanceOf(InvalidTaskStatusTransitionException::class, $result->unwrapErr());
+        static::assertInstanceOf(InvalidTaskStatusTransitionException::class, $result->unwrapErr());
     }
 
     /**
@@ -80,6 +80,6 @@ final class ChangeTaskStatusHandlerTest extends TestCase
 
         $result = $this->handler->handle(new ChangeTaskStatusCommand(id: $task->id->value(), status: 'invalid'));
 
-        self::assertInstanceOf(\InvalidArgumentException::class, $result->unwrapErr());
+        static::assertInstanceOf(\InvalidArgumentException::class, $result->unwrapErr());
     }
 }
