@@ -6,7 +6,7 @@
     "require": {
         "php": ">=8.4",
         "php-di/php-di": "^7.0",
-        "endoumame/php-monad": "^1.0",
+        "endoumame/php-monad": "^1.1",
         "ramsey/uuid": "^4.7",
         "slim/psr7": "^1.7",
         "slim/slim": "^4.15"
@@ -21,7 +21,6 @@
             "App\\": "src/"
         },
         "files": [
-            "src/Shared/Result/ResultFunctions.php",
             "src/Shared/Option/OptionFunctions.php"
         ]
     },

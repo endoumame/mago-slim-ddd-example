@@ -10,6 +10,8 @@ use App\Domain\Task\TaskId;
 use App\Domain\Task\TaskRepositoryInterface;
 use EndouMame\PhpMonad\Result;
 
+use function EndouMame\PhpMonad\Result\andThen;
+
 final readonly class GetTaskHandler
 {
     public function __construct(
@@ -21,6 +23,7 @@ final readonly class GetTaskHandler
      */
     public function handle(GetTaskQuery $query): Result
     {
-        return TaskId::create($query->id)->andThen(fn(TaskId $id): Result => $this->repository->findById($id));
+        /** @var Result<Task, \Throwable> */
+        return TaskId::create($query->id) |> andThen(fn(TaskId $id): Result => $this->repository->findById($id));
     }
 }

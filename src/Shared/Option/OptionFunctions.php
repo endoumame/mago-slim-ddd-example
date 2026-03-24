@@ -8,7 +8,7 @@ use Closure;
 use EndouMame\PhpMonad\Option;
 use EndouMame\PhpMonad\Result;
 
-use function App\Shared\Result\bind;
+use function EndouMame\PhpMonad\Result\andThen;
 use function EndouMame\PhpMonad\Result\ok;
 
 /**
@@ -55,23 +55,6 @@ function traverse(Option $option, Closure $fn): Result
 }
 
 /**
- * Curried form of ok_or for use with the pipeline operator (|>).
- *
- * Usage: $nullable |> fromValue(...) |> ok_or_err($error)
- *
- * @template T
- * @template E
- *
- * @param E $error
- *
- * @return (Closure(Option<T>): Result<T, E>)
- */
-function ok_or_err(mixed $error): Closure
-{
-    return static fn(Option $option): Result => ok_or($option, $error);
-}
-
-/**
  * Curried form of traverse for use with the pipeline operator (|>).
  *
  * Usage: $nullable |> fromValue(...) |> traverse_with(DueDate::create(...))
@@ -92,7 +75,7 @@ function traverse_with(Closure $fn): Closure
 /**
  * Conditionally apply a bind operation based on an Option value.
  *
- * If Some, applies $fn(unwrapped value) which must return a Closure suitable for bind().
+ * If Some, applies $fn(unwrapped value) which must return a Closure suitable for andThen().
  * If None, returns an identity function that passes Result through unchanged.
  *
  * Usage with pipeline operator:
@@ -115,7 +98,7 @@ function apply_if_some(Option $option, Closure $fn): Closure
         static function (mixed $value) use ($fn): Closure {
             $binding = $fn($value);
 
-            return bind($binding);
+            return andThen($binding);
         },
         static fn(): Closure => static fn(Result $result): Result => $result,
     );
