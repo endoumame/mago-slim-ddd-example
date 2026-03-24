@@ -18,6 +18,7 @@ use function EndouMame\PhpMonad\Option\fromValue;
 use function EndouMame\PhpMonad\Option\okOr;
 use function EndouMame\PhpMonad\Result\andThen;
 use function EndouMame\PhpMonad\Result\err;
+use function EndouMame\PhpMonad\Result\flat_map_all;
 
 final readonly class ChangeTaskStatusHandler
 {
@@ -30,8 +31,8 @@ final readonly class ChangeTaskStatusHandler
      */
     public function handle(ChangeTaskStatusCommand $command): Result
     {
-        /** @var Result<TaskStatus, \Throwable> $statusResult */
-        $statusResult = TaskStatus::tryFrom($command->status)
+        /** @var Result<TaskStatus, \Throwable> */
+        $status = TaskStatus::tryFrom($command->status)
             |> fromValue(...)
             |> okOr(
                 new \InvalidArgumentException(
@@ -39,12 +40,16 @@ final readonly class ChangeTaskStatusHandler
                 ),
             );
 
+        $id = TaskId::create($command->id);
+
         /** @var Result<Task, \Throwable> */
-        return $statusResult
-            |> andThen(static fn(TaskStatus $_): Result => TaskId::create($command->id))
-            |> andThen(fn(TaskId $id): Result => $this->repository->findById($id))
-            |> andThen(fn(Task $task): Result => $this->transitionTo($task, $statusResult->unwrap()))
-            |> andThen(fn(Task $updated): Result => $this->repository->save($updated));
+        return flat_map_all(
+            fn(TaskStatus $s, TaskId $taskId): Result => $this->repository->findById($taskId)
+                |> andThen(fn(Task $task): Result => $this->transitionTo($task, $s))
+                |> andThen(fn(Task $updated): Result => $this->repository->save($updated)),
+            $status,
+            $id,
+        );
     }
 
     /**
