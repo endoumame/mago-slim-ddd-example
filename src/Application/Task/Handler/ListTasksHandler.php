@@ -12,6 +12,7 @@ use EndouMame\PhpMonad\Option;
 use EndouMame\PhpMonad\Result;
 
 use function EndouMame\PhpMonad\Option\fromValue;
+use function EndouMame\PhpMonad\Result\andThen;
 use function EndouMame\PhpMonad\Result\ok;
 
 final readonly class ListTasksHandler
@@ -25,9 +26,9 @@ final readonly class ListTasksHandler
      */
     public function handle(ListTasksQuery $query): Result
     {
-        return $this->repository
-            ->findAll()
-            ->andThen(
+        /** @var Result<list<Task>, \Throwable> */
+        return $this->repository->findAll()
+            |> andThen(
                 /**
                  * @param list<Task> $tasks
                  * @return Result<list<Task>, \Throwable>

@@ -14,8 +14,9 @@ use App\Domain\Task\TaskStatus;
 use App\Domain\Task\TodoTask;
 use EndouMame\PhpMonad\Result;
 
-use function App\Shared\Option\ok_or_err;
 use function EndouMame\PhpMonad\Option\fromValue;
+use function EndouMame\PhpMonad\Option\okOr;
+use function EndouMame\PhpMonad\Result\andThen;
 use function EndouMame\PhpMonad\Result\err;
 
 final readonly class ChangeTaskStatusHandler
@@ -32,17 +33,18 @@ final readonly class ChangeTaskStatusHandler
         /** @var Result<TaskStatus, \Throwable> $statusResult */
         $statusResult = TaskStatus::tryFrom($command->status)
             |> fromValue(...)
-            |> ok_or_err(
+            |> okOr(
                 new \InvalidArgumentException(
                     "Invalid status: '{$command->status}'. Must be one of: todo, in_progress, done.",
                 ),
             );
 
+        /** @var Result<Task, \Throwable> */
         return $statusResult
-            ->andThen(static fn(TaskStatus $_): Result => TaskId::create($command->id))
-            ->andThen(fn(TaskId $id): Result => $this->repository->findById($id))
-            ->andThen(fn(Task $task): Result => $this->transitionTo($task, $statusResult->unwrap()))
-            ->andThen(fn(Task $updated): Result => $this->repository->save($updated));
+            |> andThen(static fn(TaskStatus $_): Result => TaskId::create($command->id))
+            |> andThen(fn(TaskId $id): Result => $this->repository->findById($id))
+            |> andThen(fn(Task $task): Result => $this->transitionTo($task, $statusResult->unwrap()))
+            |> andThen(fn(Task $updated): Result => $this->repository->save($updated));
     }
 
     /**

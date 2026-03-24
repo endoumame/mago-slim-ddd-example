@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "28b316a1c8ee8ba3a4d455684760423f",
+    "content-hash": "c464425d2028991fb856b45342830f56",
     "packages": [
         {
             "name": "brick/math",
@@ -68,23 +68,23 @@
         },
         {
             "name": "endoumame/php-monad",
-            "version": "v1.0.2",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/endoumame/php-monad.git",
-                "reference": "b1c24b2ba3c62b98511503a05fdd5314a704a7c4"
+                "reference": "35f475b63e6c436a5e37405134a4c25acbc19e5a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/endoumame/php-monad/zipball/b1c24b2ba3c62b98511503a05fdd5314a704a7c4",
-                "reference": "b1c24b2ba3c62b98511503a05fdd5314a704a7c4",
+                "url": "https://api.github.com/repos/endoumame/php-monad/zipball/35f475b63e6c436a5e37405134a4c25acbc19e5a",
+                "reference": "35f475b63e6c436a5e37405134a4c25acbc19e5a",
                 "shasum": ""
             },
             "require": {
                 "php": ">=8.3"
             },
             "require-dev": {
-                "endou-mame/php-cs-fixer-config": "~8.4.4",
+                "endoumame/php-cs-fixer-config": "~8.4.4",
                 "jiripudil/phpstan-sealed-classes": "^1.2",
                 "phpstan/extension-installer": "^1.4",
                 "phpstan/phpstan": "^1.12",
@@ -108,15 +108,15 @@
             "authors": [
                 {
                     "name": "Kakiuchi Shigenao",
-                    "email": "87973394+endou-mame@users.noreply.github.com"
+                    "email": "87973394+endoumame@users.noreply.github.com"
                 }
             ],
             "description": "📦 Implemented the concept of monads in functional programming in PHP.",
             "support": {
                 "issues": "https://github.com/endoumame/php-monad/issues",
-                "source": "https://github.com/endoumame/php-monad/tree/v1.0.2"
+                "source": "https://github.com/endoumame/php-monad/tree/v1.1.0"
             },
-            "time": "2026-02-16T14:27:39+00:00"
+            "time": "2026-03-23T10:22:24+00:00"
         },
         {
             "name": "fig/http-message-util",

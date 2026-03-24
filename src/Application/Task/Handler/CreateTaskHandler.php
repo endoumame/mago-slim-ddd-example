@@ -15,6 +15,7 @@ use EndouMame\PhpMonad\Result;
 
 use function App\Shared\Option\traverse;
 use function EndouMame\PhpMonad\Option\fromValue;
+use function EndouMame\PhpMonad\Result\andThen;
 
 final readonly class CreateTaskHandler
 {
@@ -27,11 +28,24 @@ final readonly class CreateTaskHandler
      */
     public function handle(CreateTaskCommand $command): Result
     {
+        /** @var Result<Task, \Throwable> */
         return TaskTitle::create($command->title)
-            ->andThen(static fn(TaskTitle $title): Result => TaskDescription::create($command->description)->andThen(static fn(TaskDescription $description): Result => traverse(
-                fromValue($command->dueDate),
-                DueDate::create(...),
-            )->andThen(static fn(?DueDate $dueDate): Result => TodoTask::create($title, $description, $dueDate))))
-            ->andThen(fn(Task $task): Result => $this->repository->save($task));
+            |> andThen(
+                static fn(TaskTitle $title): Result => TaskDescription::create($command->description)
+                    |> andThen(
+                        static fn(TaskDescription $description): Result => traverse(
+                            fromValue($command->dueDate),
+                            DueDate::create(...),
+                        )
+                            |> andThen(
+                                static fn(?DueDate $dueDate): Result => TodoTask::create(
+                                    $title,
+                                    $description,
+                                    $dueDate,
+                                ),
+                            ),
+                    ),
+            )
+            |> andThen(fn(Task $task): Result => $this->repository->save($task));
     }
 }
