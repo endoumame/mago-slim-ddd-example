@@ -68,16 +68,16 @@
         },
         {
             "name": "endoumame/php-monad",
-            "version": "v1.2.0",
+            "version": "v1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/endoumame/php-monad.git",
-                "reference": "00811d73f3d0e84f4383f2fe5ae806124a4ec447"
+                "reference": "072698a8ff3a45605e449b2e3e77f8c08a742931"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/endoumame/php-monad/zipball/00811d73f3d0e84f4383f2fe5ae806124a4ec447",
-                "reference": "00811d73f3d0e84f4383f2fe5ae806124a4ec447",
+                "url": "https://api.github.com/repos/endoumame/php-monad/zipball/072698a8ff3a45605e449b2e3e77f8c08a742931",
+                "reference": "072698a8ff3a45605e449b2e3e77f8c08a742931",
                 "shasum": ""
             },
             "require": {
@@ -114,9 +114,9 @@
             "description": "📦 Implemented the concept of monads in functional programming in PHP.",
             "support": {
                 "issues": "https://github.com/endoumame/php-monad/issues",
-                "source": "https://github.com/endoumame/php-monad/tree/v1.2.0"
+                "source": "https://github.com/endoumame/php-monad/tree/v1.3.0"
             },
-            "time": "2026-03-24T11:23:33+00:00"
+            "time": "2026-03-24T12:17:41+00:00"
         },
         {
             "name": "fig/http-message-util",

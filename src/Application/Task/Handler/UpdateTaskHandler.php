@@ -13,8 +13,8 @@ use App\Domain\Task\TaskRepositoryInterface;
 use App\Domain\Task\TaskTitle;
 use EndouMame\PhpMonad\Result;
 
-use function App\Shared\Option\traverse;
 use function EndouMame\PhpMonad\Option\fromValue;
+use function EndouMame\PhpMonad\Option\traverse;
 use function EndouMame\PhpMonad\Result\andThen;
 use function EndouMame\PhpMonad\Result\flat_map_all;
 use function EndouMame\PhpMonad\Result\ok;
