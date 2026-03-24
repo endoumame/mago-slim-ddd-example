@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\Task\Update;
 
-use App\Application\Task\Create\TaskCreateCommand;
-use App\Application\Task\Create\TaskCreateCommandHandler;
-use App\Application\Task\Update\TaskUpdateCommand;
-use App\Application\Task\Update\TaskUpdateCommandHandler;
+use App\Application\Task\Create\CreateTaskCommand;
+use App\Application\Task\Create\CreateTaskHandler;
+use App\Application\Task\Update\UpdateTaskCommand;
+use App\Application\Task\Update\UpdateTaskHandler;
 use App\Domain\Task\Exception\InvalidTaskTitleException;
 use App\Domain\Task\Exception\TaskNotFoundException;
 use App\Infrastructure\Persistence\InMemoryTaskRepository;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 
-final class TaskUpdateCommandHandlerTest extends TestCase
+final class UpdateTaskHandlerTest extends TestCase
 {
-    private TaskUpdateCommandHandler $handler;
-    private TaskCreateCommandHandler $createHandler;
+    private UpdateTaskHandler $handler;
+    private CreateTaskHandler $createHandler;
     private InMemoryTaskRepository $repository;
 
     /**
@@ -27,8 +27,8 @@ final class TaskUpdateCommandHandlerTest extends TestCase
     protected function setUp(): void
     {
         $this->repository = new InMemoryTaskRepository();
-        $this->handler = new TaskUpdateCommandHandler($this->repository);
-        $this->createHandler = new TaskCreateCommandHandler($this->repository);
+        $this->handler = new UpdateTaskHandler($this->repository);
+        $this->createHandler = new CreateTaskHandler($this->repository);
     }
 
     /**
@@ -36,9 +36,9 @@ final class TaskUpdateCommandHandlerTest extends TestCase
      */
     public function testUpdateTitleSucceeds(): void
     {
-        $task = $this->createHandler->handle(new TaskCreateCommand(title: 'Original'))->unwrap();
+        $task = $this->createHandler->handle(new CreateTaskCommand(title: 'Original'))->unwrap();
 
-        $result = $this->handler->handle(new TaskUpdateCommand(id: $task->id->value(), title: 'Updated'));
+        $result = $this->handler->handle(new UpdateTaskCommand(id: $task->id->value(), title: 'Updated'));
 
         static::assertSame('Updated', $result->unwrap()->title->value());
     }
@@ -48,9 +48,9 @@ final class TaskUpdateCommandHandlerTest extends TestCase
      */
     public function testUpdateDescriptionSucceeds(): void
     {
-        $task = $this->createHandler->handle(new TaskCreateCommand(title: 'Task'))->unwrap();
+        $task = $this->createHandler->handle(new CreateTaskCommand(title: 'Task'))->unwrap();
 
-        $result = $this->handler->handle(new TaskUpdateCommand(id: $task->id->value(), description: 'New description'));
+        $result = $this->handler->handle(new UpdateTaskCommand(id: $task->id->value(), description: 'New description'));
 
         static::assertSame('New description', $result->unwrap()->description->value());
     }
@@ -60,7 +60,7 @@ final class TaskUpdateCommandHandlerTest extends TestCase
      */
     public function testUpdateNonExistentTaskFails(): void
     {
-        $result = $this->handler->handle(new TaskUpdateCommand(id: Uuid::uuid4()->toString(), title: 'Will fail'));
+        $result = $this->handler->handle(new UpdateTaskCommand(id: Uuid::uuid4()->toString(), title: 'Will fail'));
 
         static::assertInstanceOf(TaskNotFoundException::class, $result->unwrapErr());
     }
@@ -70,9 +70,9 @@ final class TaskUpdateCommandHandlerTest extends TestCase
      */
     public function testUpdateWithInvalidTitleFails(): void
     {
-        $task = $this->createHandler->handle(new TaskCreateCommand(title: 'Task'))->unwrap();
+        $task = $this->createHandler->handle(new CreateTaskCommand(title: 'Task'))->unwrap();
 
-        $result = $this->handler->handle(new TaskUpdateCommand(id: $task->id->value(), title: ''));
+        $result = $this->handler->handle(new UpdateTaskCommand(id: $task->id->value(), title: ''));
 
         static::assertInstanceOf(InvalidTaskTitleException::class, $result->unwrapErr());
     }

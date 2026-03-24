@@ -14,7 +14,7 @@ use function EndouMame\PhpMonad\Option\fromValue;
 use function EndouMame\PhpMonad\Result\andThen;
 use function EndouMame\PhpMonad\Result\ok;
 
-final readonly class TaskListQueryHandler
+final readonly class ListTasksHandler
 {
     public function __construct(
         private TaskRepositoryInterface $repository,
@@ -23,7 +23,7 @@ final readonly class TaskListQueryHandler
     /**
      * @return Result<list<Task>, \Throwable>
      */
-    public function handle(TaskListQuery $query): Result
+    public function handle(ListTasksQuery $query): Result
     {
         /** @var Result<list<Task>, \Throwable> */
         return $this->repository->findAll()

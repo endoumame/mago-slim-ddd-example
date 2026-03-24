@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Task\Update;
 
-final readonly class TaskUpdateCommand
+final readonly class UpdateTaskCommand
 {
     public function __construct(
         public string $id,

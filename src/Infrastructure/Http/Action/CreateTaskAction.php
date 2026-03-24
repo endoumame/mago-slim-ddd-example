@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Http\Action;
 
-use App\Application\Task\Create\TaskCreateCommand;
-use App\Application\Task\Create\TaskCreateCommandHandler;
+use App\Application\Task\Create\CreateTaskCommand;
+use App\Application\Task\Create\CreateTaskHandler;
 use App\Infrastructure\Http\JsonResponseFactory;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -13,7 +13,7 @@ use Psr\Http\Message\ServerRequestInterface;
 final readonly class CreateTaskAction
 {
     public function __construct(
-        private TaskCreateCommandHandler $handler,
+        private CreateTaskHandler $handler,
     ) {}
 
     /**
@@ -24,7 +24,7 @@ final readonly class CreateTaskAction
         /** @var array<string, mixed> */
         $body = $request->getParsedBody() ?? [];
 
-        $command = new TaskCreateCommand(
+        $command = new CreateTaskCommand(
             title: \array_key_exists('title', $body) ? (string) $body['title'] : '',
             description: \array_key_exists('description', $body) ? (string) $body['description'] : '',
             dueDate: \array_key_exists('due_date', $body) ? (string) $body['due_date'] : null,

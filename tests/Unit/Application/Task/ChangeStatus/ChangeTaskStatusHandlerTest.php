@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\Task\ChangeStatus;
 
-use App\Application\Task\ChangeStatus\TaskChangeStatusCommand;
-use App\Application\Task\ChangeStatus\TaskChangeStatusCommandHandler;
-use App\Application\Task\Create\TaskCreateCommand;
-use App\Application\Task\Create\TaskCreateCommandHandler;
+use App\Application\Task\ChangeStatus\ChangeTaskStatusCommand;
+use App\Application\Task\ChangeStatus\ChangeTaskStatusHandler;
+use App\Application\Task\Create\CreateTaskCommand;
+use App\Application\Task\Create\CreateTaskHandler;
 use App\Domain\Task\DoneTask;
 use App\Domain\Task\Exception\InvalidTaskStatusTransitionException;
 use App\Domain\Task\InProgressTask;
@@ -15,10 +15,10 @@ use App\Domain\Task\TaskStatus;
 use App\Infrastructure\Persistence\InMemoryTaskRepository;
 use PHPUnit\Framework\TestCase;
 
-final class TaskChangeStatusCommandHandlerTest extends TestCase
+final class ChangeTaskStatusHandlerTest extends TestCase
 {
-    private TaskChangeStatusCommandHandler $handler;
-    private TaskCreateCommandHandler $createHandler;
+    private ChangeTaskStatusHandler $handler;
+    private CreateTaskHandler $createHandler;
     private InMemoryTaskRepository $repository;
 
     /**
@@ -28,8 +28,8 @@ final class TaskChangeStatusCommandHandlerTest extends TestCase
     protected function setUp(): void
     {
         $this->repository = new InMemoryTaskRepository();
-        $this->handler = new TaskChangeStatusCommandHandler($this->repository);
-        $this->createHandler = new TaskCreateCommandHandler($this->repository);
+        $this->handler = new ChangeTaskStatusHandler($this->repository);
+        $this->createHandler = new CreateTaskHandler($this->repository);
     }
 
     /**
@@ -37,9 +37,9 @@ final class TaskChangeStatusCommandHandlerTest extends TestCase
      */
     public function testChangeStatusTodoToInProgress(): void
     {
-        $task = $this->createHandler->handle(new TaskCreateCommand(title: 'Task'))->unwrap();
+        $task = $this->createHandler->handle(new CreateTaskCommand(title: 'Task'))->unwrap();
 
-        $result = $this->handler->handle(new TaskChangeStatusCommand(id: $task->id->value(), status: 'in_progress'));
+        $result = $this->handler->handle(new ChangeTaskStatusCommand(id: $task->id->value(), status: 'in_progress'));
 
         static::assertInstanceOf(InProgressTask::class, $result->unwrap());
         static::assertSame(TaskStatus::InProgress, $result->unwrap()->status);
@@ -50,10 +50,10 @@ final class TaskChangeStatusCommandHandlerTest extends TestCase
      */
     public function testChangeStatusInProgressToDone(): void
     {
-        $task = $this->createHandler->handle(new TaskCreateCommand(title: 'Task'))->unwrap();
-        $this->handler->handle(new TaskChangeStatusCommand(id: $task->id->value(), status: 'in_progress'));
+        $task = $this->createHandler->handle(new CreateTaskCommand(title: 'Task'))->unwrap();
+        $this->handler->handle(new ChangeTaskStatusCommand(id: $task->id->value(), status: 'in_progress'));
 
-        $result = $this->handler->handle(new TaskChangeStatusCommand(id: $task->id->value(), status: 'done'));
+        $result = $this->handler->handle(new ChangeTaskStatusCommand(id: $task->id->value(), status: 'done'));
 
         static::assertInstanceOf(DoneTask::class, $result->unwrap());
         static::assertSame(TaskStatus::Done, $result->unwrap()->status);
@@ -64,9 +64,9 @@ final class TaskChangeStatusCommandHandlerTest extends TestCase
      */
     public function testInvalidTransitionFails(): void
     {
-        $task = $this->createHandler->handle(new TaskCreateCommand(title: 'Task'))->unwrap();
+        $task = $this->createHandler->handle(new CreateTaskCommand(title: 'Task'))->unwrap();
 
-        $result = $this->handler->handle(new TaskChangeStatusCommand(id: $task->id->value(), status: 'done'));
+        $result = $this->handler->handle(new ChangeTaskStatusCommand(id: $task->id->value(), status: 'done'));
 
         static::assertInstanceOf(InvalidTaskStatusTransitionException::class, $result->unwrapErr());
     }
@@ -76,9 +76,9 @@ final class TaskChangeStatusCommandHandlerTest extends TestCase
      */
     public function testInvalidStatusValueFails(): void
     {
-        $task = $this->createHandler->handle(new TaskCreateCommand(title: 'Task'))->unwrap();
+        $task = $this->createHandler->handle(new CreateTaskCommand(title: 'Task'))->unwrap();
 
-        $result = $this->handler->handle(new TaskChangeStatusCommand(id: $task->id->value(), status: 'invalid'));
+        $result = $this->handler->handle(new ChangeTaskStatusCommand(id: $task->id->value(), status: 'invalid'));
 
         static::assertInstanceOf(\InvalidArgumentException::class, $result->unwrapErr());
     }

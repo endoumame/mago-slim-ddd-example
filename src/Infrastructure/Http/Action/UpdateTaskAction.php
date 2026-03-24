@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Http\Action;
 
-use App\Application\Task\Update\TaskUpdateCommand;
-use App\Application\Task\Update\TaskUpdateCommandHandler;
+use App\Application\Task\Update\UpdateTaskCommand;
+use App\Application\Task\Update\UpdateTaskHandler;
 use App\Infrastructure\Http\JsonResponseFactory;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -13,7 +13,7 @@ use Psr\Http\Message\ServerRequestInterface;
 final readonly class UpdateTaskAction
 {
     public function __construct(
-        private TaskUpdateCommandHandler $handler,
+        private UpdateTaskHandler $handler,
     ) {}
 
     /**
@@ -24,7 +24,7 @@ final readonly class UpdateTaskAction
         /** @var array<string, mixed> */
         $body = $request->getParsedBody() ?? [];
 
-        $command = new TaskUpdateCommand(
+        $command = new UpdateTaskCommand(
             id: $id,
             title: \array_key_exists('title', $body) ? (string) $body['title'] : null,
             description: \array_key_exists('description', $body) ? (string) $body['description'] : null,

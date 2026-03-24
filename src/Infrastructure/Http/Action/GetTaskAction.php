@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Http\Action;
 
-use App\Application\Task\Get\TaskGetQuery;
-use App\Application\Task\Get\TaskGetQueryHandler;
+use App\Application\Task\Get\GetTaskHandler;
+use App\Application\Task\Get\GetTaskQuery;
 use App\Infrastructure\Http\JsonResponseFactory;
 use Psr\Http\Message\ResponseInterface;
 
 final readonly class GetTaskAction
 {
     public function __construct(
-        private TaskGetQueryHandler $handler,
+        private GetTaskHandler $handler,
     ) {}
 
     /**
@@ -20,6 +20,6 @@ final readonly class GetTaskAction
      */
     public function __invoke(string $id): ResponseInterface
     {
-        return JsonResponseFactory::fromTaskResult($this->handler->handle(new TaskGetQuery(id: $id)));
+        return JsonResponseFactory::fromTaskResult($this->handler->handle(new GetTaskQuery(id: $id)));
     }
 }

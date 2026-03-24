@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Task\List;
 
-final readonly class TaskListQuery
+final readonly class ListTasksQuery
 {
     public function __construct(
         public ?string $status = null,

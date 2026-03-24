@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Application\Task\Get;
+namespace App\Application\Task\Delete;
 
-final readonly class TaskGetQuery
+final readonly class DeleteTaskCommand
 {
     public function __construct(
         public string $id,

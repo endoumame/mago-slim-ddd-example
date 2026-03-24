@@ -10,7 +10,7 @@ use EndouMame\PhpMonad\Result;
 
 use function EndouMame\PhpMonad\Result\andThen;
 
-final readonly class TaskDeleteCommandHandler
+final readonly class DeleteTaskHandler
 {
     public function __construct(
         private TaskRepositoryInterface $repository,
@@ -19,7 +19,7 @@ final readonly class TaskDeleteCommandHandler
     /**
      * @return Result<true, \Throwable>
      */
-    public function handle(TaskDeleteCommand $command): Result
+    public function handle(DeleteTaskCommand $command): Result
     {
         /** @var Result<true, \Throwable> */
         return TaskId::create($command->id)

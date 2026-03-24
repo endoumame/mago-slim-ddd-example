@@ -17,7 +17,7 @@ use function EndouMame\PhpMonad\Option\traverse;
 use function EndouMame\PhpMonad\Result\andThen;
 use function EndouMame\PhpMonad\Result\flat_map_all;
 
-final readonly class TaskCreateCommandHandler
+final readonly class CreateTaskHandler
 {
     public function __construct(
         private TaskRepositoryInterface $repository,
@@ -28,7 +28,7 @@ final readonly class TaskCreateCommandHandler
      *
      * @throws \Throwable
      */
-    public function handle(TaskCreateCommand $command): Result
+    public function handle(CreateTaskCommand $command): Result
     {
         $title = TaskTitle::create($command->title);
         $description = TaskDescription::create($command->description);

@@ -19,7 +19,7 @@ use function EndouMame\PhpMonad\Result\andThen;
 use function EndouMame\PhpMonad\Result\err;
 use function EndouMame\PhpMonad\Result\flat_map_all;
 
-final readonly class TaskChangeStatusCommandHandler
+final readonly class ChangeTaskStatusHandler
 {
     public function __construct(
         private TaskRepositoryInterface $repository,
@@ -28,7 +28,7 @@ final readonly class TaskChangeStatusCommandHandler
     /**
      * @return Result<Task, \Throwable>
      */
-    public function handle(TaskChangeStatusCommand $command): Result
+    public function handle(ChangeTaskStatusCommand $command): Result
     {
         /** @var Result<TaskStatus, \Throwable> */
         $status = TaskStatus::tryFrom($command->status)
