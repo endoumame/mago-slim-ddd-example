@@ -7,7 +7,7 @@ namespace App\Tests\Unit\Shared\Result;
 use EndouMame\PhpMonad\Result;
 use PHPUnit\Framework\TestCase;
 
-use function App\Shared\Result\and_then_all;
+use function App\Shared\Result\flat_map_all;
 use function App\Shared\Result\map_all;
 use function EndouMame\PhpMonad\Result\err;
 use function EndouMame\PhpMonad\Result\ok;
@@ -56,12 +56,12 @@ final class ResultFunctionsTest extends TestCase
     /**
      * @throws \Throwable
      */
-    public function testAndThenAllWithAllOkAppliesFunction(): void
+    public function testFlatMapAllWithAllOkAppliesFunction(): void
     {
         $a = ok('hello');
         $b = ok('world');
 
-        $result = and_then_all(static fn(string $x, string $y): Result => ok("{$x} {$y}"), $a, $b);
+        $result = flat_map_all(static fn(string $x, string $y): Result => ok("{$x} {$y}"), $a, $b);
 
         self::assertSame('hello world', $result->unwrap());
     }
@@ -69,12 +69,12 @@ final class ResultFunctionsTest extends TestCase
     /**
      * @throws \Throwable
      */
-    public function testAndThenAllWithAllOkButCallbackReturnsErr(): void
+    public function testFlatMapAllWithAllOkButCallbackReturnsErr(): void
     {
         $a = ok(1);
         $b = ok(2);
 
-        $result = and_then_all(
+        $result = flat_map_all(
             static fn(int $_x, int $_y): Result => err(new \LogicException('callback failed')),
             $a,
             $b,
@@ -86,14 +86,14 @@ final class ResultFunctionsTest extends TestCase
     /**
      * @throws \Throwable
      */
-    public function testAndThenAllWithErrShortCircuits(): void
+    public function testFlatMapAllWithErrShortCircuits(): void
     {
         $a = ok(1);
         $b = err(new \RuntimeException('fail'));
         $c = ok(3);
 
         $callbackCalled = false;
-        $result = and_then_all(
+        $result = flat_map_all(
             static function (int $x, int $y, int $z) use (&$callbackCalled): Result {
                 $callbackCalled = true;
 
@@ -111,12 +111,12 @@ final class ResultFunctionsTest extends TestCase
     /**
      * @throws \Throwable
      */
-    public function testAndThenAllReturnsFirstErr(): void
+    public function testFlatMapAllReturnsFirstErr(): void
     {
         $a = err(new \InvalidArgumentException('first'));
         $b = err(new \RuntimeException('second'));
 
-        $result = and_then_all(static fn(int $x, int $y): Result => ok($x + $y), $a, $b);
+        $result = flat_map_all(static fn(int $x, int $y): Result => ok($x + $y), $a, $b);
 
         self::assertInstanceOf(\InvalidArgumentException::class, $result->unwrapErr());
     }

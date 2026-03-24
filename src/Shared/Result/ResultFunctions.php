@@ -56,7 +56,7 @@ function map_all(Closure $fn, Result ...$results): Result
  *
  * @throws \Throwable
  */
-function and_then_all(Closure $fn, Result ...$results): Result
+function flat_map_all(Closure $fn, Result ...$results): Result
 {
     $values = [];
     foreach ($results as $result) {
