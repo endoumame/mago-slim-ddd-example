@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c464425d2028991fb856b45342830f56",
+    "content-hash": "7b3c63705bdbcc15e1a89f24b358cf59",
     "packages": [
         {
             "name": "brick/math",
@@ -68,16 +68,16 @@
         },
         {
             "name": "endoumame/php-monad",
-            "version": "v1.1.0",
+            "version": "v1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/endoumame/php-monad.git",
-                "reference": "35f475b63e6c436a5e37405134a4c25acbc19e5a"
+                "reference": "00811d73f3d0e84f4383f2fe5ae806124a4ec447"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/endoumame/php-monad/zipball/35f475b63e6c436a5e37405134a4c25acbc19e5a",
-                "reference": "35f475b63e6c436a5e37405134a4c25acbc19e5a",
+                "url": "https://api.github.com/repos/endoumame/php-monad/zipball/00811d73f3d0e84f4383f2fe5ae806124a4ec447",
+                "reference": "00811d73f3d0e84f4383f2fe5ae806124a4ec447",
                 "shasum": ""
             },
             "require": {
@@ -114,9 +114,9 @@
             "description": "📦 Implemented the concept of monads in functional programming in PHP.",
             "support": {
                 "issues": "https://github.com/endoumame/php-monad/issues",
-                "source": "https://github.com/endoumame/php-monad/tree/v1.1.0"
+                "source": "https://github.com/endoumame/php-monad/tree/v1.2.0"
             },
-            "time": "2026-03-23T10:22:24+00:00"
+            "time": "2026-03-24T11:23:33+00:00"
         },
         {
             "name": "fig/http-message-util",
