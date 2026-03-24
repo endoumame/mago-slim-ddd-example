@@ -15,12 +15,10 @@ use App\Infrastructure\Http\Action\DeleteTaskAction;
 use App\Infrastructure\Http\Action\GetTaskAction;
 use App\Infrastructure\Http\Action\ListTasksAction;
 use App\Infrastructure\Http\Action\UpdateTaskAction;
-use App\Infrastructure\Http\JsonResponseFactory;
 use App\Infrastructure\Persistence\InMemoryTaskRepository;
 
 return [
     TaskRepositoryInterface::class => static fn(): TaskRepositoryInterface => new InMemoryTaskRepository(),
-    JsonResponseFactory::class => static fn(): JsonResponseFactory => new JsonResponseFactory(),
     CreateTaskHandler::class => static fn(TaskRepositoryInterface $r): CreateTaskHandler => new CreateTaskHandler($r),
     UpdateTaskHandler::class => static fn(TaskRepositoryInterface $r): UpdateTaskHandler => new UpdateTaskHandler($r),
     DeleteTaskHandler::class => static fn(TaskRepositoryInterface $r): DeleteTaskHandler => new DeleteTaskHandler($r),
@@ -28,28 +26,11 @@ return [
     ListTasksHandler::class => static fn(TaskRepositoryInterface $r): ListTasksHandler => new ListTasksHandler($r),
     ChangeTaskStatusHandler::class =>
         static fn(TaskRepositoryInterface $r): ChangeTaskStatusHandler => new ChangeTaskStatusHandler($r),
-    CreateTaskAction::class => static fn(
-        CreateTaskHandler $h,
-        JsonResponseFactory $f,
-    ): CreateTaskAction => new CreateTaskAction($h, $f),
-    GetTaskAction::class => static fn(GetTaskHandler $h, JsonResponseFactory $f): GetTaskAction => new GetTaskAction(
-        $h,
-        $f,
-    ),
-    ListTasksAction::class => static fn(
-        ListTasksHandler $h,
-        JsonResponseFactory $f,
-    ): ListTasksAction => new ListTasksAction($h, $f),
-    UpdateTaskAction::class => static fn(
-        UpdateTaskHandler $h,
-        JsonResponseFactory $f,
-    ): UpdateTaskAction => new UpdateTaskAction($h, $f),
-    DeleteTaskAction::class => static fn(
-        DeleteTaskHandler $h,
-        JsonResponseFactory $f,
-    ): DeleteTaskAction => new DeleteTaskAction($h, $f),
-    ChangeTaskStatusAction::class => static fn(
-        ChangeTaskStatusHandler $h,
-        JsonResponseFactory $f,
-    ): ChangeTaskStatusAction => new ChangeTaskStatusAction($h, $f),
+    CreateTaskAction::class => static fn(CreateTaskHandler $h): CreateTaskAction => new CreateTaskAction($h),
+    GetTaskAction::class => static fn(GetTaskHandler $h): GetTaskAction => new GetTaskAction($h),
+    ListTasksAction::class => static fn(ListTasksHandler $h): ListTasksAction => new ListTasksAction($h),
+    UpdateTaskAction::class => static fn(UpdateTaskHandler $h): UpdateTaskAction => new UpdateTaskAction($h),
+    DeleteTaskAction::class => static fn(DeleteTaskHandler $h): DeleteTaskAction => new DeleteTaskAction($h),
+    ChangeTaskStatusAction::class =>
+        static fn(ChangeTaskStatusHandler $h): ChangeTaskStatusAction => new ChangeTaskStatusAction($h),
 ];

@@ -14,7 +14,6 @@ final readonly class UpdateTaskAction
 {
     public function __construct(
         private UpdateTaskHandler $handler,
-        private JsonResponseFactory $responseFactory,
     ) {}
 
     /**
@@ -32,6 +31,6 @@ final readonly class UpdateTaskAction
             dueDate: \array_key_exists('due_date', $body) ? (string) $body['due_date'] : null,
         );
 
-        return $this->responseFactory->fromTaskResult($this->handler->handle($command));
+        return JsonResponseFactory::fromTaskResult($this->handler->handle($command));
     }
 }

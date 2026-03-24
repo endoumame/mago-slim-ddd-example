@@ -14,7 +14,6 @@ final readonly class ChangeTaskStatusAction
 {
     public function __construct(
         private ChangeTaskStatusHandler $handler,
-        private JsonResponseFactory $responseFactory,
     ) {}
 
     /**
@@ -30,6 +29,6 @@ final readonly class ChangeTaskStatusAction
             status: \array_key_exists('status', $body) ? (string) $body['status'] : '',
         );
 
-        return $this->responseFactory->fromTaskResult($this->handler->handle($command));
+        return JsonResponseFactory::fromTaskResult($this->handler->handle($command));
     }
 }
