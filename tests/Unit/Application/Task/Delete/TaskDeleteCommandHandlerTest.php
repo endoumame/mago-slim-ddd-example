@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Application\Task;
+namespace App\Tests\Unit\Application\Task\Delete;
 
-use App\Application\Task\Command\CreateTaskCommand;
-use App\Application\Task\Command\DeleteTaskCommand;
-use App\Application\Task\Handler\CreateTaskHandler;
-use App\Application\Task\Handler\DeleteTaskHandler;
+use App\Application\Task\Create\TaskCreateCommand;
+use App\Application\Task\Create\TaskCreateCommandHandler;
+use App\Application\Task\Delete\TaskDeleteCommand;
+use App\Application\Task\Delete\TaskDeleteCommandHandler;
 use App\Domain\Task\Exception\TaskNotFoundException;
 use App\Infrastructure\Persistence\InMemoryTaskRepository;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 
-final class DeleteTaskHandlerTest extends TestCase
+final class TaskDeleteCommandHandlerTest extends TestCase
 {
-    private DeleteTaskHandler $handler;
-    private CreateTaskHandler $createHandler;
+    private TaskDeleteCommandHandler $handler;
+    private TaskCreateCommandHandler $createHandler;
     private InMemoryTaskRepository $repository;
 
     /**
@@ -26,8 +26,8 @@ final class DeleteTaskHandlerTest extends TestCase
     protected function setUp(): void
     {
         $this->repository = new InMemoryTaskRepository();
-        $this->handler = new DeleteTaskHandler($this->repository);
-        $this->createHandler = new CreateTaskHandler($this->repository);
+        $this->handler = new TaskDeleteCommandHandler($this->repository);
+        $this->createHandler = new TaskCreateCommandHandler($this->repository);
     }
 
     /**
@@ -35,9 +35,9 @@ final class DeleteTaskHandlerTest extends TestCase
      */
     public function testDeleteExistingTaskSucceeds(): void
     {
-        $task = $this->createHandler->handle(new CreateTaskCommand(title: 'To delete'))->unwrap();
+        $task = $this->createHandler->handle(new TaskCreateCommand(title: 'To delete'))->unwrap();
 
-        $result = $this->handler->handle(new DeleteTaskCommand(id: $task->id->value()));
+        $result = $this->handler->handle(new TaskDeleteCommand(id: $task->id->value()));
 
         static::assertNotNull($result->unwrap());
     }
@@ -47,9 +47,9 @@ final class DeleteTaskHandlerTest extends TestCase
      */
     public function testDeletedTaskIsNoLongerFound(): void
     {
-        $task = $this->createHandler->handle(new CreateTaskCommand(title: 'To delete'))->unwrap();
+        $task = $this->createHandler->handle(new TaskCreateCommand(title: 'To delete'))->unwrap();
 
-        $this->handler->handle(new DeleteTaskCommand(id: $task->id->value()));
+        $this->handler->handle(new TaskDeleteCommand(id: $task->id->value()));
 
         $findResult = $this->repository->findById($task->id);
         static::assertInstanceOf(TaskNotFoundException::class, $findResult->unwrapErr());
@@ -60,7 +60,7 @@ final class DeleteTaskHandlerTest extends TestCase
      */
     public function testDeleteNonExistentTaskFails(): void
     {
-        $result = $this->handler->handle(new DeleteTaskCommand(id: Uuid::uuid4()->toString()));
+        $result = $this->handler->handle(new TaskDeleteCommand(id: Uuid::uuid4()->toString()));
 
         static::assertInstanceOf(TaskNotFoundException::class, $result->unwrapErr());
     }

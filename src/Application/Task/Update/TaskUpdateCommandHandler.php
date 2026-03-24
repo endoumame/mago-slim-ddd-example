@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace App\Application\Task\Handler;
+namespace App\Application\Task\Update;
 
-use App\Application\Task\Command\UpdateTaskCommand;
 use App\Domain\Task\DueDate;
 use App\Domain\Task\Task;
 use App\Domain\Task\TaskDescription;
@@ -19,7 +18,7 @@ use function EndouMame\PhpMonad\Result\andThen;
 use function EndouMame\PhpMonad\Result\flat_map_all;
 use function EndouMame\PhpMonad\Result\ok;
 
-final readonly class UpdateTaskHandler
+final readonly class TaskUpdateCommandHandler
 {
     public function __construct(
         private TaskRepositoryInterface $repository,
@@ -28,7 +27,7 @@ final readonly class UpdateTaskHandler
     /**
      * @return Result<Task, \Throwable>
      */
-    public function handle(UpdateTaskCommand $command): Result
+    public function handle(TaskUpdateCommand $command): Result
     {
         $id = TaskId::create($command->id);
         $title = traverse(fromValue($command->title), TaskTitle::create(...));

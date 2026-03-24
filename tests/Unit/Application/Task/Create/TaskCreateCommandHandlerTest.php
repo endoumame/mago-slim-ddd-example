@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Application\Task;
+namespace App\Tests\Unit\Application\Task\Create;
 
-use App\Application\Task\Command\CreateTaskCommand;
-use App\Application\Task\Handler\CreateTaskHandler;
+use App\Application\Task\Create\TaskCreateCommand;
+use App\Application\Task\Create\TaskCreateCommandHandler;
 use App\Domain\Task\Exception\InvalidDueDateException;
 use App\Domain\Task\Exception\InvalidTaskTitleException;
 use App\Domain\Task\TaskStatus;
@@ -13,9 +13,9 @@ use App\Domain\Task\TodoTask;
 use App\Infrastructure\Persistence\InMemoryTaskRepository;
 use PHPUnit\Framework\TestCase;
 
-final class CreateTaskHandlerTest extends TestCase
+final class TaskCreateCommandHandlerTest extends TestCase
 {
-    private CreateTaskHandler $handler;
+    private TaskCreateCommandHandler $handler;
     private InMemoryTaskRepository $repository;
 
     /**
@@ -25,7 +25,7 @@ final class CreateTaskHandlerTest extends TestCase
     protected function setUp(): void
     {
         $this->repository = new InMemoryTaskRepository();
-        $this->handler = new CreateTaskHandler($this->repository);
+        $this->handler = new TaskCreateCommandHandler($this->repository);
     }
 
     /**
@@ -33,7 +33,7 @@ final class CreateTaskHandlerTest extends TestCase
      */
     public function testCreateTaskSucceeds(): void
     {
-        $command = new CreateTaskCommand(title: 'Buy groceries');
+        $command = new TaskCreateCommand(title: 'Buy groceries');
 
         $result = $this->handler->handle($command);
 
@@ -51,7 +51,7 @@ final class CreateTaskHandlerTest extends TestCase
     public function testCreateTaskWithDescriptionAndDueDate(): void
     {
         $futureDate = new \DateTimeImmutable('+7 days')->format('Y-m-d');
-        $command = new CreateTaskCommand(
+        $command = new TaskCreateCommand(
             title: 'Important task',
             description: 'This is important',
             dueDate: $futureDate,
@@ -71,7 +71,7 @@ final class CreateTaskHandlerTest extends TestCase
      */
     public function testCreateTaskIsSavedToRepository(): void
     {
-        $command = new CreateTaskCommand(title: 'Saved task');
+        $command = new TaskCreateCommand(title: 'Saved task');
         $result = $this->handler->handle($command);
         $task = $result->unwrap();
 
@@ -84,7 +84,7 @@ final class CreateTaskHandlerTest extends TestCase
      */
     public function testCreateTaskWithEmptyTitleFails(): void
     {
-        $command = new CreateTaskCommand(title: '');
+        $command = new TaskCreateCommand(title: '');
 
         $result = $this->handler->handle($command);
 
@@ -96,7 +96,7 @@ final class CreateTaskHandlerTest extends TestCase
      */
     public function testCreateTaskWithInvalidDueDateFails(): void
     {
-        $command = new CreateTaskCommand(title: 'Valid title', dueDate: 'not-a-date');
+        $command = new TaskCreateCommand(title: 'Valid title', dueDate: 'not-a-date');
 
         $result = $this->handler->handle($command);
 

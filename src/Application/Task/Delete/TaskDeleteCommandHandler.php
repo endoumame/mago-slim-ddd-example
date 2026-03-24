@@ -2,16 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Application\Task\Handler;
+namespace App\Application\Task\Delete;
 
-use App\Application\Task\Command\DeleteTaskCommand;
 use App\Domain\Task\TaskId;
 use App\Domain\Task\TaskRepositoryInterface;
 use EndouMame\PhpMonad\Result;
 
 use function EndouMame\PhpMonad\Result\andThen;
 
-final readonly class DeleteTaskHandler
+final readonly class TaskDeleteCommandHandler
 {
     public function __construct(
         private TaskRepositoryInterface $repository,
@@ -20,7 +19,7 @@ final readonly class DeleteTaskHandler
     /**
      * @return Result<true, \Throwable>
      */
-    public function handle(DeleteTaskCommand $command): Result
+    public function handle(TaskDeleteCommand $command): Result
     {
         /** @var Result<true, \Throwable> */
         return TaskId::create($command->id)

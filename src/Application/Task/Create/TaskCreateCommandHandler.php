@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace App\Application\Task\Handler;
+namespace App\Application\Task\Create;
 
-use App\Application\Task\Command\CreateTaskCommand;
 use App\Domain\Task\DueDate;
 use App\Domain\Task\Task;
 use App\Domain\Task\TaskDescription;
@@ -18,7 +17,7 @@ use function EndouMame\PhpMonad\Option\traverse;
 use function EndouMame\PhpMonad\Result\andThen;
 use function EndouMame\PhpMonad\Result\flat_map_all;
 
-final readonly class CreateTaskHandler
+final readonly class TaskCreateCommandHandler
 {
     public function __construct(
         private TaskRepositoryInterface $repository,
@@ -29,7 +28,7 @@ final readonly class CreateTaskHandler
      *
      * @throws \Throwable
      */
-    public function handle(CreateTaskCommand $command): Result
+    public function handle(TaskCreateCommand $command): Result
     {
         $title = TaskTitle::create($command->title);
         $description = TaskDescription::create($command->description);

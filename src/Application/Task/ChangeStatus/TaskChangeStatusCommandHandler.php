@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace App\Application\Task\Handler;
+namespace App\Application\Task\ChangeStatus;
 
-use App\Application\Task\Command\ChangeTaskStatusCommand;
 use App\Domain\Task\Exception\InvalidTaskStatusTransitionException;
 use App\Domain\Task\InProgressTask;
 use App\Domain\Task\Task;
@@ -20,7 +19,7 @@ use function EndouMame\PhpMonad\Result\andThen;
 use function EndouMame\PhpMonad\Result\err;
 use function EndouMame\PhpMonad\Result\flat_map_all;
 
-final readonly class ChangeTaskStatusHandler
+final readonly class TaskChangeStatusCommandHandler
 {
     public function __construct(
         private TaskRepositoryInterface $repository,
@@ -29,7 +28,7 @@ final readonly class ChangeTaskStatusHandler
     /**
      * @return Result<Task, \Throwable>
      */
-    public function handle(ChangeTaskStatusCommand $command): Result
+    public function handle(TaskChangeStatusCommand $command): Result
     {
         /** @var Result<TaskStatus, \Throwable> */
         $status = TaskStatus::tryFrom($command->status)

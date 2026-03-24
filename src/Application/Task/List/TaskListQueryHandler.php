@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace App\Application\Task\Handler;
+namespace App\Application\Task\List;
 
-use App\Application\Task\Query\ListTasksQuery;
 use App\Domain\Task\Task;
 use App\Domain\Task\TaskRepositoryInterface;
 use App\Domain\Task\TaskStatus;
@@ -15,7 +14,7 @@ use function EndouMame\PhpMonad\Option\fromValue;
 use function EndouMame\PhpMonad\Result\andThen;
 use function EndouMame\PhpMonad\Result\ok;
 
-final readonly class ListTasksHandler
+final readonly class TaskListQueryHandler
 {
     public function __construct(
         private TaskRepositoryInterface $repository,
@@ -24,7 +23,7 @@ final readonly class ListTasksHandler
     /**
      * @return Result<list<Task>, \Throwable>
      */
-    public function handle(ListTasksQuery $query): Result
+    public function handle(TaskListQuery $query): Result
     {
         /** @var Result<list<Task>, \Throwable> */
         return $this->repository->findAll()
