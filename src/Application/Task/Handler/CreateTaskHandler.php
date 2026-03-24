@@ -14,6 +14,7 @@ use App\Domain\Task\TodoTask;
 use EndouMame\PhpMonad\Result;
 
 use function App\Shared\Option\traverse;
+use function App\Shared\Result\and_then_all;
 use function EndouMame\PhpMonad\Option\fromValue;
 use function EndouMame\PhpMonad\Result\andThen;
 
@@ -25,27 +26,17 @@ final readonly class CreateTaskHandler
 
     /**
      * @return Result<Task, \Throwable>
+     *
+     * @throws \Throwable
      */
     public function handle(CreateTaskCommand $command): Result
     {
+        $title = TaskTitle::create($command->title);
+        $description = TaskDescription::create($command->description);
+        $dueDate = traverse(fromValue($command->dueDate), DueDate::create(...));
+
         /** @var Result<Task, \Throwable> */
-        return TaskTitle::create($command->title)
-            |> andThen(
-                static fn(TaskTitle $title): Result => TaskDescription::create($command->description)
-                    |> andThen(
-                        static fn(TaskDescription $description): Result => traverse(
-                            fromValue($command->dueDate),
-                            DueDate::create(...),
-                        )
-                            |> andThen(
-                                static fn(?DueDate $dueDate): Result => TodoTask::create(
-                                    $title,
-                                    $description,
-                                    $dueDate,
-                                ),
-                            ),
-                    ),
-            )
+        return and_then_all(TodoTask::create(...), $title, $description, $dueDate)
             |> andThen(fn(Task $task): Result => $this->repository->save($task));
     }
 }

@@ -21,7 +21,8 @@
             "App\\": "src/"
         },
         "files": [
-            "src/Shared/Option/OptionFunctions.php"
+            "src/Shared/Option/OptionFunctions.php",
+            "src/Shared/Result/ResultFunctions.php"
         ]
     },
     "autoload-dev": {
