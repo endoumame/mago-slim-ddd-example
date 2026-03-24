@@ -14,7 +14,6 @@ final readonly class ListTasksAction
 {
     public function __construct(
         private ListTasksHandler $handler,
-        private JsonResponseFactory $responseFactory,
     ) {}
 
     /**
@@ -25,6 +24,6 @@ final readonly class ListTasksAction
         $params = $request->getQueryParams();
         $query = new ListTasksQuery(status: \array_key_exists('status', $params) ? (string) $params['status'] : null);
 
-        return $this->responseFactory->fromTaskListResult($this->handler->handle($query));
+        return JsonResponseFactory::fromTaskListResult($this->handler->handle($query));
     }
 }

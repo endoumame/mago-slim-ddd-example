@@ -13,7 +13,6 @@ final readonly class DeleteTaskAction
 {
     public function __construct(
         private DeleteTaskHandler $handler,
-        private JsonResponseFactory $responseFactory,
     ) {}
 
     /**
@@ -21,6 +20,6 @@ final readonly class DeleteTaskAction
      */
     public function __invoke(string $id): ResponseInterface
     {
-        return $this->responseFactory->fromDeleteResult($this->handler->handle(new DeleteTaskCommand(id: $id)));
+        return JsonResponseFactory::fromDeleteResult($this->handler->handle(new DeleteTaskCommand(id: $id)));
     }
 }

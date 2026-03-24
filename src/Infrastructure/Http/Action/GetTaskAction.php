@@ -13,7 +13,6 @@ final readonly class GetTaskAction
 {
     public function __construct(
         private GetTaskHandler $handler,
-        private JsonResponseFactory $responseFactory,
     ) {}
 
     /**
@@ -21,6 +20,6 @@ final readonly class GetTaskAction
      */
     public function __invoke(string $id): ResponseInterface
     {
-        return $this->responseFactory->fromTaskResult($this->handler->handle(new GetTaskQuery(id: $id)));
+        return JsonResponseFactory::fromTaskResult($this->handler->handle(new GetTaskQuery(id: $id)));
     }
 }

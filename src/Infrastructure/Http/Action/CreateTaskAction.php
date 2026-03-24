@@ -14,7 +14,6 @@ final readonly class CreateTaskAction
 {
     public function __construct(
         private CreateTaskHandler $handler,
-        private JsonResponseFactory $responseFactory,
     ) {}
 
     /**
@@ -31,6 +30,6 @@ final readonly class CreateTaskAction
             dueDate: \array_key_exists('due_date', $body) ? (string) $body['due_date'] : null,
         );
 
-        return $this->responseFactory->fromTaskResult($this->handler->handle($command), 201);
+        return JsonResponseFactory::fromTaskResult($this->handler->handle($command), 201);
     }
 }

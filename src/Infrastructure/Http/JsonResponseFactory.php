@@ -21,7 +21,7 @@ final readonly class JsonResponseFactory
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
      */
-    public function json(array $data, int $statusCode = 200): ResponseInterface
+    public static function json(array $data, int $statusCode = 200): ResponseInterface
     {
         $response = new Response($statusCode)->withHeader('Content-Type', 'application/json');
         $response->getBody()->write(\json_encode($data, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE));
@@ -32,7 +32,7 @@ final readonly class JsonResponseFactory
     /**
      * @throws \InvalidArgumentException
      */
-    public function noContent(): ResponseInterface
+    public static function noContent(): ResponseInterface
     {
         return new Response(204)->withHeader('Content-Type', 'application/json');
     }
@@ -42,11 +42,11 @@ final readonly class JsonResponseFactory
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
      */
-    public function fromError(\Throwable $error): ResponseInterface
+    public static function fromError(\Throwable $error): ResponseInterface
     {
         [$statusCode, $type] = DomainErrorMapper::map($error);
 
-        return $this->json(['error' => ['type' => $type, 'message' => $error->getMessage()]], $statusCode);
+        return self::json(['error' => ['type' => $type, 'message' => $error->getMessage()]], $statusCode);
     }
 
     /**
@@ -54,13 +54,13 @@ final readonly class JsonResponseFactory
      *
      * @throws \Throwable
      */
-    public function fromTaskResult(Result $result, int $successCode = 200): ResponseInterface
+    public static function fromTaskResult(Result $result, int $successCode = 200): ResponseInterface
     {
         if ($result->isErr()) {
-            return $this->fromError($result->unwrapErr());
+            return self::fromError($result->unwrapErr());
         }
 
-        return $this->json(['data' => $result->unwrap()->toArray()], $successCode);
+        return self::json(['data' => $result->unwrap()->toArray()], $successCode);
     }
 
     /**
@@ -68,13 +68,13 @@ final readonly class JsonResponseFactory
      *
      * @throws \Throwable
      */
-    public function fromTaskListResult(Result $result): ResponseInterface
+    public static function fromTaskListResult(Result $result): ResponseInterface
     {
         if ($result->isErr()) {
-            return $this->fromError($result->unwrapErr());
+            return self::fromError($result->unwrapErr());
         }
 
-        return $this->json([
+        return self::json([
             'data' => \array_map(
                 /** @return array<string, mixed> */
                 static fn(Task $task): array => $task->toArray(),
@@ -88,12 +88,12 @@ final readonly class JsonResponseFactory
      *
      * @throws \Throwable
      */
-    public function fromDeleteResult(Result $result): ResponseInterface
+    public static function fromDeleteResult(Result $result): ResponseInterface
     {
         if ($result->isErr()) {
-            return $this->fromError($result->unwrapErr());
+            return self::fromError($result->unwrapErr());
         }
 
-        return $this->noContent();
+        return self::noContent();
     }
 }
