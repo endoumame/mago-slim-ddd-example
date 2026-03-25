@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\Task\Update;
 
-use App\Application\Task\Create\CreateTask;
+use App\Application\Task\Create\CreateTaskCommand;
 use App\Application\Task\Create\CreateTaskHandler;
-use App\Application\Task\Update\UpdateTask;
+use App\Application\Task\Update\UpdateTaskCommand;
 use App\Application\Task\Update\UpdateTaskHandler;
 use App\Domain\Task\Exception\InvalidTaskTitleException;
 use App\Domain\Task\Exception\TaskNotFoundException;
@@ -36,9 +36,9 @@ final class UpdateTaskHandlerTest extends TestCase
      */
     public function testUpdateTitleSucceeds(): void
     {
-        $task = $this->createHandler->handle(new CreateTask(title: 'Original'))->unwrap();
+        $task = $this->createHandler->handle(new CreateTaskCommand(title: 'Original'))->unwrap();
 
-        $result = $this->handler->handle(new UpdateTask(id: $task->id->value(), title: 'Updated'));
+        $result = $this->handler->handle(new UpdateTaskCommand(id: $task->id->value(), title: 'Updated'));
 
         static::assertSame('Updated', $result->unwrap()->title->value());
     }
@@ -48,9 +48,9 @@ final class UpdateTaskHandlerTest extends TestCase
      */
     public function testUpdateDescriptionSucceeds(): void
     {
-        $task = $this->createHandler->handle(new CreateTask(title: 'Task'))->unwrap();
+        $task = $this->createHandler->handle(new CreateTaskCommand(title: 'Task'))->unwrap();
 
-        $result = $this->handler->handle(new UpdateTask(id: $task->id->value(), description: 'New description'));
+        $result = $this->handler->handle(new UpdateTaskCommand(id: $task->id->value(), description: 'New description'));
 
         static::assertSame('New description', $result->unwrap()->description->value());
     }
@@ -60,7 +60,7 @@ final class UpdateTaskHandlerTest extends TestCase
      */
     public function testUpdateNonExistentTaskFails(): void
     {
-        $result = $this->handler->handle(new UpdateTask(id: Uuid::uuid4()->toString(), title: 'Will fail'));
+        $result = $this->handler->handle(new UpdateTaskCommand(id: Uuid::uuid4()->toString(), title: 'Will fail'));
 
         static::assertInstanceOf(TaskNotFoundException::class, $result->unwrapErr());
     }
@@ -70,9 +70,9 @@ final class UpdateTaskHandlerTest extends TestCase
      */
     public function testUpdateWithInvalidTitleFails(): void
     {
-        $task = $this->createHandler->handle(new CreateTask(title: 'Task'))->unwrap();
+        $task = $this->createHandler->handle(new CreateTaskCommand(title: 'Task'))->unwrap();
 
-        $result = $this->handler->handle(new UpdateTask(id: $task->id->value(), title: ''));
+        $result = $this->handler->handle(new UpdateTaskCommand(id: $task->id->value(), title: ''));
 
         static::assertInstanceOf(InvalidTaskTitleException::class, $result->unwrapErr());
     }
