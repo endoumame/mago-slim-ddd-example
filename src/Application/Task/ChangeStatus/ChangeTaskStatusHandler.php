@@ -28,7 +28,7 @@ final readonly class ChangeTaskStatusHandler
     /**
      * @return Result<Task, \Throwable>
      */
-    public function handle(ChangeTaskStatusCommand $command): Result
+    public function handle(ChangeTaskStatus $command): Result
     {
         /** @var Result<TaskStatus, \Throwable> */
         $status = TaskStatus::tryFrom($command->status)

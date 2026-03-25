@@ -19,7 +19,7 @@ final readonly class DeleteTaskHandler
     /**
      * @return Result<true, \Throwable>
      */
-    public function handle(DeleteTaskCommand $command): Result
+    public function handle(DeleteTask $command): Result
     {
         /** @var Result<true, \Throwable> */
         return TaskId::create($command->id)

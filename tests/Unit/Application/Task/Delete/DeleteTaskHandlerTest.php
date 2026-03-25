@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\Task\Delete;
 
-use App\Application\Task\Create\CreateTaskCommand;
+use App\Application\Task\Create\CreateTask;
 use App\Application\Task\Create\CreateTaskHandler;
-use App\Application\Task\Delete\DeleteTaskCommand;
+use App\Application\Task\Delete\DeleteTask;
 use App\Application\Task\Delete\DeleteTaskHandler;
 use App\Domain\Task\Exception\TaskNotFoundException;
 use App\Infrastructure\Persistence\InMemoryTaskRepository;
@@ -35,9 +35,9 @@ final class DeleteTaskHandlerTest extends TestCase
      */
     public function testDeleteExistingTaskSucceeds(): void
     {
-        $task = $this->createHandler->handle(new CreateTaskCommand(title: 'To delete'))->unwrap();
+        $task = $this->createHandler->handle(new CreateTask(title: 'To delete'))->unwrap();
 
-        $result = $this->handler->handle(new DeleteTaskCommand(id: $task->id->value()));
+        $result = $this->handler->handle(new DeleteTask(id: $task->id->value()));
 
         static::assertNotNull($result->unwrap());
     }
@@ -47,9 +47,9 @@ final class DeleteTaskHandlerTest extends TestCase
      */
     public function testDeletedTaskIsNoLongerFound(): void
     {
-        $task = $this->createHandler->handle(new CreateTaskCommand(title: 'To delete'))->unwrap();
+        $task = $this->createHandler->handle(new CreateTask(title: 'To delete'))->unwrap();
 
-        $this->handler->handle(new DeleteTaskCommand(id: $task->id->value()));
+        $this->handler->handle(new DeleteTask(id: $task->id->value()));
 
         $findResult = $this->repository->findById($task->id);
         static::assertInstanceOf(TaskNotFoundException::class, $findResult->unwrapErr());
@@ -60,7 +60,7 @@ final class DeleteTaskHandlerTest extends TestCase
      */
     public function testDeleteNonExistentTaskFails(): void
     {
-        $result = $this->handler->handle(new DeleteTaskCommand(id: Uuid::uuid4()->toString()));
+        $result = $this->handler->handle(new DeleteTask(id: Uuid::uuid4()->toString()));
 
         static::assertInstanceOf(TaskNotFoundException::class, $result->unwrapErr());
     }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\Task\Create;
 
-use App\Application\Task\Create\CreateTaskCommand;
+use App\Application\Task\Create\CreateTask;
 use App\Application\Task\Create\CreateTaskHandler;
 use App\Domain\Task\Exception\InvalidDueDateException;
 use App\Domain\Task\Exception\InvalidTaskTitleException;
@@ -33,7 +33,7 @@ final class CreateTaskHandlerTest extends TestCase
      */
     public function testCreateTaskSucceeds(): void
     {
-        $command = new CreateTaskCommand(title: 'Buy groceries');
+        $command = new CreateTask(title: 'Buy groceries');
 
         $result = $this->handler->handle($command);
 
@@ -51,11 +51,7 @@ final class CreateTaskHandlerTest extends TestCase
     public function testCreateTaskWithDescriptionAndDueDate(): void
     {
         $futureDate = new \DateTimeImmutable('+7 days')->format('Y-m-d');
-        $command = new CreateTaskCommand(
-            title: 'Important task',
-            description: 'This is important',
-            dueDate: $futureDate,
-        );
+        $command = new CreateTask(title: 'Important task', description: 'This is important', dueDate: $futureDate);
 
         $result = $this->handler->handle($command);
 
@@ -71,7 +67,7 @@ final class CreateTaskHandlerTest extends TestCase
      */
     public function testCreateTaskIsSavedToRepository(): void
     {
-        $command = new CreateTaskCommand(title: 'Saved task');
+        $command = new CreateTask(title: 'Saved task');
         $result = $this->handler->handle($command);
         $task = $result->unwrap();
 
@@ -84,7 +80,7 @@ final class CreateTaskHandlerTest extends TestCase
      */
     public function testCreateTaskWithEmptyTitleFails(): void
     {
-        $command = new CreateTaskCommand(title: '');
+        $command = new CreateTask(title: '');
 
         $result = $this->handler->handle($command);
 
@@ -96,7 +92,7 @@ final class CreateTaskHandlerTest extends TestCase
      */
     public function testCreateTaskWithInvalidDueDateFails(): void
     {
-        $command = new CreateTaskCommand(title: 'Valid title', dueDate: 'not-a-date');
+        $command = new CreateTask(title: 'Valid title', dueDate: 'not-a-date');
 
         $result = $this->handler->handle($command);
 

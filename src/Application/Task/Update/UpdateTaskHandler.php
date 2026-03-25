@@ -27,7 +27,7 @@ final readonly class UpdateTaskHandler
     /**
      * @return Result<Task, \Throwable>
      */
-    public function handle(UpdateTaskCommand $command): Result
+    public function handle(UpdateTask $command): Result
     {
         $id = TaskId::create($command->id);
         $title = traverse(fromValue($command->title), TaskTitle::create(...));
