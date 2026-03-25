@@ -20,7 +20,7 @@ final readonly class GetTaskHandler
     /**
      * @return Result<Task, \Throwable>
      */
-    public function handle(GetTask $query): Result
+    public function handle(GetTaskQuery $query): Result
     {
         /** @var Result<Task, \Throwable> */
         return TaskId::create($query->id) |> andThen(fn(TaskId $id): Result => $this->repository->findById($id));

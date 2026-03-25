@@ -23,7 +23,7 @@ final readonly class ListTasksHandler
     /**
      * @return Result<list<Task>, \Throwable>
      */
-    public function handle(ListTasks $query): Result
+    public function handle(ListTasksQuery $query): Result
     {
         /** @var Result<list<Task>, \Throwable> */
         return $this->repository->findAll()

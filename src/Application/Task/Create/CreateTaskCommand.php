@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Task\Create;
 
-final readonly class CreateTask
+final readonly class CreateTaskCommand
 {
     public function __construct(
         public string $title,

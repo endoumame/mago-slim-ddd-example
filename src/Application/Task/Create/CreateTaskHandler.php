@@ -28,7 +28,7 @@ final readonly class CreateTaskHandler
      *
      * @throws \Throwable
      */
-    public function handle(CreateTask $command): Result
+    public function handle(CreateTaskCommand $command): Result
     {
         $title = TaskTitle::create($command->title);
         $description = TaskDescription::create($command->description);

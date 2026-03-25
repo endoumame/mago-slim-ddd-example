@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Http\Action;
 
-use App\Application\Task\ChangeStatus\ChangeTaskStatus;
+use App\Application\Task\ChangeStatus\ChangeTaskStatusCommand;
 use App\Application\Task\ChangeStatus\ChangeTaskStatusHandler;
 use App\Infrastructure\Http\JsonResponseFactory;
 use Psr\Http\Message\ResponseInterface;
@@ -24,7 +24,7 @@ final readonly class ChangeTaskStatusAction
         /** @var array<string, mixed> */
         $body = $request->getParsedBody() ?? [];
 
-        $command = new ChangeTaskStatus(
+        $command = new ChangeTaskStatusCommand(
             id: $id,
             status: \array_key_exists('status', $body) ? (string) $body['status'] : '',
         );
