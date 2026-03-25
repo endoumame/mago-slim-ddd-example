@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Application\Task;
+namespace App\Tests\Unit\Application\Task\Get;
 
-use App\Application\Task\Command\CreateTaskCommand;
-use App\Application\Task\Handler\CreateTaskHandler;
-use App\Application\Task\Handler\GetTaskHandler;
-use App\Application\Task\Query\GetTaskQuery;
+use App\Application\Task\Create\CreateTask;
+use App\Application\Task\Create\CreateTaskHandler;
+use App\Application\Task\Get\GetTask;
+use App\Application\Task\Get\GetTaskHandler;
 use App\Domain\Task\Exception\InvalidTaskIdException;
 use App\Domain\Task\Exception\TaskNotFoundException;
 use App\Infrastructure\Persistence\InMemoryTaskRepository;
@@ -35,9 +35,9 @@ final class GetTaskHandlerTest extends TestCase
      */
     public function testGetExistingTask(): void
     {
-        $task = $this->createHandler->handle(new CreateTaskCommand(title: 'Find me'))->unwrap();
+        $task = $this->createHandler->handle(new CreateTask(title: 'Find me'))->unwrap();
 
-        $result = $this->handler->handle(new GetTaskQuery(id: $task->id->value()));
+        $result = $this->handler->handle(new GetTask(id: $task->id->value()));
 
         static::assertSame('Find me', $result->unwrap()->title->value());
     }
@@ -47,7 +47,7 @@ final class GetTaskHandlerTest extends TestCase
      */
     public function testGetNonExistentTask(): void
     {
-        $result = $this->handler->handle(new GetTaskQuery(id: Uuid::uuid4()->toString()));
+        $result = $this->handler->handle(new GetTask(id: Uuid::uuid4()->toString()));
 
         static::assertInstanceOf(TaskNotFoundException::class, $result->unwrapErr());
     }
@@ -57,7 +57,7 @@ final class GetTaskHandlerTest extends TestCase
      */
     public function testGetWithInvalidId(): void
     {
-        $result = $this->handler->handle(new GetTaskQuery(id: 'not-a-uuid'));
+        $result = $this->handler->handle(new GetTask(id: 'not-a-uuid'));
 
         static::assertInstanceOf(InvalidTaskIdException::class, $result->unwrapErr());
     }

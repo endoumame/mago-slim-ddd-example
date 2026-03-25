@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace App\Application\Task\Handler;
+namespace App\Application\Task\Update;
 
-use App\Application\Task\Command\UpdateTaskCommand;
 use App\Domain\Task\DueDate;
 use App\Domain\Task\Task;
 use App\Domain\Task\TaskDescription;
@@ -28,7 +27,7 @@ final readonly class UpdateTaskHandler
     /**
      * @return Result<Task, \Throwable>
      */
-    public function handle(UpdateTaskCommand $command): Result
+    public function handle(UpdateTask $command): Result
     {
         $id = TaskId::create($command->id);
         $title = traverse(fromValue($command->title), TaskTitle::create(...));

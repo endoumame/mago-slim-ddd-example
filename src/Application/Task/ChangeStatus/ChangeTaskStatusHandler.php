@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace App\Application\Task\Handler;
+namespace App\Application\Task\ChangeStatus;
 
-use App\Application\Task\Command\ChangeTaskStatusCommand;
 use App\Domain\Task\Exception\InvalidTaskStatusTransitionException;
 use App\Domain\Task\InProgressTask;
 use App\Domain\Task\Task;
@@ -29,7 +28,7 @@ final readonly class ChangeTaskStatusHandler
     /**
      * @return Result<Task, \Throwable>
      */
-    public function handle(ChangeTaskStatusCommand $command): Result
+    public function handle(ChangeTaskStatus $command): Result
     {
         /** @var Result<TaskStatus, \Throwable> */
         $status = TaskStatus::tryFrom($command->status)

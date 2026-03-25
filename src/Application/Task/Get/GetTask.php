@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Application\Task\Query;
+namespace App\Application\Task\Get;
 
-final readonly class GetTaskQuery
+final readonly class GetTask
 {
     public function __construct(
         public string $id,

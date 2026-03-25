@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use App\Application\Task\Handler\ChangeTaskStatusHandler;
-use App\Application\Task\Handler\CreateTaskHandler;
-use App\Application\Task\Handler\DeleteTaskHandler;
-use App\Application\Task\Handler\GetTaskHandler;
-use App\Application\Task\Handler\ListTasksHandler;
-use App\Application\Task\Handler\UpdateTaskHandler;
+use App\Application\Task\ChangeStatus\ChangeTaskStatusHandler;
+use App\Application\Task\Create\CreateTaskHandler;
+use App\Application\Task\Delete\DeleteTaskHandler;
+use App\Application\Task\Get\GetTaskHandler;
+use App\Application\Task\List\ListTasksHandler;
+use App\Application\Task\Update\UpdateTaskHandler;
 use App\Domain\Task\TaskRepositoryInterface;
 use App\Infrastructure\Http\Action\ChangeTaskStatusAction;
 use App\Infrastructure\Http\Action\CreateTaskAction;
