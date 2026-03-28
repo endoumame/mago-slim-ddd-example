@@ -22,11 +22,21 @@ final readonly class InProgressTask extends Task
         TaskId $id,
         TaskTitle $title,
         TaskDescription $description,
+        TaskPriority $priority,
         ?DueDate $dueDate,
         DateTimeImmutable $createdAt,
         DateTimeImmutable $updatedAt,
     ) {
-        parent::__construct($id, $title, $description, TaskStatus::InProgress, $dueDate, $createdAt, $updatedAt);
+        parent::__construct(
+            $id,
+            $title,
+            $description,
+            TaskStatus::InProgress,
+            $priority,
+            $dueDate,
+            $createdAt,
+            $updatedAt,
+        );
     }
 
     /**
@@ -42,6 +52,7 @@ final readonly class InProgressTask extends Task
             $this->title,
             $this->description,
             TaskStatus::Done,
+            $this->priority,
             $this->dueDate,
             $this->createdAt,
             new DateTimeImmutable(),
@@ -52,9 +63,10 @@ final readonly class InProgressTask extends Task
     protected function rebuild(
         TaskTitle $title,
         TaskDescription $description,
+        TaskPriority $priority,
         ?DueDate $dueDate,
         DateTimeImmutable $updatedAt,
     ): static {
-        return new self($this->id, $title, $description, $dueDate, $this->createdAt, $updatedAt);
+        return new self($this->id, $title, $description, $priority, $dueDate, $this->createdAt, $updatedAt);
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\Task\List;
 
 use App\Domain\Task\Task;
+use App\Domain\Task\TaskPriority;
 use App\Domain\Task\TaskRepositoryInterface;
 use App\Domain\Task\TaskStatus;
 use EndouMame\PhpMonad\Option;
@@ -43,6 +44,18 @@ final readonly class ListTasksHandler
                             )),
                             /** @return list<Task> */
                             static fn(): array => $tasks,
+                        );
+
+                    $filtered = fromValue($query->priority)
+                        ->andThen(static fn(string $p): Option => TaskPriority::tryFrom($p) |> fromValue(...))
+                        ->mapOrElse(
+                            /** @return list<Task> */
+                            static fn(TaskPriority $priority): array => \array_values(\array_filter(
+                                $filtered,
+                                static fn(Task $task): bool => $task->priority === $priority,
+                            )),
+                            /** @return list<Task> */
+                            static fn(): array => $filtered,
                         );
 
                     return ok($filtered);

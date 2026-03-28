@@ -29,6 +29,7 @@ final readonly class UpdateTaskAction
             title: \array_key_exists('title', $body) ? (string) $body['title'] : null,
             description: \array_key_exists('description', $body) ? (string) $body['description'] : null,
             dueDate: \array_key_exists('due_date', $body) ? (string) $body['due_date'] : null,
+            priority: \array_key_exists('priority', $body) ? (string) $body['priority'] : null,
         );
 
         return JsonResponseFactory::fromTaskResult($this->handler->handle($command));

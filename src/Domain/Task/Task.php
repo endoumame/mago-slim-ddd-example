@@ -31,6 +31,7 @@ abstract readonly class Task
         public TaskTitle $title,
         public TaskDescription $description,
         public TaskStatus $status,
+        public TaskPriority $priority,
         public ?DueDate $dueDate,
         public DateTimeImmutable $createdAt,
         public DateTimeImmutable $updatedAt,
@@ -45,14 +46,23 @@ abstract readonly class Task
         TaskTitle $title,
         TaskDescription $description,
         TaskStatus $status,
+        TaskPriority $priority,
         ?DueDate $dueDate,
         DateTimeImmutable $createdAt,
         DateTimeImmutable $updatedAt,
     ): self {
         return match ($status) {
-            TaskStatus::Todo => new TodoTask($id, $title, $description, $dueDate, $createdAt, $updatedAt),
-            TaskStatus::InProgress => new InProgressTask($id, $title, $description, $dueDate, $createdAt, $updatedAt),
-            TaskStatus::Done => new DoneTask($id, $title, $description, $dueDate, $createdAt, $updatedAt),
+            TaskStatus::Todo => new TodoTask($id, $title, $description, $priority, $dueDate, $createdAt, $updatedAt),
+            TaskStatus::InProgress => new InProgressTask(
+                $id,
+                $title,
+                $description,
+                $priority,
+                $dueDate,
+                $createdAt,
+                $updatedAt,
+            ),
+            TaskStatus::Done => new DoneTask($id, $title, $description, $priority, $dueDate, $createdAt, $updatedAt),
         };
     }
 
@@ -64,6 +74,7 @@ abstract readonly class Task
     abstract protected function rebuild(
         TaskTitle $title,
         TaskDescription $description,
+        TaskPriority $priority,
         ?DueDate $dueDate,
         DateTimeImmutable $updatedAt,
     ): static;
@@ -73,7 +84,13 @@ abstract readonly class Task
      */
     public function changeTitle(TaskTitle $newTitle): Result
     {
-        return ok($this->rebuild($newTitle, $this->description, $this->dueDate, new DateTimeImmutable()));
+        return ok($this->rebuild(
+            $newTitle,
+            $this->description,
+            $this->priority,
+            $this->dueDate,
+            new DateTimeImmutable(),
+        ));
     }
 
     /**
@@ -81,7 +98,13 @@ abstract readonly class Task
      */
     public function changeDescription(TaskDescription $newDescription): Result
     {
-        return ok($this->rebuild($this->title, $newDescription, $this->dueDate, new DateTimeImmutable()));
+        return ok($this->rebuild(
+            $this->title,
+            $newDescription,
+            $this->priority,
+            $this->dueDate,
+            new DateTimeImmutable(),
+        ));
     }
 
     /**
@@ -89,13 +112,33 @@ abstract readonly class Task
      */
     public function changeDueDate(?DueDate $newDueDate): Result
     {
-        return ok($this->rebuild($this->title, $this->description, $newDueDate, new DateTimeImmutable()));
+        return ok($this->rebuild(
+            $this->title,
+            $this->description,
+            $this->priority,
+            $newDueDate,
+            new DateTimeImmutable(),
+        ));
+    }
+
+    /**
+     * @return Result<static, never>
+     */
+    public function changePriority(TaskPriority $newPriority): Result
+    {
+        return ok($this->rebuild(
+            $this->title,
+            $this->description,
+            $newPriority,
+            $this->dueDate,
+            new DateTimeImmutable(),
+        ));
     }
 
     /**
      * Serialize to an associative array for API responses.
      *
-     * @return array{id: string, title: string, description: string, status: string, due_date: string|null, created_at: string, updated_at: string}
+     * @return array{id: string, title: string, description: string, status: string, priority: string, due_date: string|null, created_at: string, updated_at: string}
      */
     public function toArray(): array
     {
@@ -104,6 +147,7 @@ abstract readonly class Task
             'title' => $this->title->value(),
             'description' => $this->description->value(),
             'status' => $this->status->value,
+            'priority' => $this->priority->value,
             'due_date' => $this->dueDate?->format(),
             'created_at' => $this->createdAt->format(DateTimeImmutable::ATOM),
             'updated_at' => $this->updatedAt->format(DateTimeImmutable::ATOM),

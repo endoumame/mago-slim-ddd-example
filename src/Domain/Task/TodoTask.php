@@ -22,11 +22,12 @@ final readonly class TodoTask extends Task
         TaskId $id,
         TaskTitle $title,
         TaskDescription $description,
+        TaskPriority $priority,
         ?DueDate $dueDate,
         DateTimeImmutable $createdAt,
         DateTimeImmutable $updatedAt,
     ) {
-        parent::__construct($id, $title, $description, TaskStatus::Todo, $dueDate, $createdAt, $updatedAt);
+        parent::__construct($id, $title, $description, TaskStatus::Todo, $priority, $dueDate, $createdAt, $updatedAt);
     }
 
     /**
@@ -34,8 +35,12 @@ final readonly class TodoTask extends Task
      *
      * @return Result<self, never>
      */
-    public static function create(TaskTitle $title, TaskDescription $description, ?DueDate $dueDate = null): Result
-    {
+    public static function create(
+        TaskTitle $title,
+        TaskDescription $description,
+        ?DueDate $dueDate = null,
+        TaskPriority $priority = TaskPriority::Medium,
+    ): Result {
         $now = new DateTimeImmutable();
 
         return ok(
@@ -43,6 +48,7 @@ final readonly class TodoTask extends Task
                 id: TaskId::generate(),
                 title: $title,
                 description: $description,
+                priority: $priority,
                 dueDate: $dueDate,
                 createdAt: $now,
                 updatedAt: $now,
@@ -63,6 +69,7 @@ final readonly class TodoTask extends Task
             $this->title,
             $this->description,
             TaskStatus::InProgress,
+            $this->priority,
             $this->dueDate,
             $this->createdAt,
             new DateTimeImmutable(),
@@ -73,9 +80,10 @@ final readonly class TodoTask extends Task
     protected function rebuild(
         TaskTitle $title,
         TaskDescription $description,
+        TaskPriority $priority,
         ?DueDate $dueDate,
         DateTimeImmutable $updatedAt,
     ): static {
-        return new self($this->id, $title, $description, $dueDate, $this->createdAt, $updatedAt);
+        return new self($this->id, $title, $description, $priority, $dueDate, $this->createdAt, $updatedAt);
     }
 }

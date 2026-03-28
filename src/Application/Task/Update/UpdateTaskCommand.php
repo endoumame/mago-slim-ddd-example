@@ -11,5 +11,6 @@ final readonly class UpdateTaskCommand
         public ?string $title = null,
         public ?string $description = null,
         public ?string $dueDate = null,
+        public ?string $priority = null,
     ) {}
 }
