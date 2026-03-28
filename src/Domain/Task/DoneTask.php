@@ -22,20 +22,22 @@ final readonly class DoneTask extends Task
         TaskId $id,
         TaskTitle $title,
         TaskDescription $description,
+        TaskPriority $priority,
         ?DueDate $dueDate,
         DateTimeImmutable $createdAt,
         DateTimeImmutable $updatedAt,
     ) {
-        parent::__construct($id, $title, $description, TaskStatus::Done, $dueDate, $createdAt, $updatedAt);
+        parent::__construct($id, $title, $description, TaskStatus::Done, $priority, $dueDate, $createdAt, $updatedAt);
     }
 
     #[Override]
     protected function rebuild(
         TaskTitle $title,
         TaskDescription $description,
+        TaskPriority $priority,
         ?DueDate $dueDate,
         DateTimeImmutable $updatedAt,
     ): static {
-        return new self($this->id, $title, $description, $dueDate, $this->createdAt, $updatedAt);
+        return new self($this->id, $title, $description, $priority, $dueDate, $this->createdAt, $updatedAt);
     }
 }

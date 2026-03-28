@@ -70,4 +70,18 @@ final class ListTasksHandlerTest extends TestCase
         static::assertCount(1, $result->unwrap());
         static::assertSame('Task 1', $result->unwrap()[0]->title->value());
     }
+
+    /**
+     * @throws \Throwable
+     */
+    public function testListFilteredByPriority(): void
+    {
+        $this->createHandler->handle(new CreateTaskCommand(title: 'High task', priority: 'high'));
+        $this->createHandler->handle(new CreateTaskCommand(title: 'Low task', priority: 'low'));
+        $this->createHandler->handle(new CreateTaskCommand(title: 'Another high', priority: 'high'));
+
+        $result = $this->handler->handle(new ListTasksQuery(priority: 'high'));
+
+        static::assertCount(2, $result->unwrap());
+    }
 }

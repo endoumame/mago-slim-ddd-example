@@ -10,6 +10,7 @@ use App\Application\Task\Update\UpdateTaskCommand;
 use App\Application\Task\Update\UpdateTaskHandler;
 use App\Domain\Task\Exception\InvalidTaskTitleException;
 use App\Domain\Task\Exception\TaskNotFoundException;
+use App\Domain\Task\TaskPriority;
 use App\Infrastructure\Persistence\InMemoryTaskRepository;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
@@ -75,5 +76,29 @@ final class UpdateTaskHandlerTest extends TestCase
         $result = $this->handler->handle(new UpdateTaskCommand(id: $task->id->value(), title: ''));
 
         static::assertInstanceOf(InvalidTaskTitleException::class, $result->unwrapErr());
+    }
+
+    /**
+     * @throws \Throwable
+     */
+    public function testUpdatePrioritySucceeds(): void
+    {
+        $task = $this->createHandler->handle(new CreateTaskCommand(title: 'Task'))->unwrap();
+
+        $result = $this->handler->handle(new UpdateTaskCommand(id: $task->id->value(), priority: 'high'));
+
+        static::assertSame(TaskPriority::High, $result->unwrap()->priority);
+    }
+
+    /**
+     * @throws \Throwable
+     */
+    public function testUpdateWithoutPriorityPreservesExisting(): void
+    {
+        $task = $this->createHandler->handle(new CreateTaskCommand(title: 'Task', priority: 'low'))->unwrap();
+
+        $result = $this->handler->handle(new UpdateTaskCommand(id: $task->id->value(), title: 'Updated'));
+
+        static::assertSame(TaskPriority::Low, $result->unwrap()->priority);
     }
 }

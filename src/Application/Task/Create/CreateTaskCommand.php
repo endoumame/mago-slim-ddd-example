@@ -10,5 +10,6 @@ final readonly class CreateTaskCommand
         public string $title,
         public string $description = '',
         public ?string $dueDate = null,
+        public ?string $priority = null,
     ) {}
 }

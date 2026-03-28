@@ -8,6 +8,7 @@ use App\Domain\Task\DueDate;
 use App\Domain\Task\Task;
 use App\Domain\Task\TaskDescription;
 use App\Domain\Task\TaskId;
+use App\Domain\Task\TaskPriority;
 use App\Domain\Task\TaskRepositoryInterface;
 use App\Domain\Task\TaskTitle;
 use EndouMame\PhpMonad\Result;
@@ -33,13 +34,21 @@ final readonly class UpdateTaskHandler
         $title = traverse(fromValue($command->title), TaskTitle::create(...));
         $description = traverse(fromValue($command->description), TaskDescription::create(...));
         $dueDate = traverse(fromValue($command->dueDate), DueDate::create(...));
+        $priority = fromValue($command->priority)
+            ->andThen(static fn(string $p): \EndouMame\PhpMonad\Option => fromValue(TaskPriority::tryFrom($p)));
 
         /** @var Result<Task, \Throwable> */
         return flat_map_all(
             fn(TaskId $taskId, ?TaskTitle $t, ?TaskDescription $d, ?DueDate $dd): Result => $this->repository->findById(
                 $taskId,
             )
-                |> andThen(fn(Task $task): Result => $this->applyChanges($task, $t, $d, $dd)),
+                |> andThen(fn(Task $task): Result => $this->applyChanges(
+                    $task,
+                    $t,
+                    $d,
+                    $dd,
+                    $priority->unwrapOr(null),
+                )),
             $id,
             $title,
             $description,
@@ -55,6 +64,7 @@ final readonly class UpdateTaskHandler
         ?TaskTitle $newTitle,
         ?TaskDescription $newDescription,
         ?DueDate $newDueDate,
+        ?TaskPriority $newPriority,
     ): Result {
         /** @var Result<Task, \Throwable> $result */
         $result = ok($task);
@@ -69,6 +79,10 @@ final readonly class UpdateTaskHandler
 
         if ($newDueDate !== null) {
             $result = $result |> andThen(static fn(Task $t): Result => $t->changeDueDate($newDueDate));
+        }
+
+        if ($newPriority !== null) {
+            $result = $result |> andThen(static fn(Task $t): Result => $t->changePriority($newPriority));
         }
 
         /** @var Result<Task, \Throwable> */

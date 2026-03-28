@@ -7,6 +7,7 @@ namespace App\Application\Task\Create;
 use App\Domain\Task\DueDate;
 use App\Domain\Task\Task;
 use App\Domain\Task\TaskDescription;
+use App\Domain\Task\TaskPriority;
 use App\Domain\Task\TaskRepositoryInterface;
 use App\Domain\Task\TaskTitle;
 use App\Domain\Task\TodoTask;
@@ -33,9 +34,24 @@ final readonly class CreateTaskHandler
         $title = TaskTitle::create($command->title);
         $description = TaskDescription::create($command->description);
         $dueDate = traverse(fromValue($command->dueDate), DueDate::create(...));
+        $priority = fromValue($command->priority)
+            ->mapOrElse(
+                static fn(string $p): TaskPriority => TaskPriority::tryFrom($p) ?? TaskPriority::Medium,
+                static fn(): TaskPriority => TaskPriority::Medium,
+            );
 
         /** @var Result<Task, \Throwable> */
-        return flat_map_all(TodoTask::create(...), $title, $description, $dueDate)
+        return flat_map_all(
+            static fn(TaskTitle $t, TaskDescription $d, ?DueDate $dd): Result => TodoTask::create(
+                $t,
+                $d,
+                $dd,
+                $priority,
+            ),
+            $title,
+            $description,
+            $dueDate,
+        )
             |> andThen(fn(Task $task): Result => $this->repository->save($task));
     }
 }

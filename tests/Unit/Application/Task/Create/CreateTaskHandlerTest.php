@@ -8,6 +8,7 @@ use App\Application\Task\Create\CreateTaskCommand;
 use App\Application\Task\Create\CreateTaskHandler;
 use App\Domain\Task\Exception\InvalidDueDateException;
 use App\Domain\Task\Exception\InvalidTaskTitleException;
+use App\Domain\Task\TaskPriority;
 use App\Domain\Task\TaskStatus;
 use App\Domain\Task\TodoTask;
 use App\Infrastructure\Persistence\InMemoryTaskRepository;
@@ -101,5 +102,41 @@ final class CreateTaskHandlerTest extends TestCase
         $result = $this->handler->handle($command);
 
         static::assertInstanceOf(InvalidDueDateException::class, $result->unwrapErr());
+    }
+
+    /**
+     * @throws \Throwable
+     */
+    public function testCreateTaskWithDefaultPriority(): void
+    {
+        $command = new CreateTaskCommand(title: 'Default priority');
+
+        $result = $this->handler->handle($command);
+
+        static::assertSame(TaskPriority::Medium, $result->unwrap()->priority);
+    }
+
+    /**
+     * @throws \Throwable
+     */
+    public function testCreateTaskWithHighPriority(): void
+    {
+        $command = new CreateTaskCommand(title: 'Urgent', priority: 'high');
+
+        $result = $this->handler->handle($command);
+
+        static::assertSame(TaskPriority::High, $result->unwrap()->priority);
+    }
+
+    /**
+     * @throws \Throwable
+     */
+    public function testCreateTaskWithInvalidPriorityFallsBackToMedium(): void
+    {
+        $command = new CreateTaskCommand(title: 'Bad priority', priority: 'invalid');
+
+        $result = $this->handler->handle($command);
+
+        static::assertSame(TaskPriority::Medium, $result->unwrap()->priority);
     }
 }
