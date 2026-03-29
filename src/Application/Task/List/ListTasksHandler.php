@@ -7,7 +7,10 @@ namespace App\Application\Task\List;
 use App\Domain\Task\Task;
 use App\Domain\Task\TaskPriority;
 use App\Domain\Task\TaskRepositoryInterface;
+use App\Domain\Task\TaskSortDirection;
+use App\Domain\Task\TaskSortField;
 use App\Domain\Task\TaskStatus;
+use DateTimeImmutable;
 use EndouMame\PhpMonad\Option;
 use EndouMame\PhpMonad\Result;
 
@@ -57,6 +60,21 @@ final readonly class ListTasksHandler
                             /** @return list<Task> */
                             static fn(): array => $filtered,
                         );
+
+                    if ($query->overdue !== null) {
+                        $now = new DateTimeImmutable('today');
+                        $wantOverdue = $query->overdue;
+                        $filtered = \array_values(\array_filter(
+                            $filtered,
+                            static fn(Task $task): bool => $task->isOverdue($now) === $wantOverdue,
+                        ));
+                    }
+
+                    $sortField = $query->sortBy !== null ? TaskSortField::tryFrom($query->sortBy) : null;
+                    if ($sortField !== null) {
+                        $direction = TaskSortDirection::tryFrom($query->sortDirection ?? '') ?? TaskSortDirection::Asc;
+                        $filtered = TaskSorter::sort($filtered, $sortField, $direction);
+                    }
 
                     return ok($filtered);
                 },

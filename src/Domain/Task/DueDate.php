@@ -44,6 +44,26 @@ final readonly class DueDate
         return ok(new self($parsed));
     }
 
+    /**
+     * Reconstitute a DueDate from persistence. Skips the "not in the past" validation
+     * because persisted tasks may already have past due dates.
+     */
+    public static function reconstitute(string $value): self
+    {
+        $parsed = DateTimeImmutable::createFromFormat('Y-m-d', $value);
+        \assert($parsed !== false, "Invalid date format during reconstitution: {$value}");
+
+        return new self($parsed);
+    }
+
+    /**
+     * Returns true if this due date is strictly before the reference date (compared at day granularity).
+     */
+    public function isOverdue(DateTimeImmutable $referenceDate): bool
+    {
+        return $this->value->format('Y-m-d') < $referenceDate->format('Y-m-d');
+    }
+
     public function value(): DateTimeImmutable
     {
         return $this->value;

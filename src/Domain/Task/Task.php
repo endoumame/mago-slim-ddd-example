@@ -136,9 +136,26 @@ abstract readonly class Task
     }
 
     /**
+     * Returns true if the task has a due date that is strictly before the given reference date
+     * and the task is not yet completed.
+     */
+    public function isOverdue(DateTimeImmutable $referenceDate): bool
+    {
+        if ($this->dueDate === null) {
+            return false;
+        }
+
+        if ($this->status === TaskStatus::Done) {
+            return false;
+        }
+
+        return $this->dueDate->isOverdue($referenceDate);
+    }
+
+    /**
      * Serialize to an associative array for API responses.
      *
-     * @return array{id: string, title: string, description: string, status: string, priority: string, due_date: string|null, created_at: string, updated_at: string}
+     * @return array{id: string, title: string, description: string, status: string, priority: string, due_date: string|null, is_overdue: bool, created_at: string, updated_at: string}
      */
     public function toArray(): array
     {
@@ -149,6 +166,7 @@ abstract readonly class Task
             'status' => $this->status->value,
             'priority' => $this->priority->value,
             'due_date' => $this->dueDate?->format(),
+            'is_overdue' => $this->isOverdue(new DateTimeImmutable('today')),
             'created_at' => $this->createdAt->format(DateTimeImmutable::ATOM),
             'updated_at' => $this->updatedAt->format(DateTimeImmutable::ATOM),
         ];
