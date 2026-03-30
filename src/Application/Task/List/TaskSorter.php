@@ -20,32 +20,10 @@ final class TaskSorter
 
         \usort($tasks, static fn(Task $a, Task $b): int => match ($field) {
             TaskSortField::Priority => ($a->priority->weight() - $b->priority->weight()) * $multiplier,
-            TaskSortField::DueDate => self::compareDueDate($a, $b, $multiplier),
+            TaskSortField::DueDate => NullLastDueDateCompare::compare($a->dueDate, $b->dueDate, $multiplier),
             TaskSortField::CreatedAt => ($a->createdAt <=> $b->createdAt) * $multiplier,
         });
 
         return $tasks;
-    }
-
-    /**
-     * Compare two tasks by due date. Null due dates always sort last regardless of direction.
-     * The multiplier is only applied to the comparison of non-null dates.
-     */
-    private static function compareDueDate(Task $a, Task $b, int $multiplier): int
-    {
-        $aDate = $a->dueDate;
-        $bDate = $b->dueDate;
-
-        if ($aDate === null && $bDate === null) {
-            return 0;
-        }
-        if ($aDate === null) {
-            return 1;
-        }
-        if ($bDate === null) {
-            return -1;
-        }
-
-        return ($aDate->value() <=> $bDate->value()) * $multiplier;
     }
 }

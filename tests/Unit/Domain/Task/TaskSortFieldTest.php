@@ -9,6 +9,9 @@ use PHPUnit\Framework\TestCase;
 
 final class TaskSortFieldTest extends TestCase
 {
+    /**
+     * @throws \Throwable
+     */
     public function testTryFromWithValidValues(): void
     {
         static::assertSame(TaskSortField::Priority, TaskSortField::tryFrom('priority'));
@@ -16,6 +19,9 @@ final class TaskSortFieldTest extends TestCase
         static::assertSame(TaskSortField::CreatedAt, TaskSortField::tryFrom('created_at'));
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function testTryFromWithInvalidValueReturnsNull(): void
     {
         static::assertNull(TaskSortField::tryFrom('invalid'));
