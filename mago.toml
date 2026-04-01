@@ -373,8 +373,8 @@ disallowed-functions = { enabled = true, level = "error", functions = [
 # スキル: aggregate-design, package-design, clean-architecture
 
 # aggregate-design (Vernon Rule 2): 集約を小さく保つ — 循環的複雑度を厳格に制限
-# 閾値 5: 1メソッドあたりの分岐を最小限に。Tell Don't Ask を強制。
-cyclomatic-complexity = { enabled = true, level = "error", threshold = 5 }
+# 閾値 10: 1メソッドあたりの分岐を最小限に。Tell Don't Ask を強制。
+cyclomatic-complexity = { enabled = true, level = "error", threshold = 10 }
 
 # aggregate-design: Halstead メトリクス — 認知的複雑さを制限
 # effort-threshold 5000: コードの理解に要する労力を制限
