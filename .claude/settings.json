@@ -52,6 +52,7 @@
       "WebSearch"
     ],
     "deny": [
+      "Bash(bash -c:*)",
       "Bash(git commit --no-verify*)"
     ],
     "ask": [
@@ -117,16 +118,6 @@
         ]
       }
     ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/stop-quality-check.sh"
-          }
-        ]
-      }
-    ],
     "UserPromptSubmit": [
       {
         "hooks": [
@@ -142,9 +133,11 @@
     "context7@claude-plugins-official": true,
     "code-review@claude-plugins-official": true,
     "commit-commands@claude-plugins-official": true,
-    "pr-review-toolkit@claude-plugins-official": true
+    "pr-review-toolkit@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true
   },
   "outputStyle": "Explanatory",
+  "language": "japanese",
   "sandbox": {
     "enabled": true,
     "autoAllowBashIfSandboxed": true
